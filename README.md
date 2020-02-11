@@ -13,3 +13,5 @@ I recognize this may well be obnoxious to ensure code compliance, it
 Stele uses namespace packaging for the distribution packages (distros). This
   requires python 3.3+, which the setup file will check for. If any issues are
   encountered, this fact may be worth noting. It helped me at least.
+
+All distros go within the src directory, with test code going within test.
