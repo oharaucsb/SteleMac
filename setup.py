@@ -33,14 +33,17 @@ setup(
     # packages required to run the setup script itself
     dependency_links=[],
     # URLS to be searched for setup_requires dependencies
-    install_requires=[],
+    install_requires=[
+        "numpy",
+        "matplotlib"
+        ],
     # packages required for the package to function
 
     # ***distribution metadata***
     url='https://github.com/C-S-Cannon/Stele',
     author='Cameron Cannon',
     author_email='c_cannon@ucsb.edu',
-    license='GNU General Public',
+    license='GPL-3.0',
     description="Monolithic python distribution to eventually house ITST code."
 )
 
