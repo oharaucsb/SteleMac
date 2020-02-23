@@ -1,16 +1,178 @@
-from . import hsg
 import numpy as np
+import os
+import hsganalysis as hsg
+from hsganalysis.jones import JonesVector as JV
 
-"""
-Functions and objects to be included here are
-qwp.expFanCompiler
-    qwp.expFanCompiler.addSet
-    qwp.expFanCompiler.build
-    qwp.expFanCompiler.buildAndSave
-    qwp.expFanCompiler.FanCompiler
-qwp.extractMatrices.findJ
-qwp.extractMatrices.saveT
-"""
+class FanCompilerWithoutStokes(object):
+    """
+    Helper class for compiling the data of a polarimetry NIR alpha sweep
+
+    Note: I'm not sure why you would want to use this class anymore. It should be
+    deprecated and the standard FanCompiler should be sufficient for all needs (and
+    better maintained)
+
+    Typical use scenario:
+
+    datasets = [ ... list of folders, each being a dataset of different NIR alphas ...]
+    outputs = FanComilier(<whatever sideband orders you want compiled>)
+    for data in datasets:
+        laserParams, rawData = hsg.hsg_combine_qwp_sweep(folder, save=False, verbose=False)
+        _, fitDict = hsg.proc_n_fit_qwp_data(rawData, laserParams, vertAnaDir="VAna" in folder,
+                                        series=folder)
+        outputs.addSet(nira, fitDict)
+    outputs.buildAndSave(fname)
+
+    """
+    def __init__(self, wantedSBs, keepErrors = False, negateNIR = True):
+        """
+
+        :param wantedSBs:
+        :param keepErrors:
+        :param negateNIR: flag for whether to negate the NIR alpha value. Currently,
+        this is done because the PAX views -z direction, while home-built views +z (
+        with NIR)
+        """
+        self.want = np.array(wantedSBs)
+        self.arrA = wantedSBs.reshape(-1, 1) # so I can stack in the opposite direction
+        self.arrG = wantedSBs.reshape(-1, 1)  # so I can stack in the opposite direction
+        self.arrS = wantedSBs.reshape(-1, 1)  # so I can stack in the opposite direction
+        self.nirAlphas = []
+        self.nirGammas = []
+        self._e = keepErrors
+        self._n = 1
+        if negateNIR:
+            print("WARNING: NEGATING NIR ALPHA")
+            self._n = -1
+
+
+
+    @staticmethod
+    def fromDataFolder(folder, wantedSBs, keepErrors = False, negateNIR = True):
+        """
+        Create a fan compiler by passing the data path. Handles looping through the
+        folder's sub-folders to find
+        :param folder: The folder to search through. Alternatively, if it's a
+        list/iterable, iterate through that instead. Useful if external code is
+        directly removing sets of data.
+        :return:
+        """
+        comp = FanCompiler(wantedSBs, keepErrors, negateNIR)
+        # If it's a string, assume it's a single path that wants to be searached
+        if isinstance(folder, str):
+            wantFolders = hsg.natural_glob(folder, "*")
+        else:
+            # Otherwise, assume they've passed an iterable to search through
+            wantFolders = folder
+
+
+        for nirFolder in wantFolders:
+            if "skip" in nirFolder.lower(): continue
+            laserParams, rawData = hsg.hsg_combine_qwp_sweep(nirFolder, save=False,
+                                                             verbose=False,
+                                                             loadNorm=False)
+
+            _, fitDict = hsg.proc_n_fit_qwp_data(rawData, laserParams,
+                                                 vertAnaDir="VAna" in nirFolder,
+                                                 series=nirFolder)
+            comp.addSet(fitDict)
+        return comp
+
+    def addSet(self, dataSet):
+        """ Assume it's passed from  proc_n_fit_qwp_data"""
+        newAData = []
+        newGData = []
+        newSData = []
+        alphaSet = dataSet["alpha"]
+        gammaSet = dataSet["gamma"]
+        s0Set = dataSet["S0"]
+
+        # nirAlpha = dataSet["alpha"][0][1]
+        # nirGamma = dataSet["gamma"][0][1]
+        if self._e:
+            # Need to double to account for
+            nirAlpha = [self._n*dataSet["alpha"][0][1], dataSet["alpha"][0][2]]
+            nirGamma = [dataSet["gamma"][0][1], dataSet["gamma"][0][2]]
+            for sb in self.want:
+                # the list(*[]) bullshit is to make sure a list gets appended,
+                # not a numpy array. Further complicated because if the list
+                # comprehension returns nothing, it doesn't append anything,
+                # hence casting to a list.
+                newAData.append(list(*[ii[1:] for ii in alphaSet if ii[0] == sb]))
+                newGData.append(list(*[ii[1:] for ii in gammaSet if ii[0] == sb]))
+                newSData.append(list(*[ii[1:] for ii in s0Set if ii[0] == sb]))
+                if not newAData[-1]: # no data was found.
+                    newAData[-1] = [np.nan, np.nan]
+                    newGData[-1] = [np.nan, np.nan]
+                    newSData[-1] = [np.nan, np.nan]
+        else:
+            nirAlpha = [self._n*dataSet["alpha"][0][1]]
+            nirGamma = [dataSet["gamma"][0][1]]
+            for sb in self.want:
+                newAData.append([ii[1] for ii in alphaSet if ii[0] == sb])
+                newGData.append([ii[1] for ii in gammaSet if ii[0] == sb])
+                newSData.append([ii[1] for ii in s0Set if ii[0] == sb])
+                if not newAData[-1]: # no data was found.
+                    newAData[-1] = [np.nan]
+                    newGData[-1] = [np.nan]
+                    newSData[-1] = [np.nan]
+
+        try:
+            self.arrA = np.column_stack((self.arrA, newAData))
+            self.arrG = np.column_stack((self.arrG, newGData))
+            self.arrS = np.column_stack((self.arrS, newSData))
+        except:
+            print(self.arrA.shape)
+            print(np.array(newAData).shape)
+            raise
+
+        # extending created lists accounts for keeping errors r not
+        self.nirAlphas.extend(nirAlpha)
+        self.nirGammas.extend(nirGamma)
+
+    def build(self):
+        fullDataA = np.append([-1], self.nirAlphas)
+        fullDataA = np.row_stack((fullDataA, self.arrA))
+
+        fullDataG = np.append([-1], self.nirGammas)
+        fullDataG = np.row_stack((fullDataG, self.arrG))
+
+        fullDataS = np.append([-1], self.nirAlphas)
+        fullDataS = np.row_stack((fullDataS, self.arrS))
+
+        return fullDataA, fullDataG, fullDataS
+
+    def buildAndSave(self, fname, *args):
+        """
+        fname: filename to save to. Must have a least one string formatter position
+        to allow for saving separate alpha/gamma/s0 files. *args are passed to any
+        other formatting positions.
+        :param fname:
+        :param args:
+        :return:
+        """
+
+        if not os.path.exists(os.path.dirname(fname)):
+            os.mkdir(os.path.dirname(fname))
+
+        oh = "#\n" * 100
+        oh += "\n\n"
+
+        fullDataA, fullDataG, fullDataS = self.build()
+
+        # fullData = np.append([-1], self.nirAlphas)
+        # fullData = np.row_stack((fullData, self.arrA))
+        np.savetxt(fname.format("alpha", *args), fullDataA, header=oh, delimiter=',',
+                   comments='')
+
+        # fullData = np.append([-1], self.nirAlphas)
+        # fullData = np.row_stack((fullData, self.arrG))
+        np.savetxt(fname.format("gamma", *args), fullDataG, header=oh, delimiter=',',
+                   comments='')
+
+        # fullData = np.append([-1], self.nirAlphas)
+        # fullData = np.row_stack((fullData, self.arrS))
+        np.savetxt(fname.format("S0", *args), fullDataS, header=oh, delimiter=',',
+                   comments='')
 
 class FanCompiler(object):
     """
@@ -258,149 +420,62 @@ class FanCompiler(object):
         # np.savetxt(fname.format("S0", *args), fullDataS, header=oh, delimiter=',',
         #            comments='')
 
-def findJ(alphas, gammas=None, **kwargs):
+class SbStateGetter(object):
     """
-    Extract the Jones matrix (x/y basis) from given data.
-    alphas/gammas should be the matrices saved from the FanCompiler, of form:
+    sister function to FanCompiler. Useful for taking the arrays out of a FanCompiler
+    allowing indexing based on sb number and nir alpha angles.
 
-    arb     | niralpha1 | niralpha2 | niralpha3 | niralpha4 | ...
-    1st sb  | 1sb alpha | 1sb alpha |     .
-    2nd sb  | 2sb alpha | 2sb alpha |     .
-    3rd sb  | 3sb alpha | 3sb alpha |     .
-      .
-      .
-      .
+    Example creation:
+    fc = FanCompiler(wantSBs)
+    // initialize fc
 
-    Assumes both alphas/gammas are the same shape
+    getter = SbStateGetter(
+        fc.arrA[:, 1:],
+        fc.arrG[:, 1:],
+        fc.want,
+        fc.nirAlphas
+    )
+    """
+    def __init__(self, alphas, gammas, sbNum, niralphas):
+        self.alphas = alphas
+        self.gammas = gammas
+        self.sbNum = sbNum
+        self.niralphas = niralphas
 
-    kwarg options:
-       returnFlat-- return a flattened (Nx9) Jones matrix, of form
-         [[sb#, Re(Jxx), Re(Jxy), Re(Jyx), Re(Jyy), Im(Jxx), Im(Jxy), Im(Jyx), Im(Jyy)],
-          [  .. ]
-          ]
-        useful for saving to file.
-        If false, return an 2x2xN,
-          [[[Jxx, Jxy],
-            [Jyx, Jyy]],
-            [[ .. ]]
-          ]
-        useful for continuing into processing (and JonesVector maths).
+        self.invS = {kk: ii for ii, kk in enumerate(sbNum)}
 
-        NOTE: You probably shouldn't use the "Return Flat" argument for saving.
-        Instead, get the J matrix back and use saveT() to avoid accidentally
-        introducing errors from difference in the order of the columns of the flattened
-        matrix in this function vs saveT/loadT
+        self.invA = {kk: ii for ii, kk in enumerate(niralphas)}
 
-    You can also just pass a FanCompiler object and it'll pull the alpha/gamma from
-    that.
+    def getSBState(self, sb, nirA):
+        alpha = self.alphas[self.invS[sb], self.invA[nirA]]
+        gamma = self.gammas[self.invS[sb], self.invA[nirA]]
 
+        return alpha, gamma
+
+    def __call__(self, sb, nirA):
+        return self.getSBState(sb, nirA)
+
+    def getStateDict(self, sb, nirA):
+        a, g = self.getSBState(sb, nirA)
+        return {"alpha": a, "gamma": g}
+
+def jonesToFans(sbs, J, wantNIR = np.arange(-90, 90, 5)):
+    """
+    Take a Jones matrix as an Nx2x2. Returns alpha and gamma matrices similar to
+    those produced by FanCompiler.build(), which can be passed directly to a the
+    FanDiagram constructor
+    :param J:
     :return:
     """
-
-    defaults = {
-        "returnFlat": False
-    }
-    defaults.update(kwargs)
-
-    if gammas is None and isinstance(alphas, FanCompiler):
-        alphas, gammas, _ = alphas.build(withErrors=False)
-
-    sbs = alphas[1:,0]
-    nirAlphas = alphas[0, 1:]
-    nirGammas = gammas[0, 1:]
-    # This SbStateGetter makes it more convenient to get the alpha and gamma
-    # angles for a specific sideband and NIR alpha
-    sbGetter = SbStateGetter(alphas[1:, 1:], gammas[1:, 1:], sbs, nirAlphas)
-
-    ## Initialize the matrices
-    outputFlatJMatrix = np.empty((len(sbs),9))
-    outputJMatrix = np.empty((2, 2, len(sbs)), dtype=complex)
-
-    # There's one J matrix for each sideband order, so naturally have to iterate over
-    # each sideband
-    for idx, sb in enumerate(sbs):
-        # Get the list of alpha and gamma angles for each of the NIR Alphas used
-        als, gms = zip(*[sbGetter(sb, ii) for ii in nirAlphas])
-        # Check to make sure all of the data is reasonable (not nan, meaning the sideband
-        # wasn't observed for all NIRalpha, or infinite when the fits fucked up)
-        # Leaving these in causes issues for the minimizer, so they have to be skipped
-        if not any(np.isfinite(als)) or not any(np.isfinite(gms)):
-            # Do some python magic so I can still use p.x further and not have to
-            # wrap everything in a try/except
-            p = type("_", (object, ), {"x": np.array([np.nan]*3 + [0]*3)})
-        else:
-            sbJones = JV(alpha=als, gamma=gms)
-            nirJones = JV(alpha=nirAlphas, gamma=nirGammas)
-            # Note: We current'y don't do error propagation at this step
-            costfunc = lambda jmatrix: np.linalg.norm(solver([nirJones, sbJones], jmatrix))
-
-            p = minimize(costfunc, x0=np.ones(6))
-        J = unflattenJ(p.x)
-        outputJMatrix[..., idx] = J
-
-        outputFlatJMatrix[idx] = np.array([sb, 1] # Re(Jxx) === 1
-                                          + p.x[:3].tolist() # Re(Jxy-Jyy)
-                                          + [0]  # Im(Jxx) === 0
-                                          + p.x[3:].tolist() # Im(Jxy-Jyy)
-                                          )
-
-    if defaults["returnFlat"]: return outputFlatJMatrix
-    return outputJMatrix
+    vec = JV(alpha=wantNIR, gamma=0)
+    vec.apply_transformation(J)
 
 
-def saveT(T, sbs, out):
-    """
-    Save a complex T matrix, input as an Nx2x2, into a text file. Dumps it as a CSV
-    where the first four columns are the real components, the last four are imaginary
-    :param T:
-    :param out:
-    :return:
-    """
-    T = np.array(T.transpose(2, 0, 1))
+    alphas = np.column_stack((sbs, vec.alpha))
+    alphas = np.row_stack(([-1] + wantNIR.tolist(), alphas ))
 
-    ## I'm nervous of trusting how numpy handles .view() on complex types. I feel like
-    # I've seen it swap orders or something, where I've had to change the loadT function
-    # to compensate. I guess when in doubt, process data from scratch, save it and
-    # reload it and make sure the memory and disk matrices agree.
-
-    # 01/04/19 No, fuck this. I don't trust view at all. I'm looking at two different
-    # T matrices, and in one instance this gets reordered as
-    #     ReT++,ReT+-,ReT-+,ReT--,ImT++,ImT+-,ImT-+,ImT--
-    # while in another, it does it as
-    #     ReT++,ImT++,ReT+-,ImT+-,ReT-+,ImT-+,ReT--,ImT--
-    #
-    # I have no fucking clue why it does it that way, but I'm sick and fucking tired of it
-    # So no more
-    #
-    # flatT = T.reshape(-1, 4).view(float).reshape(-1, 8)
-
-    flatT = T.reshape(-1, 4)
-    flatT = np.column_stack((flatT.real, flatT.imag))
-
-    # I'm also going to complicate this, because I want to save it like qile's matlab
-    # code save his files, so that we can use the same loading.
-    # As of 12/19/18, I believe the above code should be ordering columns as,
-
-    ###   0    1     2     3      4     5    6     7
-    ### ReT++,ReT+-,ReT-+,ReT--,ImT++,ImT+-,ImT-+,ImT--
-
-    # Qile saves as
-    ###   0    1     2     3      4     5    6     7
-    ### ReT--,ImT--,ReT+-,ImT+-,ReT-+,ImT-+,ReT++,ImT++
-
-    reorder = [ 3, 7, 1, 5, 2, 6, 0, 4 ]
-
-    flatT = flatT[:, reorder]
+    gammas = alphas.copy()
+    gammas[1:, 1:] = vec.gamma
 
 
-
-    flatT = np.column_stack((sbs, flatT))
-
-    header = "SB,ReT++,ImT++,ReT+-,ImT+-,ReT-+,ImT-+,ReT--,ImT--"
-    header = "SB,ReT++,ReT+-,ReT-+,ReT--,Im++,Im+-,Im-+,Im--"
-
-    header = "SB,ReT--,ImT--,ReT+-,ImT+-,ReT-+,ImT-+,ReT++,ImT++"
-    np.savetxt(out,
-               flatT, header=header, comments='', delimiter=',',
-               fmt="%.6f")
-    print("saved {}\n".format(out))
+    return alphas, gammas
