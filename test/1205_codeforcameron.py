@@ -1,7 +1,7 @@
 # import hsganalysis.ipg as pg
 import numpy as np
-import hsganalysis as hsg
-import hsganalysis.QWPProcessing as qwp
+import Stele as hsg
+import Stele.QWPProcessing as qwp
 import matplotlib.pyplot as plt
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
                                AutoMinorLocator)
