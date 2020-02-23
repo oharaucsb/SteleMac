@@ -1,6 +1,6 @@
 import numpy as np
 from PyQt5 import QtGui, QtCore, QtWidgets
-from hsganalysis.ipg import PolarImageItem, PolarAxis
+from Stele.ipg import PolarImageItem, PolarAxis
 from pyqtgraph import GraphicsView, HistogramLUTWidget, ViewBox, mkColor, TextItem, Point
 from .extractMatrices import *
 from .expFanCompiler import *
@@ -435,5 +435,3 @@ class FanDiagram(QtGui.QWidget):
         # the bounding rect and stuff
         self.axes["azimuthal"].picture = None
         self.axes["radial"].picture = None
-
-

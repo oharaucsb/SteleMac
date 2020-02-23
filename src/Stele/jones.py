@@ -6,7 +6,7 @@ import matplotlib.pylab as plt
 import glob
 import os
 import json
-import hsganalysis as hsg
+import Stele as hsg
 import scipy.optimize as spo
 import scipy.interpolate as spi
 

@@ -1,7 +1,7 @@
 import numpy as np
 import os
-import hsganalysis as hsg
-from hsganalysis.jones import JonesVector as JV
+import Stele as hsg
+from Stele.jones import JonesVector as JV
 
 class FanCompilerWithoutStokes(object):
     """

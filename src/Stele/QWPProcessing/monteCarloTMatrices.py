@@ -2,7 +2,7 @@ import numpy as np
 from scipy.optimize import minimize
 
 from joblib import Parallel, delayed, cpu_count
-from hsganalysis.jones import JonesVector as JV
+from Stele.jones import JonesVector as JV
 from .expFanCompiler import FanCompiler
 from .extractMatrices import *
 
@@ -296,4 +296,3 @@ try:
                 )
 except ImportError:
     print("You'll need to install PyQt5 for interacting the MC data")
-

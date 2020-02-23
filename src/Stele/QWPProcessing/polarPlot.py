@@ -1,12 +1,12 @@
 from __future__ import division
 import numpy as np
-import hsganalysis.ipg as pg
+import Stele.ipg as pg
 # import pyqtgraph as pg
 import matplotlib.pylab as plt
 import glob
 import os
 import json
-import hsganalysis as hsg
+import Stele as hsg
 
 def makePolarPlot():
     plot = pg.figure()
@@ -80,43 +80,3 @@ def polarPlotBad(*args, **kwargs):
 # x = radius * np.cos(theta)
 # y = radius * np.sin(theta)
 # plot.plot(x, y)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.optimize import minimize
 
-from hsganalysis.jones import JonesVector as JV
+from Stele.jones import JonesVector as JV
 from .expFanCompiler import *
 
 
@@ -257,5 +257,3 @@ def loadT(name):
 
 
     return T, sbs
-
-

@@ -2,7 +2,7 @@ __author__ = 'dvalovcin'
 from PyQt5 import QtWidgets, QtCore
 import pyqtgraph as pg
 # from hsganalysis import ipg as cpg
-import hsganalysis.ipg as cpg
+import Stele.ipg as cpg
 
 # class DraggablePlotWidget(pg.PlotWidget):
 class DraggablePlotWidget(cpg.PlotWidget):

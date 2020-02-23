@@ -1,15 +1,15 @@
 import numpy as np
-import hsganalysis.ipg as pg
+import Stele.ipg as pg
 import matplotlib.pylab as plt
 import glob
 import os
 import json
-import hsganalysis as hsg
-from hsganalysis.ipg import PolarImagePlot
+import Stele as hsg
+from Stele.ipg import PolarImagePlot
 from PyQt5 import QtCore, QtGui, QtWidgets
 from scipy.optimize import minimize
-from hsganalysis import newhsganalysis
-from hsganalysis import JonesVector as JV
+from Stele import newhsganalysis
+from Stele import JonesVector as JV
 newhsganalysis.plt = pg
 np.set_printoptions(linewidth=400)
 

@@ -1,7 +1,7 @@
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
-from hsganalysis.ipg import PolarImagePlot
-import hsganalysis.ipg as pg
+from Stele.ipg import PolarImagePlot
+import Stele.ipg as pg
 
 
 """
@@ -261,7 +261,7 @@ def saveAndRenderFan(p1, p2, fname, hideHistograms=False):
 
     outputPainter = QtGui.QPainter(outputImage)
 
-    
+
     r2.setHeight(height)
     r1.setHeight(height)
 

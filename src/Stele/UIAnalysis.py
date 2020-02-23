@@ -24,7 +24,7 @@ except ModuleNotFoundError:
     from UI.qwpCompWin_ui import Ui_PolarimeterWindow
     from UI.draggablePlotWidget import DraggablePlotWidget, DraggableViewBox
 try:
-    import hsganalysis.ipg as ipg
+    import Stele.ipg as ipg
 except:
     raise
 import newhsganalysis as hsg
@@ -683,7 +683,7 @@ class BaseWindow(QtWidgets.QMainWindow):
         # I think the other indices include axes and things?
         # could chagne this by making the data a class
         # member, but this keeps it clear what units are used
-		
+
         if self.dataObj is None:
             return
         # data = self.dataObj.sb_results
