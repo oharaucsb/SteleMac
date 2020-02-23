@@ -77,7 +77,7 @@ saveFileName = "12-05_alphasgammas"
 # Feel free to change this one, don't change the other two
 
 alphaData, gammaData = get_alphagamma(
-    r"Fan Data", observedSidebands, 16, saveFileName, save_results=False)
+    r"Fan Data", observedSidebands, 16, saveFileName, save_results=True)
 
 # Now we need to calculate the Jones matrices.
 # For this function you need to cut out errors, and just feed it an array of
@@ -86,8 +86,8 @@ alphaData, gammaData = get_alphagamma(
 
 alphas = 0  # set up loop with below function to cut out slices of alpha matrix
 gammas = 0  # set up loop with below function to cut out slices of gamma matrix
-J = qwp.extractMatrices.findJ(alphas, gammas)
+# J = qwp.extractMatrices.findJ(alphas, gammas)
 
 # and save the matrices to text
-qwp.extractMatrices.saveT(
-    J, observedSidebands, "{}_JMatrix.txt".format(saveFileName))
+# qwp.extractMatrices.saveT(
+#    J, observedSidebands, "{}_JMatrix.txt".format(saveFileName))
