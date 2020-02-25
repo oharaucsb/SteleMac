@@ -3,8 +3,8 @@ import numpy as np
 import Stele as hsg
 import Stele.QWPProcessing as qwp
 import matplotlib.pyplot as plt
-from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
-                               AutoMinorLocator)
+# from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
+#                               AutoMinorLocator)
 
 """
 
@@ -92,11 +92,11 @@ alphaData, gammaData = get_alphagamma(
 # iterate second loop for monte carlo within that band
 
 # number of times to iterate the monte carlo
-monteCarlo = 50
+monteCarlo = 5
 # width of arrays of alphas and gammas
 AGwidth = 4
 # matrix for monte carlo results beginning with 2D slice of zeros for dstack
-monteMatrix = np.zeros((monteCarlo, 2*AGwidth+10))
+monteMatrix = np.zeros((monteCarlo+1, 4*AGwidth+2))
 # matrix listing excitations used for alphas and gammas
 excitations = np.array(alphaData[0, 0])
 for n in range(AGwidth):
@@ -105,7 +105,14 @@ for n in range(AGwidth):
 # the *drumroll* monte carlo
 for i in range(len(observedSidebands)):
 
-    monteSlice = np.zeros(18)
+    # header info for the save file slice
+    monteSlice = np.array(len(observedSidebands))
+    monteSlice = np.append(monteSlice, monteCarlo)
+    for j in range(AGwidth):
+        monteSlice = np.append(monteSlice, alphaData[i+1, 2*j+1])
+        monteSlice = np.append(monteSlice, alphaData[i+1, 2*j+2])
+        monteSlice = np.append(monteSlice, gammaData[i+1, 2*j+1])
+        monteSlice = np.append(monteSlice, gammaData[i+1, 2*j+2])
 
     for m in range(monteCarlo):
 
@@ -142,15 +149,15 @@ for i in range(len(observedSidebands)):
         # may need to cast parts of J to floats using np.imag and np.real
         monteSlice = np.vstack((monteSlice, appendMatrix))
 
-    # cut out the zeros monteSlice started with
-    monteMatrix = np.dstack((monteMatrix, monteSlice[1:, :]))
+    monteMatrix = np.dstack((monteMatrix, monteSlice))
 
 # cut out zeros monteMatrix started with
 monteMatrix = np.array(monteMatrix[:, :, 1:])
 
+np.save('monteArray', monteMatrix)
+'''
 # display results for each given sideband
-# for i in range(len(observedSidebands)):
-for i in range(1):
+for i in range(len(observedSidebands)):
 
     # plot alpha histogram
     # plt.subplot(AGwidth, 3, 1)
@@ -166,7 +173,7 @@ for i in range(1):
                  linewidth=2, color='r')
         plt.ylabel('Alpha ' + str(int(excitations[j+1])))
         plt.yticks([])
-
+'''
 # and save the matrices to text
 # qwp.extractMatrices.saveT(
 # J, observedSidebands, "{}_JMatrix.txt".format(saveFileName))
