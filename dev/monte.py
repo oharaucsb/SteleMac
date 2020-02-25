@@ -77,17 +77,76 @@ saveFileName = "12-05_alphasgammas"
 # Feel free to change this one, don't change the other two
 
 alphaData, gammaData = get_alphagamma(
-    r"Fan Data", observedSidebands, 16, saveFileName, save_results=True)
+    r"Fan Data", observedSidebands, 16, saveFileName, save_results=False)
 
 # Now we need to calculate the Jones matrices.
 # For this function you need to cut out errors, and just feed it an array of
 # sb, alpha
 # I leave that for you to figure out
 
-alphas = 0  # set up loop with below function to cut out slices of alpha matrix
-gammas = 0  # set up loop with below function to cut out slices of gamma matrix
-# J = qwp.extractMatrices.findJ(alphas, gammas)
+# within alphadata & gammadata array, skip first line
+# after that, each line is for a given side band,
+# within that sideband, values are sideband|measure|error|measure|error|+2
+
+# iterate first loop across the sidebands vertically
+# iterate second loop for monte carlo within that band
+
+monteCarlo = 5
+AGwidth = 4
+# width of arrays of alphas and gammas
+monteMatrix = np.zeros((monteCarlo, 2*AGwidth+10))
+# number of times to iterate the monte carlo
+
+for i in range(len(observedSidebands)):
+
+    monteSlice = np.zeros(18)
+    excitations = np.array(alphaData[0, 0])
+    for n in range(AGwidth):
+        excitations = np.append(excitations, alphaData[0, 2*n+1])
+
+    for m in range(monteCarlo):
+
+        appendMatrix = np.array(m)
+        appendMatrix = np.append(appendMatrix, alphaData[i+1, 0])
+
+        alphas = np.array(alphaData[1, 0])
+        # start alphas with the sideband being calculated
+        for n in range(AGwidth):
+            alphas = np.append(alphas, np.random.normal(alphaData[i+1, 2*n+1],
+                                                        alphaData[i+1, 2*n+2]))
+        # use 2n to skip the first element which is measured sideband
+        # append elements into the empty array from the extracted array
+        appendMatrix = np.append(appendMatrix, alphas[1:])
+        # put recorded alphas for this iteration into the slice
+        alphas = np.vstack((excitations, alphas))
+        # stack alphas with excitation for extracting jones matrix
+
+        # repeat process above with gammas
+        gammas = np.array(gammaData[1, 0])
+        for n in range(AGwidth):
+            gammas = np.append(gammas, np.random.normal(gammaData[i+1, 2*n+1],
+                                                        gammaData[i+1, 2*n+2]))
+        appendMatrix = np.append(appendMatrix, gammas[1:])
+        gammas = np.vstack((excitations, gammas))
+        # feed it to the jones matrix function
+        J = qwp.extractMatrices.findJ(alphas, gammas)
+        J = np.reshape(J, -1)
+        # reshape from a 2d array into a 1d array
+        for n in range(len(J)):
+            appendMatrix = np.append(appendMatrix, np.real(J[n]))
+            appendMatrix = np.append(appendMatrix, np.imag(J[n]))
+
+        print(appendMatrix)
+        # may need to cast parts of J to floats using np.imag and np.real
+        monteSlice = np.vstack((monteSlice, appendMatrix))
+
+    # cut out the zeros monteSlice started with
+    monteMatrix = np.dstack((monteMatrix, monteSlice[1:, :]))
+
+# cut out zeros monteMatrix started with
+monteMatrix = np.array(monteMatrix[:, :, 1:])
+
 
 # and save the matrices to text
 # qwp.extractMatrices.saveT(
-#    J, observedSidebands, "{}_JMatrix.txt".format(saveFileName))
+# J, observedSidebands, "{}_JMatrix.txt".format(saveFileName))
