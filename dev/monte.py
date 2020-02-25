@@ -107,6 +107,7 @@ for i in range(len(observedSidebands)):
 
     # header info for the save file slice
     monteSlice = np.array(len(observedSidebands))
+    # this inclusion is helpful but redundant, and is mostly padding
     monteSlice = np.append(monteSlice, monteCarlo)
     for j in range(AGwidth):
         monteSlice = np.append(monteSlice, alphaData[i+1, 2*j+1])
