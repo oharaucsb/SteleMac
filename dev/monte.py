@@ -91,18 +91,21 @@ alphaData, gammaData = get_alphagamma(
 # iterate first loop across the sidebands vertically
 # iterate second loop for monte carlo within that band
 
-monteCarlo = 5
-AGwidth = 4
-# width of arrays of alphas and gammas
-monteMatrix = np.zeros((monteCarlo, 2*AGwidth+10))
 # number of times to iterate the monte carlo
+monteCarlo = 50
+# width of arrays of alphas and gammas
+AGwidth = 4
+# matrix for monte carlo results beginning with 2D slice of zeros for dstack
+monteMatrix = np.zeros((monteCarlo, 2*AGwidth+10))
+# matrix listing excitations used for alphas and gammas
+excitations = np.array(alphaData[0, 0])
+for n in range(AGwidth):
+    excitations = np.append(excitations, alphaData[0, 2*n+1])
 
+# the *drumroll* monte carlo
 for i in range(len(observedSidebands)):
 
     monteSlice = np.zeros(18)
-    excitations = np.array(alphaData[0, 0])
-    for n in range(AGwidth):
-        excitations = np.append(excitations, alphaData[0, 2*n+1])
 
     for m in range(monteCarlo):
 
@@ -136,7 +139,6 @@ for i in range(len(observedSidebands)):
             appendMatrix = np.append(appendMatrix, np.real(J[n]))
             appendMatrix = np.append(appendMatrix, np.imag(J[n]))
 
-        print(appendMatrix)
         # may need to cast parts of J to floats using np.imag and np.real
         monteSlice = np.vstack((monteSlice, appendMatrix))
 
@@ -146,6 +148,24 @@ for i in range(len(observedSidebands)):
 # cut out zeros monteMatrix started with
 monteMatrix = np.array(monteMatrix[:, :, 1:])
 
+# display results for each given sideband
+# for i in range(len(observedSidebands)):
+for i in range(1):
+
+    # plot alpha histogram
+    # plt.subplot(AGwidth, 3, 1)
+    # plt.title('Input Error Distribution')
+    for j in range(AGwidth):
+        alphaMu = alphaData[i+1, 2*j+1]
+        alphaSigma = alphaData[i+1, 2*j+2]
+        plt.subplot(AGwidth, 3, (3*j+1))
+        aCount, aBins, aIgnored = plt.hist(monteMatrix[:, 2+j, i],
+                                           30, density=True)
+        plt.plot(aBins, 1/(alphaSigma * np.sqrt(2 * np.pi)) *
+                 np.exp(- (aBins - alphaMu)**2 / (2 * alphaSigma**2)),
+                 linewidth=2, color='r')
+        plt.ylabel('Alpha ' + str(int(excitations[j+1])))
+        plt.yticks([])
 
 # and save the matrices to text
 # qwp.extractMatrices.saveT(
