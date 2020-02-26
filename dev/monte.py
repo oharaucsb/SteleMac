@@ -92,7 +92,7 @@ alphaData, gammaData = get_alphagamma(
 # iterate second loop for monte carlo within that band
 
 # number of times to iterate the monte carlo
-monteCarlo = 5
+monteCarlo = 100
 # width of arrays of alphas and gammas
 AGwidth = 4
 # matrix for monte carlo results beginning with 2D slice of zeros for dstack
@@ -112,8 +112,14 @@ for i in range(len(observedSidebands)):
     for j in range(AGwidth):
         monteSlice = np.append(monteSlice, alphaData[i+1, 2*j+1])
         monteSlice = np.append(monteSlice, alphaData[i+1, 2*j+2])
+    for j in range(AGwidth):
         monteSlice = np.append(monteSlice, gammaData[i+1, 2*j+1])
         monteSlice = np.append(monteSlice, gammaData[i+1, 2*j+2])
+
+    '''
+    at this point monteSlice should be ordered as follows
+    #sidebands|monteCarlo|alphavalue|alphaerror|...|gammavalue|gammaerror|...
+    '''
 
     for m in range(monteCarlo):
 
@@ -128,6 +134,14 @@ for i in range(len(observedSidebands)):
         # use 2n to skip the first element which is measured sideband
         # append elements into the empty array from the extracted array
         appendMatrix = np.append(appendMatrix, alphas[1:])
+        '''
+        appendMatrix should be formatted as follows at this point
+        iteration#|alpha|...
+
+        alphas should be as follows
+        -1|excitation angles|
+        sideband#|alpha|...
+        '''
         # put recorded alphas for this iteration into the slice
         alphas = np.vstack((excitations, alphas))
         # stack alphas with excitation for extracting jones matrix
@@ -139,17 +153,39 @@ for i in range(len(observedSidebands)):
                                                         gammaData[i+1, 2*n+2]))
         appendMatrix = np.append(appendMatrix, gammas[1:])
         gammas = np.vstack((excitations, gammas))
-        # feed it to the jones matrix function
+        '''
+        appendMatrix should be formatted as follows at this point
+        iteration#|sideband#|alpha|...|gamma|...
+
+        gammas should be as follows
+        -1|excitation angles|
+        sideband#|gamma|...
+        '''
+        # feed alpha and gamma arrays to the jones matrix function
         J = qwp.extractMatrices.findJ(alphas, gammas)
-        J = np.reshape(J, -1)
         # reshape from a 2d array into a 1d array
+        J = np.reshape(J, -1)
+        # cast parts of J to floats using np.imag and np.real, then append
         for n in range(len(J)):
             appendMatrix = np.append(appendMatrix, np.real(J[n]))
             appendMatrix = np.append(appendMatrix, np.imag(J[n]))
-
-        # may need to cast parts of J to floats using np.imag and np.real
+        '''
+        appendMatrix should be formatted as follows at this point
+        iteration#|sideband#|alpha|...|gamma|...|jonesReal|jonesImag|...
+        '''
         monteSlice = np.vstack((monteSlice, appendMatrix))
 
+    '''
+    at this point monteSlice should be ordered as follows
+    #sidebands|monteCarlo|alphavalue|alphaerror|...|gammavalue|gammaerror|...
+    iteration#|sideband#|alpha|...|gamma|...|jonesReal|jonesImag|...
+    '''
+#                ||
+#               \||/
+#                \/
+    '''
+    for # iterations in range(monteCarlo)
+    '''
     monteMatrix = np.dstack((monteMatrix, monteSlice))
 
 # cut out zeros monteMatrix started with
