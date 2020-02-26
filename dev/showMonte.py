@@ -11,12 +11,24 @@ jones = ['xx', 'xy', 'yx', 'yy']
 observedSidebands = np.array(np.reshape(monteMatrix[1, 1, :], -1))
 
 # display results for each given sideband
-# for i in range(len(observedSidebands)):
-for i in range(1):
+for i in range(len(observedSidebands)):
+    # for i in range(1):
 
     # plot alpha histogram
     # plt.subplot(AGwidth, 3, 1)
-    plt.suptitle(str(int(observedSidebands[i])) + 'th order sideband')
+
+    # if not a X1, X2, X3 order band or if a X1X sideband eg 12th
+    if ((int(observedSidebands[i]) % 10 >= 4) or
+       (int(observedSidebands[i]) % 10 == 0) or
+       (np.floor(int(observedSidebands[i]) / 10) % 10 == 1)):
+
+        plt.suptitle(str(int(observedSidebands[i])) + 'th order sideband')
+    else:
+        # sidebands should always be even I believe but in case of other uses
+        suffix = ['st', 'nd', 'rd']
+        plt.suptitle(str(int(observedSidebands[i])) +
+                     suffix[int(observedSidebands[i]) % 10 - 1]
+                     + ' order sideband')
 
     # construct alpha histogram subplots
     for j in range(AGwidth):
@@ -50,7 +62,7 @@ for i in range(1):
             plt.title('gammas')
         plt.yticks([])
 
-    # construct jones matrix xy axis subplots
+    # construct jones matrix xy axis scatterplot subplots
     for j in range(4):
         plt.subplot(4, 3, 3*j+3)
         # do some magic here
