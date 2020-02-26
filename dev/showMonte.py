@@ -43,7 +43,7 @@ for i in range(1):
         gammaSigma = monteMatrix[0, 3+(j*2), i]
         print('gammaMu: ' + str(gammaMu) + ' gammaSigma: ' + str(gammaSigma))
         print (np.reshape(monteMatrix[1:10, 6+j, i], -1))
-        plt.subplot(AGwidth, 3, (3*j+1))
+        plt.subplot(AGwidth, 3, (3*j+2))
         aCount, aBins, aIgnored = plt.hist(
             np.reshape(monteMatrix[1:, 6+j, i], -1),
             30, density=True)

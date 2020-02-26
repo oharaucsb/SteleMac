@@ -92,7 +92,7 @@ alphaData, gammaData = get_alphagamma(
 # iterate second loop for monte carlo within that band
 
 # number of times to iterate the monte carlo
-monteCarlo = 100
+monteCarlo = 10000
 # width of arrays of alphas and gammas
 AGwidth = 4
 # matrix for monte carlo results beginning with 2D slice of zeros for dstack
