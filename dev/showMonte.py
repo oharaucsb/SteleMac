@@ -16,7 +16,7 @@ for i in range(1):
 
     # plot alpha histogram
     # plt.subplot(AGwidth, 3, 1)
-    plt.title('Sideband ' + str(int(observedSidebands[i])))
+    plt.suptitle(str(int(observedSidebands[i])) + 'th order sideband')
 
     # construct alpha histogram subplots
     for j in range(AGwidth):
@@ -58,5 +58,8 @@ for i in range(1):
         if j == 0:
             plt.title('Jones')
         plt.yticks([])
+
+    # fit plot layout and display
     plt.tight_layout()
+    plt.subplots_adjust(top=0.88)
     plt.show()
