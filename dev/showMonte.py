@@ -9,8 +9,7 @@ AGwidth = int(len(np.reshape(monteMatrix[0, 2:, 0], -1))/4)
 excitations = ['0', '-45', '-90', '45']
 jones = ['xx', 'xy', 'yx', 'yy']
 observedSidebands = np.array(np.reshape(monteMatrix[1, 1, :], -1))
-print(AGwidth)
-print (monteMatrix[0, 2:, 0])
+
 # display results for each given sideband
 # for i in range(len(observedSidebands)):
 for i in range(1):
@@ -23,8 +22,6 @@ for i in range(1):
     for j in range(AGwidth):
         alphaMu = monteMatrix[0, 2+(j*2), i]
         alphaSigma = monteMatrix[0, 3+(j*2), i]
-        # print('alphaMu: ' + str(alphaMu) + ' alphaSigma: ' + str(alphaSigma))
-        # print (np.reshape(monteMatrix[1:10, 2+j, i], -1))
         plt.subplot(AGwidth, 3, (3*j+1))
         aCount, aBins, aIgnored = plt.hist(
             np.reshape(monteMatrix[1:, 2+j, i], -1),
@@ -40,9 +37,7 @@ for i in range(1):
     # construct gamma histogram subplots
     for j in range(AGwidth):
         gammaMu = monteMatrix[0, 10+(j*2), i]
-        gammaSigma = monteMatrix[0, 3+(j*2), i]
-        print('gammaMu: ' + str(gammaMu) + ' gammaSigma: ' + str(gammaSigma))
-        print (np.reshape(monteMatrix[1:10, 6+j, i], -1))
+        gammaSigma = monteMatrix[0, 11+(j*2), i]
         plt.subplot(AGwidth, 3, (3*j+2))
         aCount, aBins, aIgnored = plt.hist(
             np.reshape(monteMatrix[1:, 6+j, i], -1),
