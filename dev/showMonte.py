@@ -71,8 +71,12 @@ for i in range(1):
         if j == 0:
             sbp2.set_title('Jones')
         sbp2.set_yticks([])
+        sbp.set_ylabel('Imaginary')
         # do some magic here
-        # sbp.scatter()
+        sbp.hist2d(monteMatrix[1:, 10+(2*j), i],
+                   monteMatrix[1:, 11+(2*j), i],
+                   20)
+# sbp.scatter(monteMatrix[1:, 10+(2*j), i], monteMatrix[1:, 11+(2*j), i])
         # end of magic
 
     # fit plot layout and display
