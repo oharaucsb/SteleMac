@@ -12,8 +12,8 @@ jones = ['xx', 'xy', 'yx', 'yy']
 observedSidebands = np.array(np.reshape(monteMatrix[1, 1, :], -1))
 
 # display results for each given sideband
-# for i in range(len(observedSidebands)):
-for i in range(1):
+for i in range(len(observedSidebands)):
+    # for i in range(1):
 
     # plot alpha histogram
     # plt.subplot(AGwidth, 3, 1)
@@ -71,8 +71,11 @@ for i in range(1):
         sbp2.set_ylabel(jones[j])
         if j == 0:
             sbp2.set_title('Jones')
+            sbp.set_ylabel('Imaginary')
+            sbp.set_xlabel('Real')
+            sbp.set_yticks([])
+            sbp.set_xticks([])
         sbp2.set_yticks([])
-        sbp.set_ylabel('Imaginary')
         # do some magic here
         # real number mean & sigma
         jrMu = np.mean(monteMatrix[1:, 10+(2*j), i])
@@ -81,7 +84,10 @@ for i in range(1):
         jiMu = np.mean(monteMatrix[1:, 11+(2*j), i])
         jiSigma = np.std(monteMatrix[1:, 11+(2*j), i])
         # scatterplot method
-        sbp.scatter(monteMatrix[1:, 10+(2*j), i], monteMatrix[1:, 11+(2*j), i])
+        sbp.scatter(monteMatrix[1:, 10+(2*j), i],
+                    monteMatrix[1:, 11+(2*j), i],
+                    s=1,
+                    marker='.')
         # single point plot of mean values
         sbp.scatter(jrMu, jiMu, c='r', marker="1")
 
