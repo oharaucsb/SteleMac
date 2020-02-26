@@ -10,11 +10,12 @@ AGwidth = int(len(np.reshape(monteMatrix[0, 2:, 0], -1))/4)
 excitations = ['0', '-45', '-90', '45']
 jones = ['xx', 'xy', 'yx', 'yy']
 observedSidebands = np.array(np.reshape(monteMatrix[1, 1, :], -1))
+MuSigmaArray = np.zeros(AGwidth*4+1)
 
 # display results for each given sideband
 for i in range(len(observedSidebands)):
     # for i in range(1):
-
+    arrayAppend = np.array(observedSidebands[i])
     # plot alpha histogram
     # plt.subplot(AGwidth, 3, 1)
     # create figure for subplots to go under
@@ -79,10 +80,20 @@ for i in range(len(observedSidebands)):
         # do some magic here
         # real number mean & sigma
         jrMu = np.mean(monteMatrix[1:, 10+(2*j), i])
+        arrayAppend = np.append(arrayAppend, jrMu)
         jrSigma = np.std(monteMatrix[1:, 10+(2*j), i])
+        arrayAppend = np.append(arrayAppend, jrSigma)
         # imaginary number mean & sigma
         jiMu = np.mean(monteMatrix[1:, 11+(2*j), i])
+        arrayAppend = np.append(arrayAppend, jiMu)
         jiSigma = np.std(monteMatrix[1:, 11+(2*j), i])
+        arrayAppend = np.append(arrayAppend, jiSigma)
+        '''
+        print(jones[j]+' jreal: $mu$:' + str(jrMu)
+              + ' $sigma$:' + str(jrSigma)
+              + ' jimag: $mu$ '+str(jiMu)
+              + ' $sigma$ ' + str(jiSigma))
+        '''
         # scatterplot method
         sbp.scatter(monteMatrix[1:, 10+(2*j), i],
                     monteMatrix[1:, 11+(2*j), i],
@@ -107,8 +118,11 @@ for i in range(len(observedSidebands)):
         # end of magic
 
     # fit plot layout and display
+    MuSigmaArray = np.vstack((MuSigmaArray, arrayAppend))
     fig.tight_layout()
     fig.subplots_adjust(top=0.88)
     fig.show()
 
-plt.show()
+# save output text matrix of mu and sigma values
+np.savetxt('MuSigmaArray', MuSigmaArray[1:])
+# plt.show()
