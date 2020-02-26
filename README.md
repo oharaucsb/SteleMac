@@ -13,13 +13,7 @@ Stele uses namespace packaging for the distribution packages (distros). This
 
 Packages go within the src directory.
 
-<<<<<<< HEAD
 Test code goes within test.
 
 Development code for new features goes in dev until being incorporated within
-=======
-Test code going within test.
-
-development code for new features goes in dev until being incorporated within
->>>>>>> f93a6affd5ffd93359c3811a7761bc9ea08d4c46
 src.
