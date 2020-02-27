@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
-from matplotlib import patches
+# from matplotlib import patches
 import numpy as np
 
-
-monteMatrix = np.load('monteArray.npy')
+loadFolder = 'theta9000'
+monteMatrix = np.load('./' + loadFolder + '/monteArray.npy')
 
 # calculate values necessary for future use of matrix
 AGwidth = int(len(np.reshape(monteMatrix[0, 2:, 0], -1))/4)
@@ -89,18 +89,19 @@ for i in range(len(observedSidebands)):
         jiSigma = np.std(monteMatrix[1:, 11+(2*j), i])
         arrayAppend = np.append(arrayAppend, jiSigma)
         '''
+        # display mu and sigma values for given jones on sideband slice
         print(jones[j]+' jreal: $mu$:' + str(jrMu)
               + ' $sigma$:' + str(jrSigma)
               + ' jimag: $mu$ '+str(jiMu)
               + ' $sigma$ ' + str(jiSigma))
         '''
+        # '''
         # scatterplot method
         sbp.scatter(monteMatrix[1:, 10+(2*j), i],
                     monteMatrix[1:, 11+(2*j), i],
                     s=1,
                     marker='.')
-        # single point plot of mean values
-        sbp.scatter(jrMu, jiMu, c='r', marker="1")
+        '''
 
         # 2D distribution would be ellipse with semimajor axis as Sigmas
         # confidence_ellipse(jrSigma, jiSigma, sbp)
@@ -108,14 +109,14 @@ for i in range(len(observedSidebands)):
         #                             width=jrSigma, height=jiSigma,
         #                             edgecolor='r')
         # sbp.add_patch(twoDSigma)
-        '''
+
         # 2d histogram method
         sbp.hist2d(monteMatrix[1:, 10+(2*j), i],
                    monteMatrix[1:, 11+(2*j), i],
                    20)
         '''
-
-        # end of magic
+        # single point plot of mean values
+        sbp.scatter(jrMu, jiMu, c='r', marker="1")
 
     # fit plot layout and display
     MuSigmaArray = np.vstack((MuSigmaArray, arrayAppend))
@@ -124,5 +125,5 @@ for i in range(len(observedSidebands)):
     fig.show()
 
 # save output text matrix of mu and sigma values
-np.savetxt('MuSigmaArray', MuSigmaArray[1:])
+np.savetxt('./' + loadFolder + '/MuSigmaArray', MuSigmaArray[1:])
 # plt.show()
