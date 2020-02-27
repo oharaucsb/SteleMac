@@ -101,6 +101,13 @@ for i in range(len(observedSidebands)):
                     monteMatrix[1:, 11+(2*j), i],
                     s=1,
                     marker='.')
+
+        # single point plot of mean values
+        sbp.scatter(jrMu, jiMu, c='r', marker="1")
+        # save scatter plot for that order within folder
+        fig.savefig(('./' + loadFolder + '/order_' +
+                    str(int(observedSidebands[i]))
+                    + '_scatterplot.png'))
         '''
 
         # 2D distribution would be ellipse with semimajor axis as Sigmas
@@ -114,15 +121,17 @@ for i in range(len(observedSidebands)):
         sbp.hist2d(monteMatrix[1:, 10+(2*j), i],
                    monteMatrix[1:, 11+(2*j), i],
                    20)
+        # save histogram plot to folder
+        fig.savefig('./' + loadFolder + '/order_' +
+                    str(observedSidebands[i])
+                    + '_histogram')
         '''
-        # single point plot of mean values
-        sbp.scatter(jrMu, jiMu, c='r', marker="1")
 
     # fit plot layout and display
     MuSigmaArray = np.vstack((MuSigmaArray, arrayAppend))
     fig.tight_layout()
     fig.subplots_adjust(top=0.88)
-    fig.show()
+    # fig.show()
 
 # save output text matrix of mu and sigma values
 np.savetxt('./' + loadFolder + '/MuSigmaArray', MuSigmaArray[1:])
