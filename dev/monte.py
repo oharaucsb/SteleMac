@@ -95,7 +95,7 @@ alphaData, gammaData = get_alphagamma(
 # name of folder for all future results to be dumped to
 saveFolder = 'theta9000'
 # number of times to iterate the monte carlo
-monteCarlo = 10000
+monteCarlo = 5000
 # width of arrays of alphas and gammas
 AGwidth = 4
 # matrix for monte carlo results beginning with 2D slice of zeros for dstack
