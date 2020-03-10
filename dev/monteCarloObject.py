@@ -244,7 +244,7 @@ for # iterations in range(self.nMonteCarlo)
                 fig.tight_layout()
                 fig.subplots_adjust(top=0.88)
                 fig.suptitle(self.__orderTitle(i))
-                # do jones histogram things
+                # TODO: jones histogram things
 
     # return plt.figure array of scatterplot of jones matrix
     def JonesScatter(self, sidebands=None):
@@ -256,11 +256,11 @@ for # iterations in range(self.nMonteCarlo)
                 fig.tight_layout()
                 fig.subplots_adjust(top=0.88)
                 fig.suptitle(self.__orderTitle(i))
-                # do jones scatterplot things
+                # TODO: jones scatterplot things
                 for j in range(4):
                     sbp = fig.add_subplot(4, 3, 3*j+3)
                     sbp2 = sbp.twinx()
-                    sbp2.set_ylabel(jones[j])
+                    sbp2.set_ylabel(self._jones[j])
                     if j == 0:
                         sbp2.set_title('Jones')
                         sbp.set_ylabel('Imaginary')
@@ -269,23 +269,19 @@ for # iterations in range(self.nMonteCarlo)
                         sbp.set_xticks([])
                     sbp2.set_yticks([])
                     # do some magic here
-                    # real number mean & sigma
-                    jrMu = np.mean(self.monteMatrix[1:, 10+(2*j), i])
-                    arrayAppend = np.append(arrayAppend, jrMu)
-                    jrSigma = np.std(self.monteMatrix[1:, 10+(2*j), i])
-                    arrayAppend = np.append(arrayAppend, jrSigma)
-                    # imaginary number mean & sigma
-                    jiMu = np.mean(self.monteMatrix[1:, 11+(2*j), i])
-                    arrayAppend = np.append(arrayAppend, jiMu)
-                    jiSigma = np.std(self.monteMatrix[1:, 11+(2*j), i])
-                    arrayAppend = np.append(arrayAppend, jiSigma)
                     # scatterplot creation
                     sbp.scatter(self.monteMatrix[1:, 10+(2*j), i],
                                 self.monteMatrix[1:, 11+(2*j), i],
                                 s=1,
                                 marker='.')
+
+                    # real & imaginary number means
+                    jrMu = np.mean(self.monteMatrix[1:, 10+(2*j), i])
+                    jiMu = np.mean(self.monteMatrix[1:, 11+(2*j), i])
                     # single point plot of mean values
                     sbp.scatter(jrMu, jiMu, c='r', marker="1")
+                figArray = np.append(figArray, fig)
+        return figArray[1:]
 
     # return figure array of contour plot of jones matrix at standard deviation
     def JonesContour(self, sidebands=None):
@@ -297,7 +293,7 @@ for # iterations in range(self.nMonteCarlo)
                 fig.tight_layout()
                 fig.subplots_adjust(top=0.88)
                 fig.suptitle(self.__orderTitle(i))
-                # do jones countourplot things
+                # TODO: do jones countourplot things
 
     # return 2D array of mu and sigma values organized
     # sideband#|xxjrMu|xxjrSigma|xxjiMu|xxjiSigma|...
