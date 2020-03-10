@@ -28,14 +28,28 @@ class monteCarlo(object):
     # array of sideband numbers
     _observedSidebands = None
 
+    # helper functions
+    # return proper title for given sideband index
+    def __orderTitle(self, i):
+        if ((int(self._observedSidebands[i]) % 10 >= 4) or
+           (int(self._observedSidebands[i]) % 10 == 0) or
+           (np.floor(int(self._observedSidebands[i]) / 10) % 10 == 1)):
+            return (str(int(self._observedSidebands[i]))+'th order sideband')
+        else:
+            # sidebands should always be even I believe but just in case
+            suffix = ['st', 'nd', 'rd']
+            return(str(int(self._observedSidebands[i])) +
+                   suffix[int(self._observedSidebands[i]) % 10 - 1]
+                   + ' order sideband')
+
     # initialization function for object, will follow one of 3 modes
     # initialization from raw input alphas and gammas
     # initialization from a saved monte carlo matrix
     # initialization from being pointed to a Fan Data file - this can be last
-    def __init__(self, alphaData=None, gammaData=None,  nMonteCarlo=5000,
-                 # TODO: remove observedSidebands and calculate it from matrix
-                 folder_name=None, observedSidebands=None):
-
+    def __init__(
+         self, alphaData=None, gammaData=None,  nMonteCarlo=5000,
+         # TODO: remove observedSidebands and calculate it from matrix
+         folder_name=None, observedSidebands=None):
         # store folder name to self for either loading or saving
         self.folder_name = folder_name
         # construct jones matrix strings
@@ -172,12 +186,143 @@ for # iterations in range(self.nMonteCarlo)
                                     np.reshape(self.monteMatrix[1, 1, :], -1))
 
     # begin graphing functions
-    # return histogram figure of alphas and gammas
-    def AGHistogram(sidebands=None):
-        # if i is a member of sidebands, graph, if sidebands  is none, graph
-    # return figure of histogram of jones matrix
-    # return figure of scatterplot of jones matrix
-    # return figure of contour plot of jones matrix at standard deviation
-    # return matrix of mu and sigma values organized
+    # return histogram array of plt.figure containing alphas and gammas
+    def agHistogram(self, sidebands=None):
+        figArray = np.array(plt.figur())
+        # if i is a member of sidebands, or if sidebands  is none, graph
+        for i in range(len(self._observedSidebands)):
+            if (float(i) in sidebands) or (sidebands is None):
+                # do histogram things
+                fig = plt.figure()
+                fig.tight_layout()
+                fig.subplots_adjust(top=0.88)
+                fig.suptitle(self.__orderTitle(i))
+                for j in range(self.AGwidth):
+                    alphaMu = self.monteMatrix[0, 2+(j*2), i]
+                    alphaSigma = self.monteMatrix[0, 3+(j*2), i]
+                    sbp = fig.add_subplot(self.AGwidth, 3, (3*j+1))
+                    sbp.set_ylabel(self._excitations[j])
+                    if j == 0:
+                        sbp.set_title('alphas')
+                    sbp.set_yticks([])
+                    aCount, aBins, aIgnored = sbp.hist(
+                        np.reshape(self.monteMatrix[1:, 2+j, i], -1),
+                        30, density=True)
+                    sbp.plot(aBins, 1/(alphaSigma * np.sqrt(2 * np.pi)) *
+                             np.exp(- (aBins - alphaMu)**2 /
+                             (2 * alphaSigma**2)), linewidth=2, color='r')
+
+                # construct gamma histogram subplots
+                for j in range(self.AGwidth):
+                    gammaMu = self.monteMatrix[0, 10+(j*2), i]
+                    gammaSigma = self.monteMatrix[0, 11+(j*2), i]
+                    sbp = fig.add_subplot(self.AGwidth, 3, (3*j+2))
+                    sbp.set_ylabel(self._excitations[j])
+                    if j == 0:
+                        sbp.set_title('gammas')
+                    sbp.set_yticks([])
+                    aCount, aBins, aIgnored = sbp.hist(
+                        np.reshape(self.monteMatrix[1:, 6+j, i], -1),
+                        30, density=True)
+                    sbp.plot(aBins, 1/(gammaSigma * np.sqrt(2 * np.pi)) *
+                             np.exp(- (aBins - gammaMu)**2 /
+                             (2 * gammaSigma**2)), linewidth=2, color='r')
+
+                # append constructed figure to array
+                figArray = np.append(figArray, fig)
+
+        figArray = np.array(figArray[1:])
+        return figArray
+
+    # return plt.figure array of histogram of jones matrix
+    def JonesHistogram(self, sidebands=None):
+        figArray = np.array(plt.figur())
+        # if i is a member of sidebands, or if sidebands  is none, graph
+        for i in range(len(self._observedSidebands)):
+            if (float(i) in sidebands) or (sidebands is None):
+                fig = plt.figure()
+                fig.tight_layout()
+                fig.subplots_adjust(top=0.88)
+                fig.suptitle(self.__orderTitle(i))
+                # do jones histogram things
+
+    # return plt.figure array of scatterplot of jones matrix
+    def JonesScatter(self, sidebands=None):
+        figArray = np.array(plt.figur())
+        # if i is a member of sidebands, or if sidebands  is none, graph
+        for i in range(len(self._observedSidebands)):
+            if (float(i) in sidebands) or (sidebands is None):
+                fig = plt.figure()
+                fig.tight_layout()
+                fig.subplots_adjust(top=0.88)
+                fig.suptitle(self.__orderTitle(i))
+                # do jones scatterplot things
+                for j in range(4):
+                    sbp = fig.add_subplot(4, 3, 3*j+3)
+                    sbp2 = sbp.twinx()
+                    sbp2.set_ylabel(jones[j])
+                    if j == 0:
+                        sbp2.set_title('Jones')
+                        sbp.set_ylabel('Imaginary')
+                        sbp.set_xlabel('Real')
+                        sbp.set_yticks([])
+                        sbp.set_xticks([])
+                    sbp2.set_yticks([])
+                    # do some magic here
+                    # real number mean & sigma
+                    jrMu = np.mean(self.monteMatrix[1:, 10+(2*j), i])
+                    arrayAppend = np.append(arrayAppend, jrMu)
+                    jrSigma = np.std(self.monteMatrix[1:, 10+(2*j), i])
+                    arrayAppend = np.append(arrayAppend, jrSigma)
+                    # imaginary number mean & sigma
+                    jiMu = np.mean(self.monteMatrix[1:, 11+(2*j), i])
+                    arrayAppend = np.append(arrayAppend, jiMu)
+                    jiSigma = np.std(self.monteMatrix[1:, 11+(2*j), i])
+                    arrayAppend = np.append(arrayAppend, jiSigma)
+                    # scatterplot creation
+                    sbp.scatter(self.monteMatrix[1:, 10+(2*j), i],
+                                self.monteMatrix[1:, 11+(2*j), i],
+                                s=1,
+                                marker='.')
+                    # single point plot of mean values
+                    sbp.scatter(jrMu, jiMu, c='r', marker="1")
+
+    # return figure array of contour plot of jones matrix at standard deviation
+    def JonesContour(self, sidebands=None):
+        figArray = np.array(plt.figur())
+        # if i is a member of sidebands, or if sidebands  is none, graph
+        for i in range(len(self._observedSidebands)):
+            if (float(i) in sidebands) or (sidebands is None):
+                fig = plt.figure()
+                fig.tight_layout()
+                fig.subplots_adjust(top=0.88)
+                fig.suptitle(self.__orderTitle(i))
+                # do jones countourplot things
+
+    # return 2D array of mu and sigma values organized
+    # sideband#|xxjrMu|xxjrSigma|xxjiMu|xxjiSigma|...
+    def JonesSigmaMu(self, sidebands=None):
+        returnStack = np.zeros(self.AGwidth*4+1)
+        # if i is a member of sidebands, or if sidebands  is none, graph
+        for i in range(len(self._observedSidebands)):
+            if (float(i) in sidebands) or (sidebands is None):
+                # convert in order to store in array with other floats
+                arrayAppend = np.array(float(self._observedSidebands[i]))
+                for j in range(4):
+                    arrayAppend = np.append(
+                      arrayAppend, np.mean(self.monteMatrix[1:, 10+(2*j), i]))
+                    arrayAppend = np.append(
+                      arrayAppend, np.std(self.monteMatrix[1:, 10+(2*j), i]))
+                    # imaginary number mean & sigma
+                    arrayAppend = np.append(
+                      arrayAppend, np.mean(self.monteMatrix[1:, 11+(2*j), i]))
+                    arrayAppend = np.append(
+                      arrayAppend, np.std(self.monteMatrix[1:, 11+(2*j), i]))
+                # vstack the arrays of sigma and Mus for the jones array
+                returnStack = np.vstack(returnStack, arrayAppend)
+        # strip off initialization zeros and return
+        return returnStack[1:, :]
+
     # return figure of monte carlo run plots
+
     # save some combination of figures to self.folder_name
