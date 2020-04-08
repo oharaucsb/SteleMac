@@ -31,8 +31,10 @@ class monteCarlo(object):
     AGwidth = None
     # string of jones matrix indice names
     _jones = None
-    # list of excitation numbers
-    _excitations = None
+    # list of excitation numbers for alpha
+    _alphaExcitations = None
+    # list of excitation numbers for alpha
+    _gammaExcitations = None
     # array of sideband numbers
     _observedSidebands = None
     # number of dead rows before monte carlo Data
@@ -80,7 +82,8 @@ class monteCarlo(object):
         self._jones = ['xx', 'xy', 'yx', 'yy']
         # construct excitation matrix strings
         # TODO: calculate strings from algha/gamma data monte matrix line
-        self._excitations = ['0', '-45', '-90', '45']
+        self._alphaExcitations = ['0', '-45', '-90', '45']
+        self._gammaExcitations = ['0', '0', '0', '0']
         print(alphaData)
         print(folder_name)
         # begin initialization from a passed alpha and gamma
@@ -99,9 +102,13 @@ class monteCarlo(object):
             self.monteMatrix = np.zeros(((self.nMonteCarlo+1),
                                          (4*self.AGwidth+2)))
             # harvest excitation numbers for use in alpha and gamma inputs
-            excitations = np.array(alphaData[0, 0])
+            alphaExcitations = np.array(alphaData[0, 0])
+            gammaExcitations = np.array(gammaData[0, 0])
             for n in range(self.AGwidth):
-                excitations = np.append(excitations, alphaData[0, 2*n+1])
+                alphaExcitations = np.append(alphaExcitations,
+                                             alphaData[0, 2*n+1])
+                gammaExcitations = np.append(gammaExcitations,
+                                             gammaData[0, 2*n+1])
 
             # the monte carlo creation
             for i in range(len(self._observedSidebands)):
@@ -132,8 +139,8 @@ at this point monteSlice should be ordered as follows
                 print(alphas)
                 appendMatrix = np.append(appendMatrix, alphas[1:])
                 appendMatrix = np.append(appendMatrix, gammas[1:])
-                alphas = np.vstack((excitations, alphas))
-                gammas = np.vstack((excitations, alphas))
+                alphas = np.vstack((alphaExcitations, alphas))
+                gammas = np.vstack((gammaExcitations, alphas))
 # find jones values of mu and append them
                 appendMatrix = np.append(appendMatrix,
                                          self.__stringJ(alphas, gammas))
@@ -165,8 +172,8 @@ append madtrix should be structured as follows based on mu values
                     appendMatrix = np.append(appendMatrix, alphas[1:])
                     appendMatrix = np.append(appendMatrix, gammas[1:])
 # stack alphas with excitation for extracting jones matrix, repeat for gammas
-                    alphas = np.vstack((excitations, alphas))
-                    gammas = np.vstack((excitations, gammas))
+                    alphas = np.vstack((alphaExcitations, alphas))
+                    gammas = np.vstack((gammaExcitations, gammas))
                     '''
 appendMatrix should be formatted as follows at this point
 iteration#|alpha|...
@@ -239,7 +246,7 @@ for # iterations in range(self.nMonteCarlo)
                     alphaMu = self.monteMatrix[0, 2+(j*2), i]
                     alphaSigma = self.monteMatrix[0, 3+(j*2), i]
                     sbp = fig.add_subplot(self.AGwidth, 3, (3*j+1))
-                    sbp.set_ylabel(self._excitations[j])
+                    sbp.set_ylabel(self._alphaExcitations[j])
                     if j == 0:
                         sbp.set_title('alphas')
                     sbp.set_yticks([])
@@ -255,7 +262,7 @@ for # iterations in range(self.nMonteCarlo)
                     gammaMu = self.monteMatrix[0, 10+(j*2), i]
                     gammaSigma = self.monteMatrix[0, 11+(j*2), i]
                     sbp = fig.add_subplot(self.AGwidth, 3, (3*j+2))
-                    sbp.set_ylabel(self._excitations[j])
+                    sbp.set_ylabel(self._alphaExcitations[j])
                     if j == 0:
                         sbp.set_title('gammas')
                     sbp.set_yticks([])
