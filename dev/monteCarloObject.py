@@ -86,9 +86,8 @@ class monteCarlo(object):
         if (alphaData is not None) & (gammaData is not None):
             # save an array of sideband numbers
             self._observedSidebands = np.arange(observedSidebands[0],
-                                                observedSidebands[1],
-                                                # dtype to set to string
-                                                2, dtype='str')
+                                                (observedSidebands[1]+1),
+                                                2)
             # set the number of monte carlo iterations and record
             self.nMonteCarlo = nMonteCarlo
             # set how many different alpha or gamma values per matrix
