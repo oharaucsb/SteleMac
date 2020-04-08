@@ -123,11 +123,9 @@ class monteCarlo(object):
 
 # create row for mu alpha sigma output to be used in comparison later
                 appendMatrix = np.array(-2)
-                # TODO: input sideband# for the matrix
                 appendMatrix = np.append(appendMatrix, alphaData[1, 0])
                 alphas = np.array(alphaData[1, 0])
                 gammas = np.array(gammaData[1, 0])
-                # TODO: find why AGwidth = 0
                 print(range(self.AGwidth))
                 for i in range(self.AGwidth):
                     alphas = np.append(alphas,
