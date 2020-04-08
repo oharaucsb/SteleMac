@@ -11,6 +11,8 @@ import scipy as sp
 
 # TODO: add a marker on graphs showing jones matrix values of mu alpha gamma
 
+# TODO: update where needed to account for additional deadslice of mu average
+
 # TODO: remove #sidebands from header and monte carlo number from slices
 # #sidebands can be found by Z traversing 3D matrix
 # carlo number can just be found by counting if needed
@@ -33,6 +35,8 @@ class monteCarlo(object):
     _excitations = None
     # array of sideband numbers
     _observedSidebands = None
+    # number of dead rows before monte carlo Data
+    _filler = 2
 
     # helper functions
     # return proper title for given sideband index
@@ -303,16 +307,21 @@ for # iterations in range(self.nMonteCarlo)
                     sbp2.set_yticks([])
                     # do some magic here
                     # scatterplot creation
-                    sbp.scatter(self.monteMatrix[1:, 10+(2*j), i],
-                                self.monteMatrix[1:, 11+(2*j), i],
-                                s=1,
-                                marker='.')
+                    sbp.scatter(self.monteMatrix[self._filler:, 10+(2*j), i],
+                                self.monteMatrix[self._filler:, 11+(2*j), i],
+                                s=1, marker='.')
 
                     # real & imaginary number means
-                    jrMu = np.mean(self.monteMatrix[1:, 10+(2*j), i])
-                    jiMu = np.mean(self.monteMatrix[1:, 11+(2*j), i])
+                    jrMu = np.mean(self.monteMatrix[self._filler:,
+                                                    10+(2*j), i])
+                    jiMu = np.mean(self.monteMatrix[self._filler:,
+                                                    11+(2*j), i])
                     # single point plot of mean values
                     sbp.scatter(jrMu, jiMu, c='r', marker="1")
+                    # single point plot of mu matrix
+                    sbp.scatter(self.monteMatrix[self._filler-1, 10+(2*j), i],
+                                self.monteMatrix[self._filler-1, 11+(2*j), i],
+                                c='g', marker="1")
                 figArray = np.append(figArray, fig)
         return figArray[1:]
 
