@@ -9,6 +9,9 @@ import os
 import scipy as sp
 
 
+# TODO: add a marker on graphs showing jones matrix values of mu alpha gamma
+
+
 # object class to construct and hold monte carlo matrix, as well as analyse
 class monteCarlo(object):
 
@@ -41,6 +44,19 @@ class monteCarlo(object):
             return(str(int(self._observedSidebands[i])) +
                    suffix[int(self._observedSidebands[i]) % 10 - 1]
                    + ' order sideband')
+
+    def __stringJ(alphas, gammas):
+        # feed alpha and gamma arrays to the jones matrix function
+        J = qwp.extractMatrices.findJ(alphas, gammas)
+        # reshape from a 2d array into a 1d array
+        J = np.reshape(J, -1)
+        # cast parts of J to floats using np.imag and np.real,
+        # then append
+        appendMatrix = np.array(0)
+        for n in range(len(J)):
+            appendMatrix = np.append(appendMatrix, np.real(J[n]))
+            appendMatrix = np.append(appendMatrix, np.imag(J[n]))
+        return appendMatrix[1:]
 
     # initialization function for object, will follow one of 3 modes
     # initialization from raw input alphas and gammas
@@ -93,6 +109,29 @@ at this point monteSlice should be ordered as follows
 #sidebands|self.nMonteCarlo|alphavalue|alphaerror|...|gammavalue|gammaerror|...
                 '''
 
+# create row for mu alpha sigma output to be used in comparison later
+                appendMatrix = np.array(-2)
+                alphas = np.array(alphaData[1, 0])
+                gammas = np.array(gammaData[1, 0])
+                for i in range(self.AGwidth):
+                    alphas = np.append(appendMatrix,
+                                       monteSlice[2+2*i][0])
+                    gammas = np.append(appendMatrix,
+                                       monteSlice[10+2*i][0])
+                appendMatrix = np.append(appendMatrix, alphas[1:])
+                appendMatrix = np.append(appendMatrix, gammas[1:])
+                alphas = np.vstack((excitations, alphas))
+                gammas = np.vstack((excitations, alphas))
+# find jones values of mu and append them
+                appendMatrix = np.append(appendMatrix,
+                                         self.__stringJ(alphas, gammas))
+                monteSlice = np.vstack((monteSlice, appendMatrix))
+
+                '''
+append madtrix should be structured as follows based on mu values
+-2|sideband#|alpha|...|gamma|...|jonesReal|jonesImag|...
+                '''
+
                 for m in range(self.nMonteCarlo):
 
                     appendMatrix = np.array(m)
@@ -128,6 +167,7 @@ sideband#|alpha|...
                             gammaData[i+1, 2*n+2]))
                     appendMatrix = np.append(appendMatrix, gammas[1:])
                     gammas = np.vstack((excitations, gammas))
+
                     '''
 appendMatrix should be formatted as follows at this point
 iteration#|sideband#|alpha|...|gamma|...
@@ -136,15 +176,9 @@ gammas should be as follows
 -1|excitation angles|
 sideband#|gamma|...
                     '''
-                    # feed alpha and gamma arrays to the jones matrix function
-                    J = qwp.extractMatrices.findJ(alphas, gammas)
-                    # reshape from a 2d array into a 1d array
-                    J = np.reshape(J, -1)
-                    # cast parts of J to floats using np.imag and np.real,
-                    # then append
-                    for n in range(len(J)):
-                        appendMatrix = np.append(appendMatrix, np.real(J[n]))
-                        appendMatrix = np.append(appendMatrix, np.imag(J[n]))
+                    appendMatrix = np.append(appendMatrix,
+                                             self.__stringJ(alphas, gammas))
+
                     '''
 appendMatrix should be formatted as follows at this point
 iteration#|sideband#|alpha|...|gamma|...|jonesReal|jonesImag|...
