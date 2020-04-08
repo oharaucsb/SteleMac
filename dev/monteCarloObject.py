@@ -54,7 +54,7 @@ class monteCarlo(object):
                    suffix[int(self._observedSidebands[i]) % 10 - 1]
                    + ' order sideband')
 
-    def __stringJ(alphas, gammas):
+    def __stringJ(self, alphas, gammas):
         # feed alpha and gamma arrays to the jones matrix function
         J = qwp.extractMatrices.findJ(alphas, gammas)
         # reshape from a 2d array into a 1d array
@@ -84,8 +84,6 @@ class monteCarlo(object):
         # TODO: calculate strings from algha/gamma data monte matrix line
         self._alphaExcitations = ['0', '-45', '-90', '45']
         self._gammaExcitations = ['0', '0', '0', '0']
-        print(alphaData)
-        print(folder_name)
         # begin initialization from a passed alpha and gamma
         if (alphaData is not None) & (gammaData is not None):
             # save an array of sideband numbers
@@ -96,9 +94,8 @@ class monteCarlo(object):
             self.nMonteCarlo = nMonteCarlo
             # set how many different alpha or gamma values per matrix
             # in other words number of excitation angles used
-            self.AGwidth = 0
+            self.AGwidth = 4
             # begin monte carlo matrix with row of zeroes for subsequent Vstack
-            print(type(nMonteCarlo))
             self.monteMatrix = np.zeros(((self.nMonteCarlo+1),
                                          (4*self.AGwidth+2)))
             # harvest excitation numbers for use in alpha and gamma inputs
@@ -119,24 +116,25 @@ class monteCarlo(object):
                 monteSlice = np.append(monteSlice, self.nMonteCarlo)
                 monteSlice = np.append(monteSlice, alphaData[(1+i), 1:])
                 monteSlice = np.append(monteSlice, gammaData[(1+i), 1:])
+                print(monteSlice)
 
-                '''
-at this point monteSlice should be ordered as follows
-#sidebands|self.nMonteCarlo|alphavalue|alphaerror|...|gammavalue|gammaerror|...
-                '''
+# at this point monteSlice should be ordered as follows
+# #sidebands|self.nMonteCarlo|alphavalue|alphaerror|..|gammavalue|gammaerror|..
 
 # create row for mu alpha sigma output to be used in comparison later
                 appendMatrix = np.array(-2)
+                # TODO: input sideband# for the matrix
+                appendMatrix = np.append(appendMatrix, alphaData[1, 0])
                 alphas = np.array(alphaData[1, 0])
                 gammas = np.array(gammaData[1, 0])
+                # TODO: find why AGwidth = 0
+                print(range(self.AGwidth))
                 for i in range(self.AGwidth):
-                    # TODO: figure out why np arrays not accessing given indice
-                    print(monteSlice[(2+2*i)])
                     alphas = np.append(alphas,
                                        monteSlice[2+2*i])
                     gammas = np.append(gammas,
                                        monteSlice[10+2*i])
-                print(alphas)
+                print("Alphas array is " + str(alphas))
                 appendMatrix = np.append(appendMatrix, alphas[1:])
                 appendMatrix = np.append(appendMatrix, gammas[1:])
                 alphas = np.vstack((alphaExcitations, alphas))
@@ -144,6 +142,8 @@ at this point monteSlice should be ordered as follows
 # find jones values of mu and append them
                 appendMatrix = np.append(appendMatrix,
                                          self.__stringJ(alphas, gammas))
+                print(appendMatrix)
+                print(monteSlice)
                 monteSlice = np.vstack((monteSlice, appendMatrix))
 
                 '''
