@@ -11,6 +11,9 @@ import scipy as sp
 
 # TODO: add a marker on graphs showing jones matrix values of mu alpha gamma
 
+# TODO: remove #sidebands from header and monte carlo number from slices
+# #sidebands can be found by Z traversing 3D matrix
+# carlo number can just be found by counting if needed
 
 # object class to construct and hold monte carlo matrix, as well as analyse
 class monteCarlo(object):
