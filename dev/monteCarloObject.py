@@ -96,7 +96,7 @@ class monteCarlo(object):
             # in other words number of excitation angles used
             self.AGwidth = 4
             # begin monte carlo matrix with row of zeroes for subsequent Vstack
-            self.monteMatrix = np.zeros(((self.nMonteCarlo+1),
+            self.monteMatrix = np.zeros(((self.nMonteCarlo+self._filler),
                                          (4*self.AGwidth+2)))
             # harvest excitation numbers for use in alpha and gamma inputs
             alphaExcitations = np.array(alphaData[0, 0])
