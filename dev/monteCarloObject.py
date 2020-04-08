@@ -81,7 +81,8 @@ class monteCarlo(object):
         # construct excitation matrix strings
         # TODO: calculate strings from algha/gamma data monte matrix line
         self._excitations = ['0', '-45', '-90', '45']
-
+        print(alphaData)
+        print(folder_name)
         # begin initialization from a passed alpha and gamma
         if (alphaData is not None) & (gammaData is not None):
             # save an array of sideband numbers
@@ -94,7 +95,9 @@ class monteCarlo(object):
             # in other words number of excitation angles used
             self.AGwidth = 0
             # begin monte carlo matrix with row of zeroes for subsequent Vstack
-            self.monteMatrix = np.zeros((self.nMonteCarlo+1, 4*self.AGwidth+2))
+            print(type(nMonteCarlo))
+            self.monteMatrix = np.zeros(((self.nMonteCarlo+1),
+                                         (4*self.AGwidth+2)))
             # harvest excitation numbers for use in alpha and gamma inputs
             excitations = np.array(alphaData[0, 0])
             for n in range(self.AGwidth):
@@ -107,16 +110,8 @@ class monteCarlo(object):
                 monteSlice = np.array(len(self._observedSidebands))
                 # this inclusion is helpful but redundant, is mostly padding
                 monteSlice = np.append(monteSlice, self.nMonteCarlo)
-                alphas = np.array(0)
-                gammas = np.array(0)
-                for j in range(self.AGwidth):
-                    alphas = np.append(alphas, alphaData[i+1, 2*j+1])
-                    alphas = np.append(alphas, alphaData[i+1, 2*j+2])
-                    gammas = np.append(gammas, gammaData[i+1, 2*j+1])
-                    gammas = np.append(gammas, gammaData[i+1, 2*j+2])
-
-                monteSlice = np.append(monteSlice, alphas[1:])
-                monteSlice = np.append(monteSlice, gammas[1:])
+                monteSlice = np.append(monteSlice, alphaData[(1+i), 1:])
+                monteSlice = np.append(monteSlice, gammaData[(1+i), 1:])
 
                 '''
 at this point monteSlice should be ordered as follows
@@ -128,10 +123,13 @@ at this point monteSlice should be ordered as follows
                 alphas = np.array(alphaData[1, 0])
                 gammas = np.array(gammaData[1, 0])
                 for i in range(self.AGwidth):
-                    alphas = np.append(appendMatrix,
-                                       monteSlice[2+2*i][0])
-                    gammas = np.append(appendMatrix,
-                                       monteSlice[10+2*i][0])
+                    # TODO: figure out why np arrays not accessing given indice
+                    print(monteSlice[(2+2*i)])
+                    alphas = np.append(alphas,
+                                       monteSlice[2+2*i])
+                    gammas = np.append(gammas,
+                                       monteSlice[10+2*i])
+                print(alphas)
                 appendMatrix = np.append(appendMatrix, alphas[1:])
                 appendMatrix = np.append(appendMatrix, gammas[1:])
                 alphas = np.vstack((excitations, alphas))
