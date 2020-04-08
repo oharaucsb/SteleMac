@@ -116,7 +116,6 @@ class monteCarlo(object):
                 monteSlice = np.append(monteSlice, self.nMonteCarlo)
                 monteSlice = np.append(monteSlice, alphaData[(1+i), 1:])
                 monteSlice = np.append(monteSlice, gammaData[(1+i), 1:])
-                print(monteSlice)
 
 # at this point monteSlice should be ordered as follows
 # #sidebands|self.nMonteCarlo|alphavalue|alphaerror|..|gammavalue|gammaerror|..
@@ -126,13 +125,11 @@ class monteCarlo(object):
                 appendMatrix = np.append(appendMatrix, alphaData[1, 0])
                 alphas = np.array(alphaData[1, 0])
                 gammas = np.array(gammaData[1, 0])
-                print(range(self.AGwidth))
                 for i in range(self.AGwidth):
                     alphas = np.append(alphas,
                                        monteSlice[2+2*i])
                     gammas = np.append(gammas,
                                        monteSlice[10+2*i])
-                print("Alphas array is " + str(alphas))
                 appendMatrix = np.append(appendMatrix, alphas[1:])
                 appendMatrix = np.append(appendMatrix, gammas[1:])
                 alphas = np.vstack((alphaExcitations, alphas))
@@ -140,8 +137,6 @@ class monteCarlo(object):
 # find jones values of mu and append them
                 appendMatrix = np.append(appendMatrix,
                                          self.__stringJ(alphas, gammas))
-                print(appendMatrix)
-                print(monteSlice)
                 monteSlice = np.vstack((monteSlice, appendMatrix))
 
                 '''
