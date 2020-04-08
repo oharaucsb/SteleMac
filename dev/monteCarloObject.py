@@ -72,8 +72,9 @@ class monteCarlo(object):
     def __init__(
          self, alphaData=None, gammaData=None,  nMonteCarlo=5000,
          # TODO: remove observedSidebands and calculate it from matrix
+         # store folder name to self for either loading or saving
+         # observedSidebands is a twople of the first & last sideband numbers
          folder_name=None, observedSidebands=None):
-        # store folder name to self for either loading or saving
         self.folder_name = folder_name
         # construct jones matrix strings
         self._jones = ['xx', 'xy', 'yx', 'yy']
@@ -84,7 +85,10 @@ class monteCarlo(object):
         # begin initialization from a passed alpha and gamma
         if (alphaData is not None) & (gammaData is not None):
             # save an array of sideband numbers
-            self._observedSidebands
+            self._observedSidebands = np.arange(observedSidebands[0],
+                                                observedSidebands[1],
+                                                # dtype to set to string
+                                                2, dtype='str')
             # set the number of monte carlo iterations and record
             self.nMonteCarlo = nMonteCarlo
             # set how many different alpha or gamma values per matrix
