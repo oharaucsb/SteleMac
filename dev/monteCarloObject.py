@@ -100,12 +100,16 @@ class monteCarlo(object):
                 monteSlice = np.array(len(self._observedSidebands))
                 # this inclusion is helpful but redundant, is mostly padding
                 monteSlice = np.append(monteSlice, self.nMonteCarlo)
+                alphas = np.array(0)
+                gammas = np.array(0)
                 for j in range(self.AGwidth):
-                    monteSlice = np.append(monteSlice, alphaData[i+1, 2*j+1])
-                    monteSlice = np.append(monteSlice, alphaData[i+1, 2*j+2])
-                for j in range(self.AGwidth):
-                    monteSlice = np.append(monteSlice, gammaData[i+1, 2*j+1])
-                    monteSlice = np.append(monteSlice, gammaData[i+1, 2*j+2])
+                    alphas = np.append(alphas, alphaData[i+1, 2*j+1])
+                    alphas = np.append(alphas, alphaData[i+1, 2*j+2])
+                    gammas = np.append(gammas, gammaData[i+1, 2*j+1])
+                    gammas = np.append(gammas, gammaData[i+1, 2*j+2])
+
+                monteSlice = np.append(monteSlice, alphas[1:])
+                monteSlice = np.append(monteSlice, gammas[1:])
 
                 '''
 at this point monteSlice should be ordered as follows
@@ -141,15 +145,23 @@ append madtrix should be structured as follows based on mu values
                     appendMatrix = np.append(appendMatrix, alphaData[i+1, 0])
 
                     alphas = np.array(alphaData[1, 0])
+                    gammas = np.array(gammaData[1, 0])
                     # TODO: group alpha and gamma code to reduce complexity
                     # start alphas with the sideband being calculated
                     for n in range(self.AGwidth):
                         alphas = np.append(alphas, np.random.normal(
                             alphaData[i+1, 2*n+1],
                             alphaData[i+1, 2*n+2]))
+                        gammas = np.append(gammas, np.random.normal(
+                            gammaData[i+1, 2*n+1],
+                            gammaData[i+1, 2*n+2]))
                     # use 2n to skip the first element, measured sideband
                     # append elements to empty array from the extracted array
                     appendMatrix = np.append(appendMatrix, alphas[1:])
+                    appendMatrix = np.append(appendMatrix, gammas[1:])
+# stack alphas with excitation for extracting jones matrix, repeat for gammas
+                    alphas = np.vstack((excitations, alphas))
+                    gammas = np.vstack((excitations, gammas))
                     '''
 appendMatrix should be formatted as follows at this point
 iteration#|alpha|...
@@ -157,28 +169,12 @@ iteration#|alpha|...
 alphas should be as follows
 -1|excitation angles|
 sideband#|alpha|...
-                    '''
-                    # put recorded alphas for this iteration into the slice
-                    alphas = np.vstack((excitations, alphas))
-                    # stack alphas with excitation for extracting jones matrix
-
-                    # repeat process above with gammas
-                    gammas = np.array(gammaData[1, 0])
-                    for n in range(self.AGwidth):
-                        gammas = np.append(gammas, np.random.normal(
-                            gammaData[i+1, 2*n+1],
-                            gammaData[i+1, 2*n+2]))
-                    appendMatrix = np.append(appendMatrix, gammas[1:])
-                    gammas = np.vstack((excitations, gammas))
-
-                    '''
-appendMatrix should be formatted as follows at this point
-iteration#|sideband#|alpha|...|gamma|...
 
 gammas should be as follows
 -1|excitation angles|
 sideband#|gamma|...
                     '''
+                    # append jones values calculated from alphas and gammas
                     appendMatrix = np.append(appendMatrix,
                                              self.__stringJ(alphas, gammas))
 
