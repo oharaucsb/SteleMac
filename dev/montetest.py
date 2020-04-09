@@ -69,5 +69,5 @@ saveFileName = "12-05_alphasgammas"
 alphas, gammas = get_alphagamma(
     r"Fan Data", observedSidebands, 16, saveFileName, save_results=True)
 
-monte = mco.monteCarlo(alphas, gammas,
-                       folder_name='thetatest', observedSidebands=(8, 30))
+monte = mco.monteCarlo(alphas, gammas, 5000,
+                       folder_name='theta9001', observedSidebands=(8, 30))
