@@ -70,4 +70,4 @@ alphas, gammas = get_alphagamma(
     r"Fan Data", observedSidebands, 16, saveFileName, save_results=True)
 
 monte = mco.monteCarlo(alphas, gammas,
-                       folder_name='theta9001', observedSidebands=(8, 30))
+                       folder_name='thetatest', observedSidebands=(8, 30))

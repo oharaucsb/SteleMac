@@ -204,10 +204,12 @@ for # iterations in range(self.nMonteCarlo)
 
             # if folder name is passed, save monte carlo matrix to that folder
             if self.folder_name is not None:
+                # TODO: use try for folder construction in event it exists
                 # construct destination folder
                 os.mkdir('./'+self.folder_name)
+                # TODO: test logic for overwriting an existing array
                 # save array to that folder
-                np.save('./'+self.folder_name+'monteArray', self.monteMatrix)
+                np.save('./'+self.folder_name+'/monteArray', self.monteMatrix)
 
         # construct monte carlo from a save destination
         elif self.folder_name is not None:
