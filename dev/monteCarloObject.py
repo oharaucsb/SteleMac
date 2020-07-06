@@ -228,7 +228,7 @@ for # iterations in range(self.nMonteCarlo)
     # begin graphing functions
     # return histogram array of plt.figure containing alphas and gammas
     def agHistogram(self, sidebands=None):
-        figArray = np.array(plt.figur())
+        figArray = np.array(plt.figure())
         # if i is a member of sidebands, or if sidebands  is none, graph
         for i in range(len(self._observedSidebands)):
             if (float(i) in sidebands) or (sidebands is None):
@@ -276,7 +276,7 @@ for # iterations in range(self.nMonteCarlo)
 
     # return plt.figure array of histogram of jones matrix
     def JonesHistogram(self, sidebands=None):
-        figArray = np.array(plt.figur())
+        figArray = np.array(plt.figure())
         # if i is a member of sidebands, or if sidebands  is none, graph
         for i in range(len(self._observedSidebands)):
             if (float(i) in sidebands) or (sidebands is None):
@@ -288,10 +288,10 @@ for # iterations in range(self.nMonteCarlo)
 
     # return plt.figure array of scatterplot of jones matrix
     def JonesScatter(self, sidebands=None):
-        figArray = np.array(plt.figur())
+        figArray = np.array(plt.figure())
         # if i is a member of sidebands, or if sidebands  is none, graph
         for i in range(len(self._observedSidebands)):
-            if (float(i) in sidebands) or (sidebands is None):
+            if  (sidebands is None) or (float(i) in sidebands):
                 fig = plt.figure()
                 fig.tight_layout()
                 fig.subplots_adjust(top=0.88)
@@ -330,9 +330,10 @@ for # iterations in range(self.nMonteCarlo)
 
     # return figure array of contour plot of jones matrix at standard deviation
     def JonesContour(self, sidebands=None):
-        figArray = np.array(plt.figur())
+        figArray = np.array(plt.figure())
         # if i is a member of sidebands, or if sidebands  is none, graph
         for i in range(len(self._observedSidebands)):
+            # TODO: apply below fix of short circuit verification to whole obj
             if (float(i) in sidebands) or (sidebands is None):
                 fig = plt.figure()
                 fig.tight_layout()

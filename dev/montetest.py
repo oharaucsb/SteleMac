@@ -1,5 +1,6 @@
 import monteCarloObject as mco
 import numpy as np
+import matplotlib as plt
 import Stele
 import Stele.QWPProcessing as qwp
 
@@ -69,5 +70,10 @@ saveFileName = "12-05_alphasgammas"
 alphas, gammas = get_alphagamma(
     r"Fan Data", observedSidebands, 16, saveFileName, save_results=True)
 
+"""
 monte = mco.monteCarlo(alphas, gammas, 5000,
                        folder_name='theta9001', observedSidebands=(8, 30))
+"""
+monte = mco.monteCarlo(folder_name='theta9001')
+graph = monte.JonesScatter()
+graph[0].show()
