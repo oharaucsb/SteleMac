@@ -14,3 +14,37 @@ proposed structure
       |--processing
           |--QWPProcessing
       |--UI (this one feels out of place, with qwp ui elements within it)
+
+
+analysis and processing could potentially be split into separate packages
+
+autodoc implementation is important for ongoing package documentation
+  this would also allow automatic construction of online documentation
+  via a resource such as "Sphinx"
+
+testing implementation is also important. Several options remain to be explored
+  as part of a latter stage, but current major considerations are unittest as
+  most other test runners seem compatible with unittest code, and unittest is
+  bundled with all python installations.
+
+Automation of testing and doc commands can be handled via Invoke I believe, but
+  that is the tool that confuses me the most out of those 4. Seems to be mostly
+  a python script runner, but I likely just need familiarity with it.
+
+Altogether, refactoring can follow a staged plan as follows
+|--Reshuffle code according to the new general architecture, mostly cut & paste
+|--Familiarize with tools to be implemented inline, so far only autodoc
+|--Rewrite code once fitted to architecture with priorities roughly as follow
+|   |--break large objects such as hsg into smaller more manageable ones
+|   |--fit code to style, at minimum whitespace styling, noting other issues
+|   |--update documentation to feature autodoc support, add new documentation
+|--Write tests for newly refactored code
+|   |--key hsg and QWP functions aiming for 100% unit testing
+|   |--general hsg and QWP functions aiming for 100% integration testing
+|   |--rest of code such as ipg integration testing is last priority
+|--Stretch goals as follow in rough order
+    |--publish package to Python Package Index (PyPI) for easy pip installation
+    |--force conformance to style on github, likely a reduced style
+    |--automation of testing and autodoc via something like invoke
+    |--creation and hosting of a html wiki for the codebase, likely via Sphinx
+    |--review current implementation of codebase in lab and redeploy as wanted
