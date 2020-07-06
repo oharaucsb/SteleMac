@@ -34,6 +34,10 @@ testing implementation is also important. Several options remain to be explored
   most other test runners seem compatible with unittest code, and unittest is
   bundled with all python installations.
 
+  after consulting the python developers discord, it seems pytest is the
+  current standard, vastly preferred over unittest. simplicity and power are
+  the main reasons stated for this preference.
+
 Automation of testing and doc commands can be handled via Invoke I believe, but
   that is the tool that confuses me the most out of those 4. Seems to be mostly
   a python script runner, but I likely just need familiarity with it.
