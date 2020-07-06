@@ -291,7 +291,7 @@ for # iterations in range(self.nMonteCarlo)
         figArray = np.array(plt.figure())
         # if i is a member of sidebands, or if sidebands  is none, graph
         for i in range(len(self._observedSidebands)):
-            if  (sidebands is None) or (float(i) in sidebands):
+            if (sidebands is None) or (float(i) in sidebands):
                 fig = plt.figure()
                 fig.tight_layout()
                 fig.subplots_adjust(top=0.88)
