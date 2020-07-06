@@ -1,0 +1,16 @@
+three general categories
+    -turn raw data into useful data (QWP)
+    -analyze useful data (HSG)
+    -output elements as a useful display (UI)
+
+ipg is a separate collection of misc deprecated features
+    appears to be split between UI and analysis in the new organization
+
+proposed structure
+  src
+  |--Stele
+      |--analysis
+          |--HSGAnalysis (new folder of the compartmentalized hsg object)
+      |--processing
+          |--QWPProcessing
+      |--UI (this one feels out of place, with qwp ui elements within it)
