@@ -6,6 +6,8 @@ from Stele.jones import JonesVector as JV
 from .expFanCompiler import FanCompiler
 from .extractMatrices import *
 
+
+# TODO: unify this code into a single object
 def generateMC(alpha, gamma=None, angle=0, niter = 4000,
                ncores = cpu_count(),
                returnFull=False):

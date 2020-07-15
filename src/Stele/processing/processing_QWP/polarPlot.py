@@ -2,11 +2,6 @@ from __future__ import division
 import numpy as np
 import Stele.ipg as pg
 # import pyqtgraph as pg
-import matplotlib.pylab as plt
-import glob
-import os
-import json
-import Stele as hsg
 
 def makePolarPlot():
     plot = pg.figure()
