@@ -1,0 +1,75 @@
+three general categories
+    -turn raw data into useful data (QWP)
+    -analyze useful data (HSG)
+    -output analysis and metadata as a useful display (UI)
+      UI seems sort of bizarre as many of the objects in analysis construct
+      their own graphs and output them. This could possibly be corrected by
+      rewriting the graph code to output figure objects without printing them
+
+ipg is a separate collection of misc deprecated features
+    appears to be split between UI and analysis in the new organization
+
+proposed structure
+  src
+  |--Stele
+      |--analysis
+          |--HSGAnalysis (new folder of the compartmentalized hsg object)
+          |--Parts of QWP such as fan diagram & polar plot
+      |--processing
+          |--QWPProcessing
+          |--Some hsg may go here such as CCD?
+      |--UI (this one feels out of place, with qwp ui elements within it)
+
+Thus extension by a new project would involve adding a sub package under say
+  analysis, and putting all relevant code there, without touching the others.
+
+analysis and processing could potentially be split into separate packages
+
+autodoc implementation is important for ongoing package documentation
+  this would also allow automatic construction of online documentation
+  via a resource such as "Sphinx"
+
+testing implementation is also important. Several options remain to be explored
+  as part of a latter stage, but current major considerations are unittest as
+  most other test runners seem compatible with unittest code, and unittest is
+  bundled with all python installations.
+
+  after consulting the python developers discord, it seems pytest is the
+  current standard, vastly preferred over unittest. simplicity and power are
+  the main reasons stated for this preference.
+
+Automation of testing and doc commands can be handled via Invoke I believe, but
+  that is the tool that confuses me the most out of those 4. Seems to be mostly
+  a python script runner, but I likely just need familiarity with it.
+
+MOST IMPORTANTLY, code should be reorganized and rewritten in a way that has
+  extendability in mind. Purpose is to close existing code as a complete and
+  well arranged code base for future individuals to understand, and for said
+  individuals to intuitively understand how to extend the existing base cleanly
+  for their own purposes. This general concept is the "Open/Closed Principle".
+
+  To put it clearly, once the existing files are rewritten, they should not be
+  added to for most normal reasons. Features can be introduced via inheritance
+  of existing objects in new ones. If this is insufficient perhaps objects can
+  be refactored to have a more narrow scope, such as my monte carlo object
+  splitting the generation and analysis functionality. As time goes on, Objects
+  can possibly be marked as "locked in" and thus clearly labeled as not to be
+  extended directly by future members of ITST.
+
+Altogether, refactoring can follow a staged plan as follows
+|--Reshuffle code according to the new general architecture, mostly cut & paste
+|--Familiarize with tools to be implemented inline, so far only autodoc
+|--Rewrite code once fitted to architecture with priorities roughly as follow
+|   |--break large objects such as hsg into smaller more manageable ones
+|   |--fit code to style, at minimum whitespace styling, noting other issues
+|   |--update documentation to feature autodoc support, add new documentation
+|--Write tests for newly refactored code
+|   |--key hsg and QWP functions aiming for 100% unit testing
+|   |--general hsg and QWP functions aiming for 100% integration testing
+|   |--rest of code such as ipg integration testing is last priority
+|--Stretch goals as follow in rough order
+    |--publish package to Python Package Index (PyPI) for easy pip installation
+    |--force conformance to style on github, likely a reduced style
+    |--automation of testing and autodoc via something like invoke
+    |--creation and hosting of a html wiki for the codebase, likely via Sphinx
+    |--review current implementation of codebase in lab and redeploy as wanted

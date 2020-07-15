@@ -5,6 +5,7 @@ import Stele.QWPProcessing as qwp
 import matplotlib.pyplot as plt
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,
                                AutoMinorLocator)
+import os
 
 """
 
@@ -91,8 +92,10 @@ alphaData, gammaData = get_alphagamma(
 # iterate first loop across the sidebands vertically
 # iterate second loop for monte carlo within that band
 
+# name of folder for all future results to be dumped to
+saveFolder = 'theta9000'
 # number of times to iterate the monte carlo
-monteCarlo = 10000
+monteCarlo = 5000
 # width of arrays of alphas and gammas
 AGwidth = 4
 # matrix for monte carlo results beginning with 2D slice of zeros for dstack
@@ -191,6 +194,7 @@ for i in range(len(observedSidebands)):
 # cut out zeros monteMatrix started with
 monteMatrix = np.array(monteMatrix[:, :, 1:])
 
+os.mkdir('./'+saveFolder)
 np.save('monteArray', monteMatrix)
 
 

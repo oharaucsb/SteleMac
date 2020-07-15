@@ -49,7 +49,7 @@ setup(
     url='https://github.com/C-S-Cannon/Stele',
     author='Cameron Cannon',
     author_email='c_cannon@ucsb.edu',
-    license='GPL-3.0',
+    license='MIT',
     description="Monolithic python distribution to eventually house ITST code."
 )
 
