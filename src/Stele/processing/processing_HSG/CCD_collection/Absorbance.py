@@ -3,6 +3,9 @@ import errno
 import json
 import numpy as np
 
+np.set_printoptions(linewidth=500)
+
+
 class Absorbance(CCD):
     def __init__(self, fname):
         """

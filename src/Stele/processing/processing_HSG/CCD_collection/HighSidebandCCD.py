@@ -6,6 +6,8 @@ import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
+np.set_printoptions(linewidth=500)
+
 
 class HighSidebandCCD(CCD):
     def __init__(self, hsg_thing, parameter_dict=None, spectrometer_offset=None):

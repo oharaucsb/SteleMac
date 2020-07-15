@@ -1,5 +1,7 @@
 import numpy as np
 
+np.set_printoptions(linewidth=500)
+
 
 class HighSidebandCCDRaw(HighSidebandCCD):
     """

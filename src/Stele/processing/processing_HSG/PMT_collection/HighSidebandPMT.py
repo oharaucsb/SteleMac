@@ -5,6 +5,8 @@ import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 
+np.set_printoptions(linewidth=500)
+
 
 class HighSidebandPMT(PMT):
     def __init__(self, file_path, verbose=False):

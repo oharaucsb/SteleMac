@@ -2,6 +2,9 @@ import os
 import errno
 import numpy as np
 
+np.set_printoptions(linewidth=500)
+
+
 class NeonNoiseAnalysis(CCD):
     """
     This class is used to make handling neon calibration lines easier.  It's not great.

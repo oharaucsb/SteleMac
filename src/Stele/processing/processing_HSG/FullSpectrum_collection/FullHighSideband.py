@@ -3,6 +3,8 @@ import errno
 import json
 import numpy as np
 
+np.set_printoptions(linewidth=500)
+
 
 # One of the main results is the HighSidebandCCD.sb_results array. These are the
 # various mappings between index and real value
