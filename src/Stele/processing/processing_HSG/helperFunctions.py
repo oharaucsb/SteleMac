@@ -2,6 +2,11 @@ import numpy as np
 import scipy.interpolate as spi
 
 
+# Returns the indices where Trues reside
+def my_lambda(x):
+    return x.nonzero()[0]
+
+
 def handle_nans(y_vals):
     """
     This function removes nans and replaces them with linearly interpolated
@@ -9,8 +14,6 @@ def handle_nans(y_vals):
     Taken from Stack Overflow: "Interpolate NaN values in a numpy array"
     """
     nan_idx = np.isnan(y_vals)
-    # Returns the indices where Trues reside
-    my_lambda = lambda x: x.nonzero()[0]
     y_vals[nan_idx] = np.interp(
         my_lambda(nan_idx), my_lambda(~nan_idx), y_vals[~nan_idx])
     return y_vals
