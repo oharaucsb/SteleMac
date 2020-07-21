@@ -1,3 +1,9 @@
+import numpy as np
+import scipy.fftpack as fft
+import matplotlib.pyplot as plt
+from .processing_HSG import helperFunctions
+
+
 def low_pass_filter(x_vals, y_vals, cutoff, inspectPlots=True):
     """
     Replicate origin directy
@@ -8,13 +14,14 @@ def low_pass_filter(x_vals, y_vals, cutoff, inspectPlots=True):
 
     This uses a 50th order Butterworth filter.
     """
-    x_vals, y_vals = fourier_prep(x_vals, y_vals)
+    x_vals, y_vals = helperFunctions.fourier_prep(x_vals, y_vals)
     if inspectPlots:
         plt.figure("Real Space")
         plt.plot(x_vals, y_vals, label="Non-nan Data")
 
     zeroPadding = len(x_vals)
-    # print "zero padding", zeroPadding  # This needs to be this way because truncation is bad and actually zero padding
+    # print "zero padding", zeroPadding
+    # Required because truncation is bad & actually zero padding
     N = len(x_vals)
     onePerc = int(0.01 * N)
     x1 = np.mean(x_vals[:onePerc])
@@ -42,13 +49,15 @@ def low_pass_filter(x_vals, y_vals, cutoff, inspectPlots=True):
         plt.semilogy(x_fourier, np.abs(y_fourier), label="Raw FFT")
 
     # Define where to remove the data
-    band_start = cutoff
-    band_end = int(max(abs(x_fourier))) + 1
+    # band_start = cutoff
+    # band_end = int(max(abs(x_fourier))) + 1
 
     '''
     # Find the indices to remove the data
-    refitRangeIdx = np.argwhere((x_fourier > band_start) & (x_fourier <= band_end))
-    refitRangeIdxNeg = np.argwhere((x_fourier < -band_start) & (x_fourier >= -band_end))
+    refitRangeIdx = np.argwhere((x_fourier > band_start)
+        & (x_fourier <= band_end))
+    refitRangeIdxNeg = np.argwhere((x_fourier < -band_start)
+        & (x_fourier >= -band_end))
 
     #print "x_fourier", x_fourier[795:804]
     #print "max(x_fourier)", max(x_fourier)
@@ -59,7 +68,8 @@ def low_pass_filter(x_vals, y_vals, cutoff, inspectPlots=True):
     y_fourier[refitRangeIdxNeg] = 0
 
     # This section does a square filter on the remaining code.
-    smoothIdx = np.argwhere((-band_start < x_fourier) & (x_fourier < band_start))
+    smoothIdx = np.argwhere((-band_start < x_fourier)
+        & (x_fourier < band_start))
     smoothr = -1 / band_start**2 * x_fourier[smoothIdx]**2 + 1
 
     y_fourier[smoothIdx] *= smoothr

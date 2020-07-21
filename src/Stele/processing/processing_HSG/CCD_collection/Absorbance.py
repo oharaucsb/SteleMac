@@ -2,7 +2,8 @@ import os
 import errno
 import json
 import numpy as np
-from . import CCD
+from .CCD_collection import CCD
+from .CCD_collection import helperFunctions
 
 np.set_printoptions(linewidth=500)
 
@@ -122,7 +123,7 @@ class Absorbance(CCD.CCD):
         # self.fixed = np.nan_to_num(self.proc_data[:, 1])
         # self.fixed = np.column_stack((self.raw_data[:, 0], self.fixed))
         self.parameters['fourier cutoff'] = cutoff
-        self.clean = low_pass_filter(
+        self.clean = helperFunctions.low_pass_filter(
             self.proc_data[:, 0], self.proc_data[:, 1], cutoff, inspectPlots)
 
     def save_processing(self, file_name, folder_str, marker='', index=''):
