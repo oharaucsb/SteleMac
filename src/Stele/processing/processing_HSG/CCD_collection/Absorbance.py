@@ -2,17 +2,18 @@ import os
 import errno
 import json
 import numpy as np
+from . import CCD
 
 np.set_printoptions(linewidth=500)
 
 
-class Absorbance(CCD):
+class Absorbance(CCD.CCD):
     def __init__(self, fname):
         """
         There are several ways Absorbance data can be loaded
-        You could try to load the abs data output from data collection directly,
-        which has the wavelength, raw, blank and actual absorbance data itself.
-        This is best way to do it.
+        You could try to load the abs data output from data collection
+        directly, which has the wavelength, raw, blank and actual absorbance
+        data itself. This is best way to do it.
 
         Alternatively, you could want to load the raw transmission/reference
         data, ignoring (or maybe not even having) the abs calculated
@@ -33,7 +34,7 @@ class Absorbance(CCD):
 
         Note, the error bars for this data haven't been defined.
 
-        :param fname: either an absorbance filename, or a length 2 list of filenames
+        :param fname: an absorbance filename or a length 2 list of filenames
         :type fname: str
         :return: None
         """
@@ -45,7 +46,8 @@ class Absorbance(CCD):
             #   Raw counts of the sample
             self.raw_data = np.array(self.ccd_data[:, [0, 2]])
             #   The calculated absorbance data (-10*log10(raw/ref))
-            self.proc_data = np.array(self.ccd_data[:, [0, 3]]) # Already in dB's
+            self.proc_data = np.array(self.ccd_data[:, [0, 3]])
+            # Already in dB's
 
         else:
             # Should be here if you pass the reference/trans filenames
@@ -63,14 +65,14 @@ class Absorbance(CCD):
 
                 # See CCD.__init__ for what's going on.
 
-                self.ref_data = np.flipud(np.genfromtxt(fname[0], comments='#',
-                                                        delimiter=',', usecols=(0, 1)))
+                self.ref_data = np.flipud(np.genfromtxt(
+                    fname[0], comments='#', delimiter=',', usecols=(0, 1)))
 
                 self.ref_data = np.array(self.ref_data[:1600, :])
                 self.ref_data[:, 0] = 1239.84 / self.ref_data[:, 0]
 
-                self.raw_data = np.flipud(np.genfromtxt(fname[1], comments='#',
-                                                        delimiter=',', usecols=(0, 1)))
+                self.raw_data = np.flipud(np.genfromtxt(
+                    fname[1], comments='#', delimiter=',', usecols=(0, 1)))
 
                 self.raw_data = np.array(self.raw_data[:1600, :])
                 self.raw_data[:, 0] = 1239.84 / self.raw_data[:, 0]
@@ -80,8 +82,8 @@ class Absorbance(CCD):
             # Calculate the absorbance from the raw camera counts.
             self.proc_data = np.empty_like(self.ref_data)
             self.proc_data[:, 0] = self.ref_data[:, 0]
-            self.proc_data[:, 1] = -10*np.log10(self.raw_data[:, 1] / self.ref_data[:,
-                                                                     1])
+            self.proc_data[:, 1] = -10*np.log10(
+                self.raw_data[:, 1] / self.ref_data[:, 1])
 
     def abs_per_QW(self, qw_number):
         """
@@ -91,12 +93,13 @@ class Absorbance(CCD):
         :return: None
         """
         """
-        This method turns the absorption to the absorbance per quantum well.  Is
-        that how this data should be reported?
+        This method turns the absorption to the absorbance per quantum well.
+            Is that how this data should be reported?
 
         Also, I'm not sure if columns 1 and 2 are correct.
         """
-        temp_abs = -np.log(self.proc_data[:, 1] / self.proc_data[:, 2]) / qw_number
+        temp_abs = -np.log(
+            self.proc_data[:, 1] / self.proc_data[:, 2]) / qw_number
         self.proc_data = np.hstack((self.proc_data, temp_abs))
 
     def fft_smooth(self, cutoff, inspectPlots=False):
@@ -104,19 +107,23 @@ class Absorbance(CCD):
         This function removes the Fabry-Perot that affects the absorption data
 
         creates:
-        self.clean = np.array of the Fourier-filtered absorption data, freq (eV) vs. absorbance (dB!)
-        self.parameters['fourier cutoff'] = the low pass cutoff frequency, in eV**(-1)
+        self.clean = np.array of the Fourier-filtered absorption data,
+            freq (eV) vs. absorbance (dB!)
+        self.parameters['fourier cutoff'] = the low pass cutoff frequency,
+            in eV**(-1)
         :param cutoff: Fourier frequency of the cut off for the low pass filter
         :type cutoff: int or float
         :param inspectPlots: Do you want to see the results?
         :type inspectPlots: bool
         :return: None
         """
-        # self.fixed = -np.log10(abs(self.raw_data[:, 1]) / abs(self.ref_data[:, 1]))
+        # self.fixed = -np.log10(abs(self.raw_data[:, 1])
+        #              / abs(self.ref_data[:, 1]))
         # self.fixed = np.nan_to_num(self.proc_data[:, 1])
         # self.fixed = np.column_stack((self.raw_data[:, 0], self.fixed))
         self.parameters['fourier cutoff'] = cutoff
-        self.clean = low_pass_filter(self.proc_data[:, 0], self.proc_data[:, 1], cutoff, inspectPlots)
+        self.clean = low_pass_filter(
+            self.proc_data[:, 0], self.proc_data[:, 1], cutoff, inspectPlots)
 
     def save_processing(self, file_name, folder_str, marker='', index=''):
         """
@@ -128,9 +135,10 @@ class Absorbance(CCD):
         :type file_name: str
         :param folder_str: The name of the folder where the file will be saved
         :type folder_str: str
-        :param marker: A further label that might be the series tag or something
+        :param marker: A further label that might be the series tag or such
         :type marker: str
-        :param index: If multiple files are being saved with the same name, include an integer to append to the end of the file
+        :param index: If multiple files are being saved with the same name,
+            include an integer to append to the end of the file
         :type index: int
         :return: None
         """
@@ -146,27 +154,35 @@ class Absorbance(CCD):
         self.save_name = spectra_fname
 
         try:
-            parameter_str = json.dumps(self.parameters, sort_keys=True, indent=4, separators=(',', ': '))
+            parameter_str = json.dumps(
+                self.parameters, sort_keys=True, indent=4,
+                separators=(',', ': '))
         except:
             print("Source: EMCCD_image.save_images\nJSON FAILED")
             print("Here is the dictionary that broke JSON:\n", self.parameters)
             return
         parameter_str = parameter_str.replace('\n', '\n#')
 
-        num_lines = parameter_str.count('#')  # Make the number of lines constant so importing into Origin is easier
+        # Make the number of lines constant so importing into Origin is easier
+        num_lines = parameter_str.count('#')
         # for num in range(99 - num_lines): parameter_str += '\n#'
         parameter_str += '\n#' * (99 - num_lines)
 
-        origin_import_spec = '\nNIR frequency,Signal,Standard error\neV,arb. u.,arb. u.'
+        origin_import_spec = (
+            '\nNIR frequency,Signal,Standard error\neV,arb. u.,arb. u.')
         spec_header = '#' + parameter_str + origin_import_spec
-        # spec_header = '#' + parameter_str + '\n#' + self.description[:-2] + origin_import_spec
+        # spec_header = ('#' + parameter_str +
+        # '\n#' + self.description[:-2] + origin_import_spec)
 
-        np.savetxt(os.path.join(folder_str, spectra_fname), self.proc_data, delimiter=',',
-                   header=spec_header, comments='', fmt='%0.6e')
+        np.savetxt(
+            os.path.join(folder_str, spectra_fname), self.proc_data,
+            delimiter=',', header=spec_header, comments='', fmt='%0.6e')
         spectra_fname = 'clean ' + spectra_fname
-        np.savetxt(os.path.join(folder_str, spectra_fname), self.clean, delimiter=',',
-                   header=spec_header, comments='', fmt='%0.6e')
-        print("Save image.\nDirectory: {}".format(os.path.join(folder_str, spectra_fname)))
+        np.savetxt(
+            os.path.join(folder_str, spectra_fname), self.clean, delimiter=',',
+            header=spec_header, comments='', fmt='%0.6e')
+        print("Save image.\nDirectory: {}".format(
+            os.path.join(folder_str, spectra_fname)))
 
 # class LaserLineCCD(HighSidebandCCD):
 #     """
