@@ -158,7 +158,7 @@ class Absorbance(CCD.CCD):
             parameter_str = json.dumps(
                 self.parameters, sort_keys=True, indent=4,
                 separators=(',', ': '))
-        except:
+        except Exception:
             print("Source: EMCCD_image.save_images\nJSON FAILED")
             print("Here is the dictionary that broke JSON:\n", self.parameters)
             return
