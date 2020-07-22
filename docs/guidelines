@@ -1,0 +1,21 @@
+A useful set of guidelines to help keep the code nice, clear, and extendable
+These are in no particular order.
+
+- Use a linter with the requisite styles, currently Pep8, mccabe, pyflakes
+
+- One object, one file. Keep objects in their own files with clear filenames
+
+- One file, one commit. Stage your changes so each commit clearly reflects the
+    changes made to the specific files it appears next to. This is incredibly
+    helpful for anyone trying to understand changes made to the code by reading
+    commits
+
+    Special note should be taken for moving a function or object from one file
+    to another, then it is appropriate to commit both files at once.
+
+    Similarly, if one action has been performed across multiple files, such as
+    updating a dependency being moved, that could appropriately be one commit.
+
+    Use your best judgment.
+
+- Have clear and informative commit messages.
