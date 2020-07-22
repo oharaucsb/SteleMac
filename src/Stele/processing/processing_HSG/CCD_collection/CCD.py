@@ -1,10 +1,12 @@
 import json
 import numpy as np
 import os
+from .CCD_collection import helperFunctions
 
 np.set_printoptions(linewidth=500)
 
 
+# TODO: reduce object initialization complexity to mccabe limit
 class CCD(object):
     def __init__(self, fname, spectrometer_offset=None):
         """
@@ -100,17 +102,18 @@ class CCD(object):
         # Check to see if the spectrometer offset is set. This isn't specified
         # during data collection. This is a value that can be appended
         # when processing if it's realized the data is offset.
-        # This allows the offset to be specified and kept with the data file itself,
-        # instead of trying to do it in individual processing scripts
+        # This allows the offset to be specified and kept with the data file
+        # itself, instead of trying to do it in individual processing scripts
         #
-        # It's allowed as a kwarg parameter in this script for trying to determine
-        # what the correct offset should be
+        # It's allowed as a kwarg parameter in this script for trying to
+        # determine what the correct offset should be
         if spectrometer_offset is not None or "offset" in self.parameters:
             try:
                 self.ccd_data[:, 0] += float(self.parameters["offset"])
-            except:
+            except Exception:
                 self.ccd_data[:, 0] += spectrometer_offset
 
         # Convert from nm to eV
         # self.ccd_data[:, 0] = 1239.84 / self.ccd_data[:, 0]
-        self.ccd_data[:, 0] = photon_converter["nm"]["eV"](self.ccd_data[:, 0])
+        self.ccd_data[:, 0] = helperFunctions.photon_converter["nm"]["eV"](
+            self.ccd_data[:, 0])
