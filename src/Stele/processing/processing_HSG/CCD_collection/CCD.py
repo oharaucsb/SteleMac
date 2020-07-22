@@ -41,12 +41,13 @@ class CCD(object):
         # Checking restrictions from Windows path length limits. Check if able
         # open the file:
         try:
-            with open(fname) as f: pass
+            with open(fname) as f:
+                pass
         except FileNotFoundError:
-            # Couldn't find the file. Could be you passed the wrong one, but I'm
-            # finding with a large number of subfolders for polarimetry stuff,
-            # you end up exceeding Windows'  filelength limit.
-            # Haven't tested on Mac or UNC moutned drives (e.g \\128.x.x.x\Sherwin\)
+            # Couldn't find the file. Could be you passed the wrong one, but
+            # I'm finding with a large number of subfolders for polarimetry
+            # stuff, you end up exceeding Windows'  filelength limit. Haven't
+            # tested on Mac or UNC moutned drives (e.g \\128.x.x.x\Sherwin\)
             fname = r"\\?\\" + os.path.abspath(fname)
 
         # Read in the JSON-formatted parameter string.
@@ -56,7 +57,7 @@ class CCD(object):
             param_str = ''
             line = f.readline()
             while line[0] == '#':
-                ### changed 09/17/18
+                # changed 09/17/18
                 # This line assumed there was a single '#'
                 # param_str += line[1:]
                 # while this one handles everal (because I found old files
@@ -67,32 +68,33 @@ class CCD(object):
             try:
                 self.parameters = json.loads(param_str)
             except json.JSONDecodeError:
-                # error from _really_ old data where comments were dumped after a
-                # single-line json dumps
-                self.parameters=json.loads(param_str.splitlines()[0])
+                # error from _really_ old data where comments were dumped after
+                # a single-line json dumps
+                self.parameters = json.loads(param_str.splitlines()[0])
 
-        # Spec[trometer] steps are set to define the same physical data, but taken at
-        # different spectrometer center wavelengths. This value is used later
-        # for stitching these scans together
+        # Spec[trometer] steps are set to define the same physical data, but
+        # taken at different spectrometer center wavelengths. This value is
+        # used later for stitching these scans together
         try:
             self.parameters["spec_step"] = int(self.parameters["spec_step"])
         except (ValueError, KeyError):
             # If there isn't a spe
             self.parameters["spec_step"] = 0
 
-        # Slice through 3 to get rid of comments/origin info.
-        # Would likely be better to check np.isnan() and slicing out those nans.
-        # I used flipup so that the x-axis is an increasing function of frequency
-        self.raw_data = np.flipud(np.genfromtxt(fname, comments='#', delimiter=',')[3:])
+        # Slice through 3 to get rid of comments/origin info. Would likely be
+        # better to check np.isnan() and slicing out those nans. I used flipup
+        # so that the x-axis is an increasing function of frequency
+        self.raw_data = np.flipud(np.genfromtxt(
+            fname, comments='#', delimiter=',')[3:])
 
-
-        # The camera chip is 1600 pixels wide. This line was redudent with the [3:]
-        # slice above and served to make sure there weren't extra stray bad lines
-        # hanging around.
+        # The camera chip is 1600 pixels wide. This line was redudent with the
+        # [3:] slice above and served to make sure there weren't extra stray
+        # bad lines hanging around.
         #
-        # This should also be updated some day to compensate for any horizontal bining
-        # on the chip, or masking out points that are bad (cosmic ray making it
-        # through processing, room lights or monitor lines interfering with signal)
+        # This should also be updated some day to compensate for any horizontal
+        # bining on the chip, or masking out points that are bad (cosmic ray
+        # making it through processing, room lights or monitor lines
+        # interfering with signal)
         self.ccd_data = np.array(self.raw_data[:1600, :])
 
         # Check to see if the spectrometer offset is set. This isn't specified
