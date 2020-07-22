@@ -106,3 +106,18 @@ def low_pass_filter(x_vals, y_vals, cutoff, inspectPlots=True):
         a.draggable(True)
 
     return np.column_stack((x_vals, y_vals))
+
+
+# photonConverter[A][B](x):
+#    convert x from A to B.
+photon_converter = {
+    "nm": {
+        "nm": lambda x: x,           "eV": lambda x: 1239.84/x,
+        "wavenumber": lambda x: 10000000./x},
+    "eV": {
+        "nm": lambda x: 1239.84/x,   "eV": lambda x: x,
+        "wavenumber": lambda x: 8065.56 * x},
+    "wavenumber": {
+        "nm": lambda x: 10000000./x, "eV": lambda x: x/8065.56,
+        "wavenumber": lambda x: x}
+}
