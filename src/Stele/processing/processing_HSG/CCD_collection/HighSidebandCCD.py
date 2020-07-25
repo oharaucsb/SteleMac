@@ -6,6 +6,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 from .CCD_collection import CCD
+from .processing.processing_HSG import helperFunctions as procHSGHelp
 
 np.set_printoptions(linewidth=500)
 
@@ -1089,17 +1090,17 @@ class HighSidebandCCD(CCD.CCD):
                     data_temp[0, 0], data_temp[-1, 0], num=500)
                 if elem != 0:
                     try:
-                        plt.plot(x_vals, gauss(x_vals, *p0),
+                        plt.plot(x_vals, procHSGHelp.gauss(x_vals, *p0),
                                  # I don't really know. Mostly
                                  plt.gca().get_lines()[-1].get_color() + '--',
                                  # just looked around at what functions
                                  # matplotlib has...
                                  linewidth=linewidth)
                     except:  # to prevent weird mac issues with the matplotlib things?
-                        plt.plot(x_vals, gauss(x_vals, *p0), '--', linewidth=linewidth)
+                        plt.plot(x_vals, procHSGHelp.gauss(x_vals, *p0), '--', linewidth=linewidth)
 
                 else:
-                    plt.plot(x_vals, gauss(x_vals, *p0), '--', linewidth=linewidth)
+                    plt.plot(x_vals, procHSGHelp.gauss(x_vals, *p0), '--', linewidth=linewidth)
 
             try:
                 # 11/1/16
@@ -1162,16 +1163,16 @@ class HighSidebandCCD(CCD.CCD):
                 x_vals = np.linspace(data_temp[0, 0], data_temp[-1, 0], num=500)
                 if elem != 0:
                     try:
-                        plt.plot(x_vals, gauss(x_vals, *coeff),
+                        plt.plot(x_vals, procHSGHelp.gauss(x_vals, *coeff),
                                  plt.gca().get_lines()[-1].get_color() + '--'  # I don't really know. Mostly
                                  # just looked around at what functions
                                  # matplotlib has...
                                  , linewidth=linewidth)
                     except:  # to prevent weird mac issues with the matplotlib things?
-                        plt.plot(x_vals, gauss(x_vals, *coeff), '--', linewidth=linewidth)
+                        plt.plot(x_vals, procHSGHelp.gauss(x_vals, *coeff), '--', linewidth=linewidth)
 
                 else:
-                    plt.plot(x_vals, gauss(x_vals, *coeff), '--', linewidth=linewidth)
+                    plt.plot(x_vals, procHSGHelp.gauss(x_vals, *coeff), '--', linewidth=linewidth)
         sb_fits_temp = np.asarray(sb_fits)
         reorder = [0, 1, 5, 2, 6, 3, 7, 4, 8]
         # Reorder the list to put the error of the i-th parameter as the i+1th.

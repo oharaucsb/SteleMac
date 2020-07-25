@@ -1,4 +1,5 @@
 import numpy as np
+from .processing.processing_HSG import helperFunctions as procHSGHelp
 
 
 def lingauss(x, *p):
@@ -58,4 +59,4 @@ def gaussWithBackground(x, *p):
     """
     pGauss = p[:4]
     a, b = p[4:]
-    return gauss(x, *pGauss) + background(x, a, b)
+    return procHSGHelp.gauss(x, *pGauss) + background(x, a, b)

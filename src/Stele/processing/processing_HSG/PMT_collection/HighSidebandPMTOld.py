@@ -4,6 +4,7 @@ import json
 import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
+from .processing.processing_HSG import helperFunctions as procHSGHelp
 
 np.set_printoptions(linewidth=500)
 
@@ -209,7 +210,7 @@ class HighSidebandPMTOld(PMT):
             if verbose:
                 x_vals = np.linspace(np.amin(sideband[1][:, 0]),
                                      np.amax(sideband[1][:, 0]), num=50)
-                plt.plot(x_vals, gauss(x_vals, *p0),
+                plt.plot(x_vals, procHSGHelp.gauss(x_vals, *p0),
                          label="fit :{}".format(sideband[1]))
                 print("p0:", p0)
             try:
@@ -237,7 +238,7 @@ class HighSidebandPMTOld(PMT):
                     if plot:
                         x_vals = np.linspace(np.amin(sideband[1][:, 0]),
                                              np.amax(sideband[1][:, 0]), num=50)
-                        plt.plot(x_vals, gauss(x_vals, *coeff))
+                        plt.plot(x_vals, procHSGHelp.gauss(x_vals, *coeff))
                         # plt.plot(x_vals, gauss(x_vals, *p0))
                 else:
                     print("what happened?")
