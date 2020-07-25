@@ -518,16 +518,21 @@ class HighSidebandCCD(CCD.CCD):
                 octant = 1
 
             check_max_area = np.sum(
-                check_y[check_max_index - octant - 1:check_max_index + octant + 1])
+                check_y[check_max_index - octant - 1:
+                        check_max_index + octant + 1])
 
             if verbose and plot:
                 plt.figure("CCD data")
-                plt.plot([lo_freq_bound] * 2, [0, check_y[check_max_index]], 'b')
-                plt.plot([hi_freq_bound] * 2, [0, check_y[check_max_index]], 'b')
-                plt.plot([lo_freq_bound, hi_freq_bound], [check_y[check_max_index]] *
-                         2, 'b', label=order)
-                plt.text((lo_freq_bound + hi_freq_bound) / 2, check_y[check_max_index],
-                         order)
+                plt.plot(
+                    [lo_freq_bound] * 2, [0, check_y[check_max_index]], 'b')
+                plt.plot(
+                    [hi_freq_bound] * 2, [0, check_y[check_max_index]], 'b')
+                plt.plot(
+                    [lo_freq_bound, hi_freq_bound],
+                    [check_y[check_max_index]] * 2, 'b', label=order)
+                plt.text(
+                    (lo_freq_bound + hi_freq_bound) / 2,
+                    check_y[check_max_index], order)
 
             no_peak = (2 * len(
                 check_y)) // 6  # The denominator is in flux, used to be 5
@@ -538,7 +543,8 @@ class HighSidebandCCD(CCD.CCD):
             check_stdev = np.std(np.take(check_y, np.concatenate(
                 (np.arange(no_peak), np.arange(-no_peak, 0)))))
 
-            check_ratio = (check_max_area - (2 * octant + 1) * check_ave) / check_stdev
+            check_ratio = (
+                check_max_area - (2 * octant + 1) * check_ave) / check_stdev
 
             if verbose:
                 print("\tIndices: {}->{} (d={})".format(start_index, end_index,
@@ -550,28 +556,35 @@ class HighSidebandCCD(CCD.CCD):
                 # print "check_ratio is", check_ratio
 
                 print("\t" + ("{:^14}" * 4).format(
-                    "check_max_area", "check_ave", "check_stdev", "check_ratio"))
+                    "check_max_area", "check_ave",
+                    "check_stdev", "check_ratio"))
                 print("\t" + ("{:^14.6g}" * 4).format(
                     check_max_area, check_ave, check_stdev, check_ratio))
 
-            if order % 2 == 1:  # This raises the barrier for odd sideband detection
+            # This raises the barrier for odd sideband detection
+            if order % 2 == 1:
                 check_ratio = check_ratio / 2
             if check_ratio > cutoff:
                 found_index = check_max_index + start_index
                 self.sb_index.append(found_index)
                 last_sb = x_axis[found_index]
 
+# print "\tI found", order, "at index", found_index, "at freq", last_sb
                 if verbose:
-                    print("\tI'm counting this SB at index {} (f={:.4f})".format(
-                        found_index, last_sb), end=' ')
-                    # print "\tI found", order, "at index", found_index, "at freq", last_sb
+                    print(
+                        "\tI'm counting this SB at index {} (f={:.4f})".format(
+                            found_index, last_sb),
+                        end=' ')
 
-                sb_freq_guess.append(x_axis[found_index])
-                sb_amp_guess.append(check_max_area - (2 * octant + 1) * check_ave)
-                error_est = np.sqrt(sum([i ** 2 for i in error[
-                                                         found_index - octant:found_index + octant]])) / (
-                                    check_max_area - (2 * octant + 1) * check_ave)
+                sb_freq_guess.append(
+                    x_axis[found_index])
+                sb_amp_guess.append(
+                    check_max_area - (2 * octant + 1) * check_ave)
                 # This error is a relative error.
+                error_est = (
+                    np.sqrt(sum([i ** 2 for i in error[
+                        found_index - octant:found_index + octant]]))
+                    / (check_max_area - (2 * octant + 1) * check_ave))
                 if verbose:
                     print(". Err = {:.3g}".format(error_est))
                     # print "\tMy error estimate is:", error_est
@@ -589,7 +602,7 @@ class HighSidebandCCD(CCD.CCD):
                     consecutive_null_odd += 1
                 if verbose:
                     print("\t\tI did not count this sideband")
-            if consecutive_null_odd == 1 and no_more_odds == False:
+            if consecutive_null_odd == 1 and no_more_odds is False:
                 # print "I'm done looking for odd sidebands"
                 no_more_odds = True
             if consecutive_null_sb == 2:
@@ -601,9 +614,12 @@ class HighSidebandCCD(CCD.CCD):
             print('-' * 15)
             print()
             print()
-        self.sb_guess = np.array([np.asarray(sb_freq_guess), np.asarray(sb_amp_guess),
+
+        # self.sb_guess = [frequency guess, amplitude guess,
+        #                  relative error of amplitude] for each sideband.
+        self.sb_guess = np.array([np.asarray(sb_freq_guess),
+                                  np.asarray(sb_amp_guess),
                                   np.asarray(sb_error_est)]).T
-        # self.sb_guess = [frequency guess, amplitude guess, relative error of amplitude] for each sideband.
 
     def guess_sidebandsOld(self, cutoff=4.5, verbose=False, plot=False, **kwargs):
         """
