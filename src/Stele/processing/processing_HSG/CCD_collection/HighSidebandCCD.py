@@ -1252,6 +1252,7 @@ class HighSidebandCCD(CCD.CCD):
         :return: freqNIR, freqTHz, the frequencies in the appropriate units
         """
         # force same units for in dict
+<<<<<<< HEAD
         freqNIR, freqTHz = helperFunctions.calc_laser_frequencies(
             self, "wavenumber", "wavenumber", bad_points)
 
@@ -1261,6 +1262,14 @@ class HighSidebandCCD(CCD.CCD):
             freqTHz, freqTHz)
         freqNIR, freqTHz = helperFunctions.calc_laser_frequencies(
             self, nir_units, thz_units, bad_points)
+=======
+        freqNIR, freqTHz = calc_laser_frequencies(
+            self, "wavenumber", "wavenumber", bad_points)
+
+        self.parameters["calculated NIR freq (cm-1)"] = "{}".format(freqNIR, nir_units)
+        self.parameters["calculated THz freq (cm-1)"] = "{}".format(freqTHz, freqTHz)
+        freqNIR, freqTHz = calc_laser_frequencies(self, nir_units, thz_units, bad_points)
+>>>>>>> 65d670b1a5a1f92f7a33296e1517baaef2ef301c
         return freqNIR, freqTHz
 
     def save_processing(self, file_name, folder_str, marker='', index='', verbose=''):
