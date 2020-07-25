@@ -1252,7 +1252,6 @@ class HighSidebandCCD(CCD.CCD):
         :return: freqNIR, freqTHz, the frequencies in the appropriate units
         """
         # force same units for in dict
-<<<<<<< HEAD
         freqNIR, freqTHz = helperFunctions.calc_laser_frequencies(
             self, "wavenumber", "wavenumber", bad_points)
 
@@ -1262,17 +1261,10 @@ class HighSidebandCCD(CCD.CCD):
             freqTHz, freqTHz)
         freqNIR, freqTHz = helperFunctions.calc_laser_frequencies(
             self, nir_units, thz_units, bad_points)
-=======
-        freqNIR, freqTHz = calc_laser_frequencies(
-            self, "wavenumber", "wavenumber", bad_points)
-
-        self.parameters["calculated NIR freq (cm-1)"] = "{}".format(freqNIR, nir_units)
-        self.parameters["calculated THz freq (cm-1)"] = "{}".format(freqTHz, freqTHz)
-        freqNIR, freqTHz = calc_laser_frequencies(self, nir_units, thz_units, bad_points)
->>>>>>> 65d670b1a5a1f92f7a33296e1517baaef2ef301c
         return freqNIR, freqTHz
 
-    def save_processing(self, file_name, folder_str, marker='', index='', verbose=''):
+    def save_processing(
+     self, file_name, folder_str, marker='', index='', verbose=''):
         """
         This will save all of the self.proc_data and the results from the
         fitting of this individual file.
@@ -1296,11 +1288,14 @@ class HighSidebandCCD(CCD.CCD):
 
         :param file_name: The base name for the saved file
         :type file_name: str
-        :param folder_str: The full name for the folder hte file is saved it.  Folder can be created
+        :param folder_str: The full name for the folder hte file is saved it.
+            Folder can be created
         :type folder_str: str
-        :param marker: Marker for the file, appended to file_name, often the self.parameters['series']
+        :param marker: Marker for the file, appended to file_name, often the
+            self.parameters['series']
         :type marker: str
-        :param index: used to keep these files from overwriting themselves when marker is the same
+        :param index: used to keep these files from overwriting themselves when
+            marker is the same
         :type index: str or int
         :return: None
         """
@@ -1313,7 +1308,8 @@ class HighSidebandCCD(CCD.CCD):
                 raise
         temp = np.array(self.sb_results)
 
-        ampli = np.array([temp[:, 3] / temp[:, 5]])  # But [:, 3] is already area?
+        # But [:, 3] is already area?
+        ampli = np.array([temp[:, 3] / temp[:, 5]])
         # (The old name was area)
         # I think it must be amplitude
         temp[:, 5:7] = temp[:, 5:7] * 1000  # For meV linewidths
@@ -1329,29 +1325,39 @@ class HighSidebandCCD(CCD.CCD):
         self.parameters['addenda'] = self.addenda
         self.parameters['subtrahenda'] = self.subtrahenda
         try:
-            parameter_str = json.dumps(self.parameters, sort_keys=True, indent=4, separators=(',', ': '))
-        except:
+            parameter_str = json.dumps(
+                self.parameters, sort_keys=True, indent=4,
+                separators=(',', ': '))
+        except Exception:
             print("Source: EMCCD_image.save_images\nJSON FAILED")
             print("Here is the dictionary that broke JSON:\n", self.parameters)
             return
         parameter_str = parameter_str.replace('\n', '\n#')
 
-        num_lines = parameter_str.count('#')  # Make the number of lines constant so importing is easier
+        # Make the number of lines constant so importing is easier
+        num_lines = parameter_str.count('#')
         # for num in range(99 - num_lines): parameter_str += '\n#'
         parameter_str += '\n#' * (99 - num_lines)
-        origin_import_spec = '\nNIR frequency,Signal,Standard error\neV,arb. u.,arb. u.'
+        origin_import_spec = (
+            '\nNIR frequency,Signal,Standard error\neV,arb. u.,arb. u.')
         spec_header = '#' + parameter_str + origin_import_spec
 
-        origin_import_fits  = '\nSideband,Center energy,error,Sideband strength,error,Linewidth,error,Amplitude'
+        origin_import_fits = (
+            # TODO: ensure splitting lines with a + for concatenation works
+            '\nSideband,Center energy,error,Sideband strength,error,'
+            + 'Linewidth,error,Amplitude')
         origin_import_fits += '\norder,eV,,arb. u.,,meV,,arb. u.'
         origin_import_fits += "\n{},,,{},,,".format(marker, marker)
         fits_header = '#' + parameter_str + origin_import_fits
 
         # print "DEBUG: in saving", folder_str, ",", spectra_fname
 
-        np.savetxt(os.path.join(folder_str, spectra_fname), self.proc_data, delimiter=',',
-                   header=spec_header, comments='', fmt='%0.6e')
-        np.savetxt(os.path.join(folder_str, fit_fname), save_results, delimiter=',',
-                   header=fits_header, comments='', fmt='%0.6e')
+        np.savetxt(
+            os.path.join(folder_str, spectra_fname), self.proc_data,
+            delimiter=',', header=spec_header, comments='', fmt='%0.6e')
+        np.savetxt(
+            os.path.join(folder_str, fit_fname), save_results,
+            delimiter=',', header=fits_header, comments='', fmt='%0.6e')
         if verbose:
-            print("Save image.\nDirectory: {}".format(os.path.join(folder_str, spectra_fname)))
+            print("Save image.\nDirectory: {}".format(os.path.join(
+                folder_str, spectra_fname)))
