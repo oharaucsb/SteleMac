@@ -7,6 +7,7 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 from .CCD_collection import CCD
 from .processing.processing_HSG import helperFunctions as procHSGHelp
+from .CCD_collection import helperFunctions
 
 np.set_printoptions(linewidth=500)
 
@@ -1251,14 +1252,14 @@ class HighSidebandCCD(CCD.CCD):
         :return: freqNIR, freqTHz, the frequencies in the appropriate units
         """
         # force same units for in dict
-        freqNIR, freqTHz = calc_laser_frequencies(
+        freqNIR, freqTHz = helperFunctions.calc_laser_frequencies(
             self, "wavenumber", "wavenumber", bad_points)
 
         self.parameters["calculated NIR freq (cm-1)"] = "{}".format(
             freqNIR, nir_units)
         self.parameters["calculated THz freq (cm-1)"] = "{}".format(
             freqTHz, freqTHz)
-        freqNIR, freqTHz = calc_laser_frequencies(
+        freqNIR, freqTHz = helperFunctions.calc_laser_frequencies(
             self, nir_units, thz_units, bad_points)
         return freqNIR, freqTHz
 

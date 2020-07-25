@@ -1323,61 +1323,8 @@ def integrateData(data, t1, t2, ave=False):
         return tot, error
     return tot
 
-def calc_laser_frequencies(spec, nir_units="eV", thz_units="eV",
-                           bad_points=-2, inspect_plots=False):
-    """
-    Calculate the NIR and FEL frequency for a spectrum
-    :param spec: HSGCCD object to fit
-    :type spec: HighSidebandCCD
-    :param nir_units: str of desired units.
-        Options: wavenumber, eV, meV, THz, GHz, nm
-    :param thz_units: str of desired units.
-        Options: wavenumber, eV, meV, THz, GHz, nm
-    :param bad_points: How many bad points which shouldn't be used
-        to calculate the frequencies (generally because the last
-        few points are noisy and unreliable)
-    :return: <NIR freq>, <THz freq>
-    """
-    if not hasattr(spec, "sb_results"):
-        spec.guess_sidebands()
-        spec.fit_sidebands()
 
-    sidebands = spec.sb_results[:, 0]
-    locations = spec.sb_results[:, 1]
-    errors = spec.sb_results[:, 2]
-    try:
-        p = np.polyfit(sidebands[1:bad_points],
-                       # This is 1 because the peak picker function was calling the 10th order the 9th
-                       locations[1:bad_points], deg=1)
-    except TypeError:
-        # if there aren't enough sidebands to fit, give -1
-        p = [-1, -1]
-
-    NIRfreq = p[1]
-    THzfreq = p[0]
-
-    if inspect_plots:
-        plt.figure("Frequency Fit")
-        plt.errorbar(sidebands, locations, errors, marker='o')
-        plt.errorbar(sidebands[:bad_points], locations[:bad_points],
-                     errors[:bad_points], marker='o')
-        plt.plot(sidebands, np.polyval(p, sidebands))
-
-    converter = {
-        "eV": lambda x: x,
-        "meV": lambda x: 1000. * x,
-        "wavenumber": lambda x: 8065.6 * x,
-        "THz": lambda x: 241.80060 * x,
-        "GHz": lambda x: 241.80060 * 1e3 * x,
-        "nm": lambda x: 1239.83 / x
-    }
-
-    freqNIR = converter.get(nir_units, converter["eV"])(NIRfreq)
-    freqTHz = converter.get(thz_units, converter["eV"])(THzfreq)
-
-    return freqNIR, freqTHz
-
-def get_data_and_header(fname, returnOrigin = False):
+def get_data_and_header(fname, returnOrigin=False):
     """
     Given a file to a raw data file, returns the data
     and the json decoded header.
