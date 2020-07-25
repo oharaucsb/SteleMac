@@ -1,20 +1,6 @@
 import numpy as np
 
 
-def gauss(x, *p):
-    """
-    Gaussian fit function.
-
-    :param x: The independent variable
-    :type x: np.array, or int or float
-    :param p: [mean, area, width, y offset] to be unpacked
-    :type p: list of floats or ints
-    :return: Depends on x, returns another np.array or float or int
-    :rtype: type(x)
-    """
-    mu, A, sigma, y0 = p
-    return (A / sigma) * np.exp(-(x - mu) ** 2 / (2. * sigma ** 2)) + y0
-
 def lingauss(x, *p):
     """
     Gaussian fit function with a linear offset

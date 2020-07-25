@@ -7,6 +7,21 @@ def my_lambda(x):
     return x.nonzero()[0]
 
 
+def gauss(x, *p):
+    """
+    Gaussian fit function.
+
+    :param x: The independent variable
+    :type x: np.array, or int or float
+    :param p: [mean, area, width, y offset] to be unpacked
+    :type p: list of floats or ints
+    :return: Depends on x, returns another np.array or float or int
+    :rtype: type(x)
+    """
+    mu, A, sigma, y0 = p
+    return (A / sigma) * np.exp(-(x - mu) ** 2 / (2. * sigma ** 2)) + y0
+
+
 def handle_nans(y_vals):
     """
     This function removes nans and replaces them with linearly interpolated
