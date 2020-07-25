@@ -12,7 +12,7 @@ np.set_printoptions(linewidth=500)
 
 class HighSidebandCCD(CCD.CCD):
     def __init__(
-        self, hsg_thing, parameter_dict=None, spectrometer_offset=None):
+     self, hsg_thing, parameter_dict=None, spectrometer_offset=None):
         """
         This will read the appropriate file.  The header needs to be fixed to
         reflect the changes to the output header from the Andor file.  Because
@@ -239,14 +239,15 @@ class HighSidebandCCD(CCD.CCD):
         so I've finally merged them into one.
 
         Finds the locations of all the sidebands in the proc_data array to be
-        able to seed the fitting method.  This works by finding the maximum data
-        value in the array and guessing what sideband it is.  It creates an array
-        that includes this information.  It will then step down, initially by one
-        THz frequency, then by twos after it hasn't found any odd ones.  It then
-        goes up from the max and finds everything above in much the same way.
+        able to seed the fitting method.  This works by finding the maximum
+        data value in the array and guessing what sideband it is.  It creates
+        an array that includes this information.  It will then step down,
+        initially by one THz frequency, then by twos after it hasn't found any
+        odd ones.  It then goes up from the max and finds everything above in
+        much the same way.
 
-        There is currently no rhyme or reason to a cutoff of 8.  I don't know what
-        it should be changed to, though.
+        There is currently no rhyme or reason to a cutoff of 8.  I don't know
+        what it should be changed to, though.
 
         Input:
         cutoff = signal-to-noise threshold to count a sideband candidate.
@@ -263,7 +264,8 @@ class HighSidebandCCD(CCD.CCD):
         self.sb_guess = three-part list including the frequency, amplitude and
                         error guesses for each sideband
         """
-        # TODO: this isn't commented appropriately.  Will it be made more readable first?
+        # TODO: this isn't commented appropriately.
+        #   Will it be made more readable first?
 
         if "cutoff" in self.parameters:
             cutoff = self.parameters["cutoff"]
@@ -314,7 +316,8 @@ class HighSidebandCCD(CCD.CCD):
             check_y = y_axis[global_max - 15:global_max + 15]
 
         check_max_index = np.argmax(check_y)
-        check_max_area = np.sum(check_y[check_max_index - 2:check_max_index + 3])
+        check_max_area = np.sum(
+            check_y[check_max_index - 2:check_max_index + 3])
 
         check_ave = np.mean(check_y[[0, 1, 2, 3, 4, -1, -2, -3, -4, -5]])
         check_stdev = np.std(check_y[[0, 1, 2, 3, 4, -1, -2, -3, -4, -5]])
@@ -325,7 +328,8 @@ class HighSidebandCCD(CCD.CCD):
                 "global_max idx", "check_max_area", "check_ave", "check_stdev",
                 "check_ratio"))
             print(("{:^16.5g}" * 5).format(
-                global_max, check_max_area, check_ave, check_stdev, check_ratio))
+                global_max, check_max_area, check_ave,
+                check_stdev, check_ratio))
 
         if check_ratio > cutoff:
             self.sb_list = [order_init]
@@ -333,18 +337,20 @@ class HighSidebandCCD(CCD.CCD):
             sb_freq_guess = [x_axis[global_max]]
             sb_amp_guess = [y_axis[global_max]]
             sb_error_est = [
-                np.sqrt(sum([i ** 2 for i in error[global_max - 2:global_max + 3]])) / (
-                            check_max_area - 5 * check_ave)]
+                np.sqrt(sum(
+                    [i ** 2 for i in error[global_max - 2:global_max + 3]]))
+                / (check_max_area - 5 * check_ave)]
         else:
             print("There are no sidebands in", self.fname)
             raise RuntimeError
 
         if verbose:
-            print("\t Looking for sidebands with f < {:.6f}".format(sb_freq_guess[0]))
+            print("\t Looking for sidebands with f < {:.6f}".format(
+                sb_freq_guess[0]))
         last_sb = sb_freq_guess[0]
         index_guess = global_max
-        # keep track of how many consecutive sidebands we've skipped. Sometimes one's
-        #  noisy or something, so we want to keep looking after skipping one
+        # keep track of how many consecutive sidebands we've skipped. Sometimes
+        # one's noisy or something, so we keep looking after skipping one
         consecutive_null_sb = 0
         consecutive_null_odd = 0
         no_more_odds = False
@@ -352,15 +358,15 @@ class HighSidebandCCD(CCD.CCD):
         for order in range(order_init - 1, min_sb - 1, -1):
             # Check to make sure we're not looking at an odd when
             # we've decided to skip them.
-            if no_more_odds == True and order % 2 == 1:
+            if no_more_odds is True and order % 2 == 1:
                 last_sb = last_sb - thz_freq
                 if verbose:
                     print("I skipped", order)
                 continue
 
-            # Window size to look for next sideband. Needs to be order dependent
-            # because higher orders get wider, so we need to look at more.
-            # Values are arbitrary.
+            # Window size to look for next sideband. Needs to be order
+            # dependent because higher orders get wider, so we need to look at
+            # more. Values are arbitrary.
             window_size = 0.45 + 0.0004 * order  # used to be last_sb?
             lo_freq_bound = last_sb - thz_freq * (
                         1 + window_size)  # Not sure what to do about these
@@ -371,9 +377,10 @@ class HighSidebandCCD(CCD.CCD):
                 print("\t{:.4f} < f_{} < {:.4f}".format(lo_freq_bound, order,
                                                         hi_freq_bound))
 
-            # Get the indices where the energies lie within the bounds for this SB
+            # Get the indices tenergies lie within the bounds for this SB
             sliced_indices = \
-            np.where((x_axis > lo_freq_bound) & (x_axis < hi_freq_bound))[0]
+                np.where((x_axis > lo_freq_bound)
+                         & (x_axis < hi_freq_bound))[0]
             start_index, end_index = sliced_indices.min(), sliced_indices.max()
 
             # Get a slice of the y_data which is only in the region of interest
@@ -383,18 +390,23 @@ class HighSidebandCCD(CCD.CCD):
                 check_y)  # This assumes that two floats won't be identical
             # Calculate the "area" of the sideband by looking at the peak value
             # within the range, and the pixel above/below it
-            check_max_area = np.sum(check_y[check_max_index - 1:check_max_index + 2])
+            check_max_area = np.sum(
+                check_y[check_max_index - 1:check_max_index + 2])
 
             if verbose and plot:
                 plt.figure("CCD data")
-                plt.plot([lo_freq_bound] * 2, [0, check_y[check_max_index]], 'b')
-                plt.plot([hi_freq_bound] * 2, [0, check_y[check_max_index]], 'b')
-                plt.plot([lo_freq_bound, hi_freq_bound], [check_y[check_max_index]] *
-                         2, 'b', label="{} Box".format(order))
-                plt.text((lo_freq_bound + hi_freq_bound) / 2, check_y[check_max_index],
-                         order)
+                plt.plot(
+                    [lo_freq_bound] * 2, [0, check_y[check_max_index]], 'b')
+                plt.plot(
+                    [hi_freq_bound] * 2, [0, check_y[check_max_index]], 'b')
+                plt.plot(
+                    [lo_freq_bound, hi_freq_bound], [check_y[check_max_index]]
+                    * 2, 'b', label="{} Box".format(order))
+                plt.text(
+                    (lo_freq_bound + hi_freq_bound) / 2,
+                    check_y[check_max_index], order)
 
-            # get the slice that doesn't have the peak in it to compare statistics
+            # get slice that doesn't have the peak in it to compare statistics
             check_region = np.append(check_y[:check_max_index - 1],
                                      check_y[check_max_index + 2:])
             check_ave = check_region.mean()
@@ -404,11 +416,13 @@ class HighSidebandCCD(CCD.CCD):
             # background level
             check_ratio = (check_max_area - 3 * check_ave) / check_stdev
 
-            if order % 2 == 1:  # This raises the barrier for odd sideband detection
+            # This raises the barrier for odd sideband detection
+            if order % 2 == 1:
                 check_ratio = check_ratio / 1.5
             if verbose:
                 print("\t" + ("{:^14}" * 4).format(
-                    "check_max_area", "check_ave", "check_stdev", "check_ratio"))
+                    "check_max_area", "check_ave",
+                    "check_stdev", "check_ratio"))
                 print("\t" + ("{:^14.5g}" * 4).format(
                     check_max_area, check_ave, check_stdev, check_ratio))
 
@@ -424,7 +438,8 @@ class HighSidebandCCD(CCD.CCD):
                 sb_amp_guess.append(check_max_area - 3 * check_ave)
                 error_est = np.sqrt(
                     sum(
-                        [i ** 2 for i in error[found_index - 1:found_index + 2]]
+                        [i ** 2 for i in error[
+                            found_index - 1:found_index + 2]]
                     )) / (check_max_area - 3 * check_ave)
                 if verbose:
                     print("My error estimate is:", error_est)
@@ -439,7 +454,7 @@ class HighSidebandCCD(CCD.CCD):
                 consecutive_null_sb += 1
                 if order % 2 == 1:
                     consecutive_null_odd += 1
-            if consecutive_null_odd == 1 and no_more_odds == False:
+            if consecutive_null_odd == 1 and no_more_odds is False:
                 # print "I'm done looking for odd sidebands"
                 no_more_odds = True
             if consecutive_null_sb == 2:
@@ -447,7 +462,8 @@ class HighSidebandCCD(CCD.CCD):
                 break
 
         # Look for higher sidebands
-        if verbose: print("\nLooking for higher energy sidebands")
+        if verbose:
+            print("\nLooking for higher energy sidebands")
 
         last_sb = sb_freq_guess[0]
         index_guess = global_max
@@ -456,7 +472,7 @@ class HighSidebandCCD(CCD.CCD):
         no_more_odds = False
         break_condition = False
         for order in range(order_init + 1, max_sb + 1):
-            if no_more_odds == True and order % 2 == 1:
+            if no_more_odds is True and order % 2 == 1:
                 last_sb = last_sb + thz_freq
                 continue
             window_size = 0.45 + 0.001 * order  # used to be 0.28 and 0.0004
@@ -474,17 +490,17 @@ class HighSidebandCCD(CCD.CCD):
                 print("\t{:.4f} < f_{} < {:.4f}".format(lo_freq_bound, order,
                                                         hi_freq_bound))
             for i in range(index_guess, 1600):
-                if start_index == False and i == 1599:
+                if start_index is False and i == 1599:
                     # print "I'm all out of space, captain!"
                     break_condition = True
                     break
-                elif start_index == False and x_axis[i] > lo_freq_bound:
+                elif start_index is False and x_axis[i] > lo_freq_bound:
                     # print "start_index is", i
                     start_index = i
                 elif i == 1599:
                     end_index = 1599
                     # print "hit end of data, end_index is 1599"
-                elif end_index == False and x_axis[i] > hi_freq_bound:
+                elif end_index is False and x_axis[i] > hi_freq_bound:
                     end_index = i
                     # print "end_index is", i
                     index_guess = i
@@ -493,9 +509,11 @@ class HighSidebandCCD(CCD.CCD):
                 break
             check_y = y_axis[start_index:end_index]
 
-            check_max_index = np.argmax(
-                check_y)  # This assumes that two floats won't be identical
-            octant = len(check_y) // 8  # To be able to break down check_y into eighths
+            # This assumes that two floats won't be identical
+            check_max_index = np.argmax(check_y)
+
+            # To be able to break down check_y into eighths
+            octant = len(check_y) // 8
             if octant < 1:
                 octant = 1
 
