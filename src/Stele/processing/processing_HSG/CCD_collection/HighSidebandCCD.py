@@ -621,6 +621,7 @@ class HighSidebandCCD(CCD.CCD):
                                   np.asarray(sb_amp_guess),
                                   np.asarray(sb_error_est)]).T
 
+# TODO: altar guess_sidebands and guess_sidebandsOld to share functions
     def guess_sidebandsOld(
      self, cutoff=4.5, verbose=False, plot=False, **kwargs):
         """
@@ -823,7 +824,8 @@ class HighSidebandCCD(CCD.CCD):
                 sb_amp_guess.append(check_max_area - 3 * check_ave)
                 error_est = np.sqrt(
                     sum(
-                        [i ** 2 for i in error[found_index - 1:found_index + 2]]
+                        [i ** 2 for i in error[
+                            found_index - 1:found_index + 2]]
                     )) / (check_max_area - 3 * check_ave)
                 if verbose:
                     print("My error estimate is:", error_est)
@@ -838,7 +840,7 @@ class HighSidebandCCD(CCD.CCD):
                 consecutive_null_sb += 1
                 if order % 2 == 1:
                     consecutive_null_odd += 1
-            if consecutive_null_odd == 1 and no_more_odds == False:
+            if consecutive_null_odd == 1 and no_more_odds is False:
                 # print "I'm done looking for odd sidebands"
                 no_more_odds = True
             if consecutive_null_sb == 2:
@@ -846,7 +848,8 @@ class HighSidebandCCD(CCD.CCD):
                 break
 
         # Look for higher sidebands
-        if verbose: print("\nLooking for higher energy sidebands")
+        if verbose:
+            print("\nLooking for higher energy sidebands")
 
         last_sb = sb_freq_guess[0]
         index_guess = global_max
@@ -855,7 +858,7 @@ class HighSidebandCCD(CCD.CCD):
         no_more_odds = False
         break_condition = False
         for order in range(order_init + 1, max_sb + 1):
-            if no_more_odds == True and order % 2 == 1:
+            if no_more_odds is True and order % 2 == 1:
                 last_sb = last_sb + thz_freq
                 continue
             window_size = 0.45 + 0.001 * order  # used to be 0.28 and 0.0004
@@ -873,17 +876,17 @@ class HighSidebandCCD(CCD.CCD):
                 print("\t{:.4f} < f_{} < {:.4f}".format(lo_freq_bound, order,
                                                         hi_freq_bound))
             for i in range(index_guess, 1600):
-                if start_index == False and i == 1599:
+                if start_index is False and i == 1599:
                     # print "I'm all out of space, captain!"
                     break_condition = True
                     break
-                elif start_index == False and x_axis[i] > lo_freq_bound:
+                elif start_index is False and x_axis[i] > lo_freq_bound:
                     # print "start_index is", i
                     start_index = i
                 elif i == 1599:
                     end_index = 1599
                     # print "hit end of data, end_index is 1599"
-                elif end_index == False and x_axis[i] > hi_freq_bound:
+                elif end_index is False and x_axis[i] > hi_freq_bound:
                     end_index = i
                     # print "end_index is", i
                     index_guess = i
@@ -894,21 +897,27 @@ class HighSidebandCCD(CCD.CCD):
 
             check_max_index = np.argmax(
                 check_y)  # This assumes that two floats won't be identical
-            octant = len(check_y) // 8  # To be able to break down check_y into eighths
+            # To be able to break down check_y into eighths
+            octant = len(check_y) // 8
             if octant < 1:
                 octant = 1
 
             check_max_area = np.sum(
-                check_y[check_max_index - octant - 1:check_max_index + octant + 1])
+                check_y[check_max_index - octant - 1:
+                        check_max_index + octant + 1])
 
             if verbose and plot:
                 plt.figure("CCD data")
-                plt.plot([lo_freq_bound] * 2, [0, check_y[check_max_index]], 'b')
-                plt.plot([hi_freq_bound] * 2, [0, check_y[check_max_index]], 'b')
-                plt.plot([lo_freq_bound, hi_freq_bound], [check_y[check_max_index]] *
-                         2, 'b', label=order)
-                plt.text((lo_freq_bound + hi_freq_bound) / 2, check_y[check_max_index],
-                         order)
+                plt.plot(
+                    [lo_freq_bound] * 2, [0, check_y[check_max_index]], 'b')
+                plt.plot(
+                    [hi_freq_bound] * 2, [0, check_y[check_max_index]], 'b')
+                plt.plot(
+                    [lo_freq_bound, hi_freq_bound],
+                    [check_y[check_max_index]] * 2, 'b', label=order)
+                plt.text(
+                    (lo_freq_bound + hi_freq_bound) / 2,
+                    check_y[check_max_index], order)
 
             no_peak = (2 * len(
                 check_y)) // 6  # The denominator is in flux, used to be 5
@@ -919,7 +928,8 @@ class HighSidebandCCD(CCD.CCD):
             check_stdev = np.std(np.take(check_y, np.concatenate(
                 (np.arange(no_peak), np.arange(-no_peak, 0)))))
 
-            check_ratio = (check_max_area - (2 * octant + 1) * check_ave) / check_stdev
+            check_ratio = ((check_max_area - (2 * octant + 1) * check_ave)
+                           / check_stdev)
 
             if verbose:
                 print("\tIndices: {}->{} (d={})".format(start_index, end_index,
@@ -931,27 +941,32 @@ class HighSidebandCCD(CCD.CCD):
                 # print "check_ratio is", check_ratio
 
                 print("\t" + ("{:^14}" * 4).format(
-                    "check_max_area", "check_ave", "check_stdev", "check_ratio"))
+                    "check_max_area", "check_ave",
+                    "check_stdev", "check_ratio"))
                 print("\t" + ("{:^14.6g}" * 4).format(
                     check_max_area, check_ave, check_stdev, check_ratio))
 
-            if order % 2 == 1:  # This raises the barrier for odd sideband detection
+            # This raises the barrier for odd sideband detection
+            if order % 2 == 1:
                 check_ratio = check_ratio / 2
             if check_ratio > cutoff:
                 found_index = check_max_index + start_index
                 self.sb_index.append(found_index)
                 last_sb = x_axis[found_index]
 
+# print "\tI found", order, "at index", found_index, "at freq", last_sb
                 if verbose:
-                    print("\tI'm counting this SB at index {} (f={:.4f})".format(
-                        found_index, last_sb), end=' ')
-                    # print "\tI found", order, "at index", found_index, "at freq", last_sb
+                    print(
+                        "\tI'm counting this SB at index {} (f={:.4f})".format(
+                            found_index, last_sb), end=' ')
 
                 sb_freq_guess.append(x_axis[found_index])
-                sb_amp_guess.append(check_max_area - (2 * octant + 1) * check_ave)
-                error_est = np.sqrt(sum([i ** 2 for i in error[
-                                                         found_index - octant:found_index + octant]])) / (
-                                    check_max_area - (2 * octant + 1) * check_ave)
+                sb_amp_guess.append(
+                    check_max_area - (2 * octant + 1) * check_ave)
+                error_est = (
+                    np.sqrt(sum([i ** 2 for i in error[
+                        found_index - octant:found_index + octant]]))
+                    / (check_max_area - (2 * octant + 1) * check_ave))
                 # This error is a relative error.
                 if verbose:
                     print(". Err = {:.3g}".format(error_est))
@@ -970,7 +985,7 @@ class HighSidebandCCD(CCD.CCD):
                     consecutive_null_odd += 1
                 if verbose:
                     print("\t\tI did not count this sideband")
-            if consecutive_null_odd == 1 and no_more_odds == False:
+            if consecutive_null_odd == 1 and no_more_odds is False:
                 # print "I'm done looking for odd sidebands"
                 no_more_odds = True
             if consecutive_null_sb == 2:
@@ -982,9 +997,11 @@ class HighSidebandCCD(CCD.CCD):
             print('-' * 15)
             print()
             print()
-        self.sb_guess = np.array([np.asarray(sb_freq_guess), np.asarray(sb_amp_guess),
-                                  np.asarray(sb_error_est)]).T
-        # self.sb_guess = [frequency guess, amplitude guess, relative error of amplitude] for each sideband.
+        self.sb_guess = np.array(
+            [np.asarray(sb_freq_guess), np.asarray(sb_amp_guess),
+                np.asarray(sb_error_est)]).T
+        # self.sb_guess = [frequency guess, amplitude guess,
+        #   relative error of amplitude] for each sideband.
 
     def fit_sidebands(self, plot=False, verbose=False):
         """
@@ -994,21 +1011,26 @@ class HighSidebandCCD(CCD.CCD):
         else is from the curve fit.  Which is definitely underestimating the
         error, but we don't care too much about those errors (at this point).
 
-        self.sb_guess = [frequency guess, amplitude guess, relative error of amplitude] for each sideband.
+        self.sb_guess = [frequency guess, amplitude guess, relative error of
+            amplitude] for each sideband.
 
         Temporary stuff:
         sb_fits = holder of the fitting results until all spectra have been fit
-        window = an integer that determines the "radius" of the fit window, proportional to thz_freq.
+        window = an integer that determines the "radius" of the fit window,
+            proportional to thz_freq.
 
         Attributes created:
         self.sb_results = the money maker.  Column order:
-                          [sb number, Freq (eV), Freq error (eV), Gauss area (arb.), Area error, Gauss linewidth (eV), Linewidth error (eV)]
-                          [    0    ,      1   ,        2,      ,        3         ,      4    ,         5           ,        6            ]
+            [sb number, Freq (eV), Freq error (eV), Gauss area (arb.),
+            Area error, Gauss linewidth (eV), Linewidth error (eV)]
+            [    0    ,      1   ,        2,      ,        3         ,
+                 4    ,         5           ,        6            ]
         self.full_dict = a dictionary similar to sb_results, but now the keys
-                         are the sideband orders.  Column ordering is otherwise the same.
+              are the sideband orders.  Column ordering is otherwise the same.
         :param plot: Do you want to see the fits plotted with the data?
         :type plot: bool
-        :param verbose: Do you want to see the details AND the initial guess fits?
+        :param verbose: Do you want to see the details
+            AND the initial guess fits?
         :type verbose: bool
         :return: None
         """
@@ -1026,44 +1048,53 @@ class HighSidebandCCD(CCD.CCD):
         # when no sidebands found
         self.full_dict = {}
         thz_freq = self.parameters["thz_freq"]
-        window = 15 + int(15 * thz_freq / 0.0022) # Adjust the fit window based on the sideband spacing
-                                                  # The 15's are based on empirical knowledge that for
-                                                  # 540 GHz (2.23 meV), the best window size is 30 and
-                                                  # that it seems like the window size should grow slowly?
-        for elem, peakIdx in enumerate(self.sb_index):  # Have to do this because guess_sidebands
-            # doesn't out put data in the most optimized way
+
+# Adjust the fit window based on the sideband spacing The 15's are based on
+# empirical knowledge that for 540 GHz (2.23 meV), the best window size is 30
+# and that it seems like the window size should grow slowly?
+
+        window = 15 + int(15 * thz_freq / 0.0022)
+        # Have to do this because guess_sidebands doesn't out put data in the
+        # most optimized way
+        for elem, peakIdx in enumerate(self.sb_index):
             if peakIdx < window:
                 data_temp = self.proc_data[:peakIdx + window, :]
             elif (1600 - peakIdx) < window:
                 data_temp = self.proc_data[peakIdx - window:, :]
             else:
-                data_temp = self.proc_data[peakIdx - window:peakIdx + window, :]
-            width_guess = 0.0001 + 0.000001 * self.sb_list[elem]  # so the width guess gets wider as order goes up
+                data_temp = self.proc_data[
+                    peakIdx - window:peakIdx + window, :]
+            # so the width guess gets wider as order goes up
+            width_guess = 0.0001 + 0.000001 * self.sb_list[elem]
             p0 = np.array([self.sb_guess[elem, 0],
                            self.sb_guess[elem, 1] * width_guess,
                            width_guess,
                            0.1])
             # print "Let's fit this shit!"
             if verbose:
-                print("Fitting SB {}. Peak index: {}, {}th peak in spectra".format(
-                    self.sb_list[elem], peakIdx, elem
-                ))
+                # TODO: check that . operator can carry to next line
+                print(
+                    "Fitting SB {}. Peak index: {}, {}th peak in spectra".
+                    format(self.sb_list[elem], peakIdx, elem))
                 # print "\nnumber:", elem, num
                 # print "data_temp:", data_temp
                 # print "p0:", p0
-                print(' '*20 +"p0 = " + np.array_str(p0, precision=4))
-            # plot_guess = True  # This is to disable plotting the guess function
+                print(' '*20 + "p0 = " + np.array_str(p0, precision=4))
+            # This is to disable plotting the guess function
+            # plot_guess = True
             if verbose and plot:
                 plt.figure('CCD data')
                 linewidth = 3
-                x_vals = np.linspace(data_temp[0, 0], data_temp[-1, 0], num=500)
+                x_vals = np.linspace(
+                    data_temp[0, 0], data_temp[-1, 0], num=500)
                 if elem != 0:
                     try:
                         plt.plot(x_vals, gauss(x_vals, *p0),
-                                 plt.gca().get_lines()[-1].get_color() + '--'  # I don't really know. Mostly
+                                 # I don't really know. Mostly
+                                 plt.gca().get_lines()[-1].get_color() + '--',
                                  # just looked around at what functions
                                  # matplotlib has...
-                                 , linewidth=linewidth)
+                                 linewidth=linewidth)
                     except:  # to prevent weird mac issues with the matplotlib things?
                         plt.plot(x_vals, gauss(x_vals, *p0), '--', linewidth=linewidth)
 
