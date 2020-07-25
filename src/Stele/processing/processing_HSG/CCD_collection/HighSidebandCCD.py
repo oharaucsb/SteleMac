@@ -1096,34 +1096,47 @@ class HighSidebandCCD(CCD.CCD):
                                  # just looked around at what functions
                                  # matplotlib has...
                                  linewidth=linewidth)
-                    except:  # to prevent weird mac issues with the matplotlib things?
-                        plt.plot(x_vals, procHSGHelp.gauss(x_vals, *p0), '--', linewidth=linewidth)
+                    # to prevent weird mac issues with the matplotlib things?
+                    except Exception:
+                        plt.plot(
+                            x_vals, procHSGHelp.gauss(x_vals, *p0), '--',
+                            linewidth=linewidth)
 
                 else:
-                    plt.plot(x_vals, procHSGHelp.gauss(x_vals, *p0), '--', linewidth=linewidth)
+                    plt.plot(
+                        x_vals, procHSGHelp.gauss(x_vals, *p0), '--',
+                        linewidth=linewidth)
 
             try:
                 # 11/1/16
-                # needed to bump maxfev up to 2k because a sideband wasn't being fit
+                # had to bump maxfev up to 2k since a sideband wasn't being fit
                 # Fix for sb 106
                 # 05-23 Loren 10nm\hsg_640_Perp352seq_spectrum.txt
+
+                # TODO: find new name for guass parameter and correct code
                 coeff, var_list = curve_fit(
-                    gauss, data_temp[:, 0], data_temp[:, 1], p0=p0, maxfev = 2000)
+                    gauss, data_temp[:, 0], data_temp[:, 1],
+                    p0=p0, maxfev=2000)
             except Exception as e:
                 if verbose:
                     print("\tThe fit failed:")
                     print("\t\t", e)
-                    print("\tFitting region: {}->{}".format(peakIdx-window, peakIdx+window))
+                    print("\tFitting region: {}->{}".format(
+                        peakIdx-window, peakIdx+window))
                     # print "I couldn't fit", elem
                     # print "It's sideband", num
                     # print "In file", self.fname
                     # print "because", e
                     # print "wanted to fit xindx", peakIdx, "+-", window
                 self.sb_list[elem] = None
-                continue # This will ensure the rest of the loop is not run without an actual fit.
+                # This will ensure the rest of the loop is not run without
+                # an actual fit.
+                continue
 
-            coeff[1] = abs(coeff[1])  # The amplitude could be negative if the linewidth is negative
-            coeff[2] = abs(coeff[2])  # The linewidth shouldn't be negative
+            # The amplitude could be negative if the linewidth is negative
+            coeff[1] = abs(coeff[1])
+            # The linewidth shouldn't be negative
+            coeff[2] = abs(coeff[2])
             if verbose:
                 print("\tFit successful: ", end=' ')
                 print("p = " + np.array_str(coeff, precision=4))
@@ -1131,55 +1144,74 @@ class HighSidebandCCD(CCD.CCD):
                 # print "sigma for {}: {}".format(self.sb_list[elem], coeff[2])
             if 10e-4 > coeff[2] > 10e-6:
                 try:
-                    sb_fits.append(np.hstack((self.sb_list[elem], coeff, np.sqrt(np.diag(var_list)))))
+                    sb_fits.append(np.hstack((
+                        self.sb_list[elem], coeff,
+                        np.sqrt(np.diag(var_list)))))
                 except RuntimeWarning:
-                    sb_fits.append(np.hstack((self.sb_list[elem], coeff, np.sqrt(np.abs(np.diag(var_list))))))
+                    sb_fits.append(np.hstack((
+                        self.sb_list[elem], coeff,
+                        np.sqrt(np.abs(np.diag(var_list))))))
 
-                # the var_list wasn't approximating the error well enough, even when using sigma and absoluteSigma
-                # self.sb_guess[elem, 2] is the relative error as calculated by the guess_sidebands method
-                # coeff[1] is the area from the fit.  Therefore, the product should be the absolute error
-                # of the integrated area of the sideband.  The other errors are still underestimated.
+                # the var_list wasn't approximating the error well enough, even
+                # when using sigma and absoluteSigma self.sb_guess[elem, 2] is
+                # the relative error as calculated by the guess_sidebands
+                # method coeff[1] is the area from the fit.  Therefore, the
+                # product should be the absolute error of the integrated area
+                # of the sideband.  The other errors are still underestimated.
                 #
-                # 1/12/18 note: So it looks like what hunter did is calculate an error estimate
-                # for the strength/area by the quadrature sum of errors of the points in the peak
+                # 1/12/18 note: So it looks like what hunter did is calculate
+                # an error estimate for the strength/area by the quadrature sum
+                # of errors of the points in the peak
                 # (from like 813 in guess_sidebands:
-                #    error_est = np.sqrt(sum([i ** 2 for i in error[found_index - 1:found_index + 2]])) / (
-                # Where the error is what comes from the CCD by averaging 4 spectra. As far as I can tell,
-                # it doesn't currently pull in the dark counts or anything like that, except maybe
+                #   error_est = np.sqrt(sum([i ** 2 for i in error[
+                #       found_index - 1:found_index + 2]])) / (
+                # Where the error is what comes from the CCD by averaging 4
+                # spectra. As far as I can tell, it doesn't currently pull in
+                # the dark counts or anything like that, except maybe
                 # indirectly since it'll cause the variations in the peaks
                 sb_fits[-1][6] = self.sb_guess[elem, 2] * coeff[1]
                 if verbose:
-                    print("\tRel.Err: {:.4e}  |  Abs.Err: {:.4e}".format(
-                        self.sb_guess[elem, 2], coeff[1] * self.sb_guess[elem, 2]
-                    ))
+                    print(
+                        "\tRel.Err: {:.4e}  |  Abs.Err: {:.4e}".format(
+                            self.sb_guess[elem, 2],
+                            coeff[1] * self.sb_guess[elem, 2]))
                     print()
-                    # print "The rel. error guess is", self.sb_guess[elem, 2]
-                    # print "The abs. error guess is", coeff[1] * self.sb_guess[elem, 2]
+                    # print "The rel. error guess is",
+                    # self.sb_guess[elem, 2]
+                    # print "The abs. error guess is",
+                    # coeff[1] * self.sb_guess[elem, 2]
 
                 # The error from self.sb_guess[elem, 2] is a relative error
             if plot and verbose:
                 plt.figure('CCD data')
                 linewidth = 5
-                x_vals = np.linspace(data_temp[0, 0], data_temp[-1, 0], num=500)
+                x_vals = np.linspace(
+                    data_temp[0, 0], data_temp[-1, 0], num=500)
                 if elem != 0:
                     try:
                         plt.plot(x_vals, procHSGHelp.gauss(x_vals, *coeff),
-                                 plt.gca().get_lines()[-1].get_color() + '--'  # I don't really know. Mostly
+                                 plt.gca().get_lines()[-1].get_color() + '--',
+                                 # I don't really know. Mostly
                                  # just looked around at what functions
                                  # matplotlib has...
-                                 , linewidth=linewidth)
-                    except:  # to prevent weird mac issues with the matplotlib things?
-                        plt.plot(x_vals, procHSGHelp.gauss(x_vals, *coeff), '--', linewidth=linewidth)
+                                 linewidth=linewidth)
+                    # to prevent weird mac issues with the matplotlib things?
+                    except Exception:
+                        plt.plot(
+                            x_vals, procHSGHelp.gauss(x_vals, *coeff), '--',
+                            linewidth=linewidth)
 
                 else:
-                    plt.plot(x_vals, procHSGHelp.gauss(x_vals, *coeff), '--', linewidth=linewidth)
+                    plt.plot(
+                        x_vals, procHSGHelp.gauss(x_vals, *coeff), '--',
+                        linewidth=linewidth)
         sb_fits_temp = np.asarray(sb_fits)
         reorder = [0, 1, 5, 2, 6, 3, 7, 4, 8]
         # Reorder the list to put the error of the i-th parameter as the i+1th.
         try:
             sb_fits = sb_fits_temp[:, reorder]
             # if verbose: print "The abs. error guess is", sb_fits[:, 0:5]
-        except:
+        except Exception:
             raise RuntimeError("No sidebands to fit?")
 
         # Going to label the appropriate row with the sideband
@@ -1192,28 +1224,35 @@ class HighSidebandCCD(CCD.CCD):
 
         if verbose:
             print("\tsb_results:")
-            print("\t\t" + ("{:^5s}" + ("{:^12s}")*(self.sb_results.shape[1]-1)).format(
-                "SB", "Cen.En.", "", "Area", "", "Width",""))
+            print(
+                "\t\t" + ("{:^5s}" + ("{:^12s}")*(self.sb_results.shape[1]-1)).
+                format("SB", "Cen.En.", "", "Area", "", "Width", ""))
             for line in self.sb_results:
-                print('\t\t[' + ("{:^5.0f}"+ "{:<12.4g}"*(line.size-1)).format(*line) + ']')
+                print(
+                    '\t\t[' + ("{:^5.0f}" + "{:<12.4g}"*(line.size-1)).format(
+                        *line) + ']')
             print('-'*19)
         self.full_dict = {}
         for sb in self.sb_results:
             self.full_dict[sb[0]] = np.asarray(sb[1:])
 
-    def infer_frequencies(self, nir_units="wavenumber", thz_units="GHz", bad_points=-2):
+    def infer_frequencies(
+     self, nir_units="wavenumber", thz_units="GHz", bad_points=-2):
         """
-        This guy tries to fit the results from fit_sidebands to a line to get the relevant frequencies
+        This guy tries to fit the results from fit_sidebands to a line to get
+            the relevant frequencies
         :param nir_units: What units do you want this to output?
         :type nir_units: 'nm', 'wavenumber', 'eV', 'THz'
         :param thz_units: What units do you want this to output for the THz?
         :type thz_units: 'GHz', 'wavenumber', 'meV'
-        :param bad_points: How many more-positive order sidebands shall this ignore?
+        :param bad_points: How many more-positive order sidebands shall this
+            ignore?
         :type bad_points: int
         :return: freqNIR, freqTHz, the frequencies in the appropriate units
         """
         # force same units for in dict
-        freqNIR, freqTHz = calc_laser_frequencies(self, "wavenumber", "wavenumber", bad_points)
+        freqNIR, freqTHz = calc_laser_frequencies(
+            self, "wavenumber", "wavenumber", bad_points)
 
         self.parameters["calculated NIR freq (cm-1)"] = "{}".format(freqNIR, nir_units)
         self.parameters["calculated THz freq (cm-1)"] = "{}".format(freqTHz, freqTHz)
