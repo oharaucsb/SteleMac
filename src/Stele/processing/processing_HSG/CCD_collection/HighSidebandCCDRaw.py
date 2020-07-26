@@ -63,17 +63,21 @@ class HighSidebandCCDRaw(HSCCD.HighSidebandCCD):
 
         KCenD = k * center / d
 
+        repl = 2 * gammaNorm ** 2 * (
+            2 - KCenD ** 2 + 2 * np.cos(gamma)) ** (1 / 2)
+
         # TODO: ensure that the below output matches that of the elder gods
-        output = d/k * ((-1) * np.cos(
-            delta + gamma - 1 * np.arccos(
-                (-1 / 4) * (1 / gammaNorm) ** 2 *
-                (2 * gammaNorm ** 2 * (2 - KCenD ** 2 + 2 * np.cos(gamma))
-                 ** (1 / 2) + KCenD * np.sin(gamma)))
-            + np.arctan(b ** (-1) * (r * wavelength_list + b *
-                        np.cos(delta + gamma)) * (1 / np.sin(delta + gamma))))
-                        + (1 + (-1 / 16) * (1 / gammaNorm) ** 4 *
-                           (2 * (gammaNorm ** 4 * (2 - KCenD ** 2 + 2 * np.cos(gamma))) ** (1 / 2) + d ** (-1) * k * center * np.sin(gamma)
-                            ) ** 2) ** (1 / 2))
+        output = d/k * (
+            (-1) * np.cos(
+                delta + gamma - 1 * np.arccos(
+                    (-1 / 4) * (1 / gammaNorm) ** 2 * (repl + KCenD * np.sin(
+                        gamma)))
+                + np.arctan(b ** (-1)
+                            * (r * wavelength_list + b * np.cos(delta + gamma))
+                            * (1 / np.sin(delta + gamma))))
+            + (1 + (-1 / 16) * (1 / gammaNorm) ** 4 * (
+                repl + d ** (-1) * k * center * np.sin(gamma)) ** 2)
+            ** (1 / 2))
         output = (output + center) * 10 ** 9
         return output
 
