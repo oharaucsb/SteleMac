@@ -6,8 +6,8 @@ import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 from .CCD_collection import CCD
-from .processing.processing_HSG import helperFunctions as procHSGHelp
-from .CCD_collection import helperFunctions
+import processing.processing_HSG.helperFunctions as procHSGHelp
+import CCD_collection.helperFunctions as helperFunctions
 
 np.set_printoptions(linewidth=500)
 
