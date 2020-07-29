@@ -28,7 +28,8 @@ def calc_laser_frequencies(spec, nir_units="eV", thz_units="eV",
     errors = spec.sb_results[:, 2]
     try:
         p = np.polyfit(sidebands[1:bad_points],
-                       # This is 1 because the peak picker function was calling the 10th order the 9th
+                       # This is 1 because the peak picker function was
+                       #    calling the 10th order the 9th
                        locations[1:bad_points], deg=1)
     except TypeError:
         # if there aren't enough sidebands to fit, give -1
