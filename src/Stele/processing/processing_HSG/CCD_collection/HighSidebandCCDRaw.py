@@ -19,8 +19,8 @@ class HighSidebandCCDRaw(HSCCD.HighSidebandCCD):
         self.ccd_data = np.genfromtxt(hsg_thing, delimiter=',').T
         self.proc_data = np.column_stack((self.gen_wavelengths(
             self.parameters["center_lambda"],
-            self.parameters["grating"]), np.array(self.ccd_data[:, 1],
-                                                  dtype=float)
+            self.parameters["grating"]),
+            np.array(self.ccd_data[:, 1], dtype=float)
             - np.median(self.ccd_data[:, 1]),
             np.ones_like(self.ccd_data[:, 1], dtype=float)))
 
