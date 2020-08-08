@@ -2,16 +2,19 @@ import os
 import errno
 import json
 import numpy as np
+from .FullSpectrum_collection import FullSpectrum
 
 np.set_printoptions(linewidth=500)
 
 
-# One of the main results is the HighSidebandCCD.sb_results array. These are the
-# various mappings between index and real value
-# I deally, this code should be converted to pandas to avoid this issue,
+# One of the main results is the HighSidebandCCD.sb_results array. These are
+# the various mappings between index and real value I deally, this code should
+# be converted to pandas to avoid this issue,
 # but that's outside the scope of current work.
-# [sb number, Freq (eV), Freq error (eV), Gauss area (arb.), Area error, Gauss linewidth (eV), Linewidth error (eV)]
-# [    0    ,      1   ,        2,      ,        3         ,      4    ,         5           ,        6            ]
+# [sb number, Freq (eV), Freq error (eV), Gauss area (arb.), Area error,
+#    Gauss linewidth (eV), Linewidth error (eV)]
+# [    0    ,      1   ,        2,      ,        3         ,
+#         4    ,         5           ,        6            ]
 class sbarr(object):
     SBNUM = 0
     CENFREQ = 1
@@ -22,8 +25,7 @@ class sbarr(object):
     WIDTHERR = 6
 
 
-
-class FullHighSideband(FullSpectrum):
+class FullHighSideband(FullSpectrum.FullSpectrum):
     """
     I'm imagining this class is created with a base CCD file, then gobbles up
     other spectra that belong with it, then grabs the PMT object to normalize
@@ -38,12 +40,13 @@ class FullHighSideband(FullSpectrum):
         Creates:
         self.fname = file name of the initial_CCD_piece
         self.sb_results = The sideband details from the initializing data
-        self.parameters = The parameter dictionary of the initializing data.  May
-                          not have all details of spectrum pieces added later.
-        self.full_dict = a copy of the sb_results without the zeroth column, which
-                         is SB order
+        self.parameters = The parameter dictionary of the initializing data.
+                    May not have all details of spectrum pieces added later.
+        self.full_dict = a copy of the sb_results without the zeroth column,
+                    which is SB order
 
-        :param initial_CCD_piece: The starting part of the spectrum, often the lowest orders seen by CCD
+        :param initial_CCD_piece: The starting part of the spectrum, often the
+            lowest orders seen by CCD
         :type initial_CCD_piece: HighSidebandCCD
         :return: None
         """
@@ -54,18 +57,18 @@ class FullHighSideband(FullSpectrum):
             print(initial_CCD_piece.full_dict)
             raise
         self.parameters = initial_CCD_piece.parameters
-        self.parameters['files_here'] = [initial_CCD_piece.fname.split('/')[-1]]
+        self.parameters['files_here'] = [
+            initial_CCD_piece.fname.split('/')[-1]]
         self.full_dict = {}
         for sb in self.sb_results:
             self.full_dict[sb[0]] = np.asarray(sb[1:])
 
-
     @staticmethod
     def parse_sb_array(arr):
         """
-        Check to make sure the first even order sideband in an array is not weaker
-        than the second even order. If this happens, it's likely because the SB was in
-        the short pass filter and isn't work counting.
+        Check to make sure the first even order sideband in an array is not
+        weaker than the second even order. If this happens, it's likely because
+        the SB was in the short pass filter and isn't work counting.
 
         We cut it out to prevent it from itnerfering with calculating overlaps
         :param arr:
@@ -73,13 +76,14 @@ class FullHighSideband(FullSpectrum):
         """
         arr = np.array(arr)
 
-        if (arr[0, sbarr.SBNUM]>0 and arr[1, sbarr.SBNUM]>0 and # make sure they're both pos
-               arr[0, sbarr.AREA] < arr[1, sbarr.AREA]): # and the fact the area is less
+        # make sure they're both pos
+        if (arr[0, sbarr.SBNUM] > 0 and arr[1, sbarr.SBNUM] > 0 and
+            # and the fact the area is less
+                arr[0, sbarr.AREA] < arr[1, sbarr.AREA]):
             # print "REMOVING FIRST SIDEBAND FROM FULLSIDEBAND"
             # print arr[0]
             # print arr[1]
             arr = arr[1:]
-
 
         full_dict = {}
         for sb in arr:
@@ -88,10 +92,11 @@ class FullHighSideband(FullSpectrum):
 
     def add_CCD(self, ccd_object, verbose=False, force_calc=None, **kwargs):
         """
-        This method will be called by the stitch_hsg_results function to add another
-        CCD image to the spectrum.
+        This method will be called by the stitch_hsg_results function to add
+            another CCD image to the spectrum.
 
-        :param ccd_object: The CCD object that will be stiched into the current FullHighSideband object
+        :param ccd_object: The CCD object that will be stiched into the current
+            FullHighSideband object
         :type ccd_object: HighSidebandCCD
         :return: None
         """
@@ -101,14 +106,16 @@ class FullHighSideband(FullSpectrum):
             calc = True
         if force_calc is not None:
             calc = force_calc
-        if "need_ratio" in kwargs: #cascading it through, starting to think
+        # cascading it through, starting to think
+        if "need_ratio" in kwargs:
             # everything should be in a kwarg
             calc = kwargs.pop("need_ratio")
         try:
-            # self.full_dict = stitch_hsg_dicts(self.full_dict, ccd_object.full_dict,
-            #                                   need_ratio=calc, verbose=verbose)
-            self.full_dict = stitch_hsg_dicts(self, ccd_object, need_ratio=calc,
-                                              verbose=verbose, **kwargs)
+            # self.full_dict = stitch_hsg_dicts(
+            #    self.full_dict, ccd_object.full_dict, need_ratio=calc,
+            #    verbose=verbose)
+            self.full_dict = stitch_hsg_dicts(
+                self, ccd_object, need_ratio=calc, verbose=verbose, **kwargs)
             self.parameters['files_here'].append(ccd_object.fname.split('/')[-1])
             # update sb_results, too
             sb_results = [[k]+list(v) for k, v in list(self.full_dict.items())]
