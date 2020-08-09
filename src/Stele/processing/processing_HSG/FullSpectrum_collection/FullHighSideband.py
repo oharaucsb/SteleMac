@@ -3,6 +3,7 @@ import errno
 import json
 import numpy as np
 from .FullSpectrum_collection import FullSpectrum
+from .FullSpectrum_collection import helperFunctions as helpers
 
 np.set_printoptions(linewidth=500)
 
@@ -114,7 +115,7 @@ class FullHighSideband(FullSpectrum.FullSpectrum):
             # self.full_dict = stitch_hsg_dicts(
             #    self.full_dict, ccd_object.full_dict, need_ratio=calc,
             #    verbose=verbose)
-            self.full_dict = stitch_hsg_dicts(
+            self.full_dict = helpers.stitch_hsg_dicts(
                 self, ccd_object, need_ratio=calc, verbose=verbose, **kwargs)
             self.parameters['files_here'].append(ccd_object.fname.split('/')[-1])
             # update sb_results, too
@@ -135,7 +136,7 @@ class FullHighSideband(FullSpectrum.FullSpectrum):
         # print "I'm adding PMT once"
         # self.full_dict = stitch_hsg_dicts(pmt_object.full_dict, self.full_dict,
                                           # need_ratio=True, verbose=False)
-        self.full_dict = stitch_hsg_dicts(pmt_object, self,
+        self.full_dict = helpers.stitch_hsg_dicts(pmt_object, self,
                                           need_ratio=True, verbose=verbose)
         # if verbose:
         #     self.full_dict, ratio = self.full_dict

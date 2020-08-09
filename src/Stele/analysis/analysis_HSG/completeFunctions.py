@@ -168,6 +168,7 @@ def create_full_spectra(folder_path, skipLaser = True, *args, **kwargs):
         ccd.fit_sidebands()
         ratio = [1, 1]
 
+        # stitch _hsg_dicts moved to Fullspectrum helpers
         stitch_hsg_dicts(ccd_list[idx], ccd, need_ratio = True, ratios=ratio)
 
         print("new ratio", ratio)
