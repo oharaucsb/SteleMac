@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 from .FullSpectrum_collection import FullSpectrum
-=======
-from .FullSpectr_collection import FullSpectrum
->>>>>>> f901072858baee23219c6fd57a0586a858f189a5
 
 
 class FullAbsorbance(FullSpectrum.FullSpectrum):
