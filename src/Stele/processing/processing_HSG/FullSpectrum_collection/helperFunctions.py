@@ -1,48 +1,55 @@
 import copy
 import numpy as np
+from .FullSpectrum_collection import FullHighSideband
+from .processing.PMT_collection import HighSidebandPMT as HSPMT
 
 
 def stitch_hsg_dicts_old(full, new_dict, need_ratio=False, verbose=False):
     """
-    This helper function takes a FullHighSideband.full_dict attribute and a sideband
-    object, either CCD or PMT and smushes the new sb_results into the full_dict.
+    This helper function takes a FullHighSideband.full_dict attribute and a
+    sideband object, either CCD or PMT and smushes the new sb_results into the
+    full_dict.
 
     The first input doesn't change, so f there's a PMT set of data involved, it
     should be in the full variable to keep the laser normalization intact.
 
-    This function almost certainly does not work for stitching many negative orders
-    in it's current state
+    This function almost certainly does not work for stitching many negative
+    orders in it's current state
 
     11/14/16
     --------
     The original function has been updated to take the full object (instead of
-    the dicts alone) to better handle calculating ratios when stitching. This is called
-    once things have been parsed in the original function (or legacy code where dicts
-    are passed instead of the object)
+    the dicts alone) to better handle calculating ratios when stitching. This
+    is called once things have been parsed in the original function (or legacy
+    code where dicts are passed instead of the object)
 
     Inputs:
     full = full_dict from FullHighSideband, or HighSidebandPMT.  It's important
            that it contains lower orders than the new_dict.
     new_dict = another full_dict.
     need_ratio = If gain or other parameters aren't equal and must resort to
-                 calculating the ratio instead of the measurements being equivalent.
-                 Changing integration time still means N photons made M counts,
-                 but changing gain or using PMT or whatever does affect things.
+                 calculating the ratio instead of the measurements being
+                 equivalent. Changing integration time still means N photons
+                 made M counts, but changing gain or using PMT or whatever does
+                 affect things.
 
     Returns:
     full = extended version of the input full.  Overlapping sidebands are
            averaged because that makes sense?
     """
     if verbose:
-        print("I'm adding these sidebands in old stitcher", sorted(new_dict.keys()))
-    overlap = [] # The list that hold which orders are in both dictionaries
-    missing = [] # How to deal with sidebands that are missing from full but in new.
+        print("I'm adding these sidebands in old stitcher", sorted(
+            new_dict.keys()))
+    # The list that hold which orders are in both dictionaries
+    overlap = []
+    # How to deal with sidebands that are missing from full but in new.
+    missing = []
     for new_sb in sorted(new_dict.keys()):
         full_sbs = sorted(full.keys())
         if new_sb in full_sbs:
             overlap.append(new_sb)
+        # This probably doesn't work with bunches of negative orders
         elif new_sb not in full_sbs and new_sb < full_sbs[-1]:
-            # This probably doesn't work with bunches of negative orders
             missing.append(new_sb)
 
     if verbose:
@@ -55,12 +62,12 @@ def stitch_hsg_dicts_old(full, new_dict, need_ratio=False, verbose=False):
         # Calculate the appropriate ratio to multiply the new sidebands by.
         # I'm not entirely sure what to do with the error of this guy.
         ratio_list = []
-        #print '\n1979\nfull[2]', full[0][2]
+        # print '\n1979\nfull[2]', full[0][2]
         try:
             new_starter = overlap[-1]
             if len(overlap) > 2:
-                overlap = [x for x in overlap if (x % 2 == 0)
-                           ]#and (x != min(overlap) and (x != max(overlap)))]
+                overlap = [x for x in overlap if (x % 2 == 0)]
+                # and (x != min(overlap) and (x != max(overlap)))]
             for sb in overlap:
                 ratio_list.append(full[sb][2] / new_dict[sb][2])
             ratio = np.mean(ratio_list)
@@ -83,63 +90,85 @@ def stitch_hsg_dicts_old(full, new_dict, need_ratio=False, verbose=False):
             else:
                 raise
         if verbose:
-            print("Ratio list","\n", [round(ii, 3) for ii in ratio_list])
-            print("Overlap   ","\n", [round(ii, 3) for ii in overlap])
+            print("Ratio list", "\n", [round(ii, 3) for ii in ratio_list])
+            print("Overlap   ", "\n", [round(ii, 3) for ii in overlap])
             print("Ratio", ratio)
             print("Error", error)
-        #print '\n2118\nfull[2]', full[0][2]
+        # print '\n2118\nfull[2]', full[0][2]
         # Adding the new sidebands to the full set and moving errors around.
-        # I don't know exactly what to do about the other aspects of the sidebands
-        # besides the strength and its error.
+        # I don't know exactly what to do about the other aspects of the
+        # sidebands besides the strength and its error.
         for sb in overlap:
             full[sb][2] = ratio * new_dict[sb][2]
-            full[sb][3] = full[sb][2] * np.sqrt((error / ratio) ** 2 + (new_dict[sb][3] / new_dict[sb][2]) ** 2)
-            #print '\n2125\nfull[2]', full[0][3]
+            full[sb][3] = full[sb][2] * np.sqrt(
+                (error / ratio) ** 2 +
+                (new_dict[sb][3] / new_dict[sb][2]) ** 2)
+            # print '\n2125\nfull[2]', full[0][3]
             # Now for linewidths
-            lw_error = np.sqrt(full[sb][5] ** (-2) + new_dict[sb][5] ** (-2)) ** (-1)
-            lw_avg = (full[sb][4] / (full[sb][5] ** 2) + new_dict[sb][4] / (new_dict[sb][5] ** 2)) / (
-            full[sb][5] ** (-2) + new_dict[sb][5] ** (-2))
+            lw_error = np.sqrt(
+                full[sb][5] ** (-2) + new_dict[sb][5] ** (-2)) ** (-1)
+            lw_avg = (
+                    full[sb][4] / (full[sb][5] ** 2) +
+                    new_dict[sb][4] / (new_dict[sb][5] ** 2)) / (
+                    full[sb][5] ** (-2) + new_dict[sb][5] ** (-2))
             full[sb][4] = lw_avg
             full[sb][5] = lw_error
-        #print '\n2132\nfull[2]', full[0][2]
+        # print '\n2132\nfull[2]', full[0][2]
     else:
         try:
-            new_starter = overlap[-1] # This grabs the sideband order where only the new dictionary has
-                                      # sideband information.  It's not clear why it necessarily has to be
-                                      # at this line.
-            overlap = [x for x in overlap if (x % 2 == 0) and (x != min(overlap) and (x != max(overlap)))]
-            # This cuts out the lowest order sideband in the overlap for mysterious reasons
-            for sb in overlap: # This for loop average two data points weighted by their relative errors
+            # This grabs the sideband order where only the new dictionary has
+            # sideband information.  It's not clear why it necessarily has to
+            # be at this line.
+            new_starter = overlap[-1]
+            # This cuts out the lowest order sideband in the overlap for
+            # mysterious reasons
+            overlap = [
+                x for x in overlap if
+                (x % 2 == 0) and (x != min(overlap) and (x != max(overlap)))]
+            # This for loop average two data points weighted by their
+            # relative errors
+            for sb in overlap:
                 if verbose:
                     print("The sideband", sb)
                     print("Old value", full[sb][4] * 1000)
                     print("Add value", new_dict[sb][4] * 1000)
-                error = np.sqrt(full[sb][3] ** (-2) + new_dict[sb][3] ** (-2)) ** (-1)
-                avg = (full[sb][2] / (full[sb][3] ** 2) + new_dict[sb][2] / (new_dict[sb][3] ** 2)) / (
+                error = (np.sqrt(full[sb][3] ** (-2) +
+                         new_dict[sb][3] ** (-2)) ** (-1))
+                # TODO: unify average value calculations into function calls
+                avg = (
+                    full[sb][2] / (full[sb][3] ** 2) + new_dict[sb][2] /
+                    (new_dict[sb][3] ** 2)) / (
                     full[sb][3] ** (-2) + new_dict[sb][3] ** (-2))
                 full[sb][2] = avg
                 full[sb][3] = error
 
-                lw_error = np.sqrt(full[sb][5] ** (-2) + new_dict[sb][5] ** (-2)) ** (-1)
-                lw_avg = (full[sb][4] / (full[sb][5] ** 2) + new_dict[sb][4] / (new_dict[sb][5] ** 2)) / (
-                full[sb][5] ** (-2) + new_dict[sb][5] ** (-2))
+                lw_error = (np.sqrt(full[sb][5] ** (-2) +
+                            new_dict[sb][5] ** (-2)) ** (-1))
+                lw_avg = (
+                    full[sb][4] / (full[sb][5] ** 2) + new_dict[sb][4] /
+                    (new_dict[sb][5] ** 2)) / (
+                    full[sb][5] ** (-2) + new_dict[sb][5] ** (-2))
                 full[sb][4] = lw_avg
-                full[sb][5] = lw_error  # This may not be the exactly right way to calculate the error
+                # This may not be the exactly right way to calculate the error
+                full[sb][5] = lw_error
                 if verbose:
                     print("New value", lw_avg * 1000)
-        except:
-
-            new_starter = 0  # I think this makes things work when there's no overlap
+        except Exception:
+            # I think this makes things work when there's no overlap
+            new_starter = 0
     if verbose:
         print("appending new elements. new_starter={}".format(new_starter))
 
     # This loop will add the sidebands which were only seen in the second step
-    for sb in [x for x in list(new_dict.keys()) if ((x >= new_starter) or (x in missing))]:
+    for sb in [x for x in list(new_dict.keys()) if (
+     (x >= new_starter) or (x in missing))]:
         full[sb] = new_dict[sb]
         if need_ratio:
             full[sb][2] = ratio * full[sb][2]
-            full[sb][3] = full[sb][2] * np.sqrt((error / ratio) ** 2 + (ratio * full[sb][3] / full[sb][2]) ** 2)
-            #print '\n2164\nfull[2]', full[0][2]
+            full[sb][3] = full[sb][2] * np.sqrt(
+                (error / ratio) ** 2 +
+                (ratio * full[sb][3] / full[sb][2]) ** 2)
+            # print '\n2164\nfull[2]', full[0][2]
     if verbose:
         print("I made this dictionary", sorted(full.keys()))
     return full
@@ -216,16 +245,19 @@ def stitch_hsg_dicts(
         print()
         print("=" * 15)
 
-    # remove potentially offensive SBs, i.e. a 6th order SB being in the SPF for more
-    #  data, but being meaningless to pull intensity information from.
-    # Note: this might not be the best if you get to higher order stitches where it's
-    #  possible that the sidebands might not be monotonic (from noise?)
+    # remove potentially offensive SBs, i.e. a 6th order SB being in the SPF
+    # for more data, but being meaningless to pull intensity information from.
+    # Note: this might not be the best if you get to higher order stitches
+    # where it's possible that the sidebands might not be monotonic
+    # (from noise?)
     if ignore_weaker_lowers:
-        full_obj.full_dict, full_obj.sb_results = FullHighSideband.parse_sb_array(full_obj.sb_results)
-        new_obj.new_dict, new_obj.sb_results = FullHighSideband.parse_sb_array(new_obj.sb_results)
+        full_obj.full_dict, full_obj.sb_results = (
+            FullHighSideband.parse_sb_array(full_obj.sb_results))
+        new_obj.new_dict, new_obj.sb_results = (
+            FullHighSideband.parse_sb_array(new_obj.sb_results))
 
-    # was fucking around with references and causing updates to arrays when it shouldn't
-    # be
+    # was messing around with references and causing updates to arrays when
+    # it shouldn't be
     full = copy.deepcopy(full_obj.full_dict)
     new_dict = copy.deepcopy(new_obj.full_dict)
 
@@ -234,17 +266,19 @@ def stitch_hsg_dicts(
     #     need_ratio = True
 
     # Do some testing to see which dict should be scaled to the other
-    # I honestly forget why I prioritized the PMT first like this. But the third
-    # check looks to make a gain 110 prioritize non-110, unless the non-110 includes
-    # a laser line
+    # I honestly forget why I prioritized the PMT first like this. But the
+    # third check looks to make a gain 110 prioritize non-110, unless the
+    # non-110 includes a laser line
     scaleTo = ""
     if need_ratio:
-        if isinstance(new_obj, HighSidebandPMT):
+        if isinstance(new_obj, HSPMT.HighSidebandPMT):
             scaleTo = "new"
-        elif isinstance(full_obj, HighSidebandPMT):
+        elif isinstance(full_obj, HSPMT.HighSidebandPMT):
             scaleTo = "full"
-        elif new_obj.parameters["gain"] == 110 and full_obj.parameters["gain"] != 110 \
-            and 0 not in full:
+        elif (
+        # TODO: correct pre existing syntax error of below lines
+         new_obj.parameters["gain"] == 110 and
+         full_obj.parameters["gain"] != 110 and 0 not in full:)
             scaleTo = "new"
         else:
             scaleTo = "full"
