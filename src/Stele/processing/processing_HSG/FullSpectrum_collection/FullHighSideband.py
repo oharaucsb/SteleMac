@@ -229,17 +229,20 @@ class FullHighSideband(FullSpectrum.FullSpectrum):
         num_lines = parameter_str.count('#')
         # for num in range(99 - num_lines): parameter_str += '\n#'
         parameter_str += '\n#' * (99 - num_lines)
-        # origin_import_spec = '\nNIR frequency,Signal,Standard error\neV,arb. u.,arb. u.'
-        # spec_header = '#' + parameter_str + '\n#' + self.description[:-2] + origin_import_spec
+        # origin_import_spec = '\nNIR frequency,Signal,Standard error' +
+        #   '\neV,arb. u.,arb. u.'
+        # spec_header = '#' + parameter_str + '\n#' +
+        #    self.description[:-2] + origin_import_spec
 
         origin_import_fits = '\nSideband,Center energy,error,Sideband strength,error,Linewidth,error,Amplitude'+\
                              '\norder,eV,,arb. u.,,meV,,arb. u.\n' + ','.join([marker]*8)
         fits_header = '#' + parameter_str + origin_import_fits
 
-        # np.savetxt(os.path.join(folder_str, spectra_fname), self.proc_data, delimiter=',',
-        #           header=spec_header, comments='', fmt='%f')
-        np.savetxt(os.path.join(folder_str, fit_fname), save_results, delimiter=',',
-                   header=fits_header, comments='', fmt='%0.6e')
+        # np.savetxt(os.path.join(folder_str, spectra_fname), self.proc_data,
+        #            delimiter=',', header=spec_header, comments='', fmt='%f')
+        np.savetxt(os.path.join(folder_str, fit_fname), save_results,
+                   delimiter=',', header=fits_header, comments='', fmt='%0.6e')
 
         if verbose:
-            print("Save image.\nDirectory: {}".format(os.path.join(folder_str, fit_fname)))
+            print("Save image.\nDirectory: {}".format(
+                os.path.join(folder_str, fit_fname)))
