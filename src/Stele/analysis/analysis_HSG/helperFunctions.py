@@ -2,7 +2,6 @@ import os
 import io
 import glob
 import errno
-import copy
 import json
 import numpy as np
 import scipy.interpolate as spi
