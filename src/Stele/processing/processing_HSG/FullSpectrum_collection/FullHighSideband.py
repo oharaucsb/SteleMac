@@ -117,31 +117,34 @@ class FullHighSideband(FullSpectrum.FullSpectrum):
             #    verbose=verbose)
             self.full_dict = helpers.stitch_hsg_dicts(
                 self, ccd_object, need_ratio=calc, verbose=verbose, **kwargs)
-            self.parameters['files_here'].append(ccd_object.fname.split('/')[-1])
+            self.parameters['files_here'].append(
+                ccd_object.fname.split('/')[-1])
             # update sb_results, too
             sb_results = [[k]+list(v) for k, v in list(self.full_dict.items())]
             sb_results = np.array(sb_results)
-            self.sb_results = sb_results[sb_results[:,0].argsort()]
+            self.sb_results = sb_results[sb_results[:, 0].argsort()]
         except AttributeError:
             print('Error, not enough sidebands to fit here! {}, {}, {}, {}'.format(
-                self.parameters["series"], self.parameters["spec_step"],
-                ccd_object.parameters["series"], ccd_object.parameters["spec_step"]
-            ))
+                    self.parameters["series"],
+                    self.parameters["spec_step"],
+                    ccd_object.parameters["series"],
+                    ccd_object.parameters["spec_step"]))
 
     def add_PMT(self, pmt_object, verbose=False):
         """
-        This method will be called by the stitch_hsg_results function to add the PMT
-        data to the spectrum.
+        This method will be called by the stitch_hsg_results function to add
+        the PMT data to the spectrum.
         """
         # print "I'm adding PMT once"
-        # self.full_dict = stitch_hsg_dicts(pmt_object.full_dict, self.full_dict,
-                                          # need_ratio=True, verbose=False)
-        self.full_dict = helpers.stitch_hsg_dicts(pmt_object, self,
-                                          need_ratio=True, verbose=verbose)
+    # self.full_dict = stitch_hsg_dicts(pmt_object.full_dict, self.full_dict,
+    # need_ratio=True, verbose=False)
+        self.full_dict = helpers.stitch_hsg_dicts(
+            pmt_object, self, need_ratio=True, verbose=verbose)
         # if verbose:
         #     self.full_dict, ratio = self.full_dict
         # print "I'm done adding PMT data"
-        self.parameters['files_here'].append(pmt_object.parameters['files included'])
+        self.parameters['files_here'].append(
+            pmt_object.parameters['files included'])
         self.make_results_array()
         # if verbose:
         #     return ratio
@@ -156,13 +159,16 @@ class FullHighSideband(FullSpectrum.FullSpectrum):
         for sb in sorted(self.full_dict.keys()):
             # print "Going to add this", sb
             try:
-                self.sb_results = np.vstack((self.sb_results, np.hstack((sb, self.full_dict[sb]))))
+                # too many parenthesis?
+                self.sb_results = np.vstack(
+                    (self.sb_results, np.hstack((sb, self.full_dict[sb]))))
             except ValueError:
                 # print "It didn't exist yet!"
                 self.sb_results = np.hstack((sb, self.full_dict[sb]))
                 # print "and I made this array:", self.sb_results[:, 0]
 
-    def save_processing(self, file_name, folder_str, marker='', index='', verbose=''):
+    def save_processing(
+     self, file_name, folder_str, marker='', index='', verbose=''):
         """
         This will save all of the self.proc_data and the results from the
         fitting of this individual file.
@@ -210,7 +216,8 @@ class FullHighSideband(FullSpectrum.FullSpectrum):
             # by casting it to a string.
             reduced = self.parameters.copy()
             reduced["files_here"] = str(reduced["files_here"])
-            parameter_str = json.dumps(reduced, sort_keys=True, indent=4, separators=(',', ': '))
+            parameter_str = json.dumps(
+                reduced, sort_keys=True, indent=4, separators=(',', ': '))
         except Exception as e:
             print(e)
             print("Source: EMCCD_image.save_images\nJSON FAILED")
@@ -218,7 +225,8 @@ class FullHighSideband(FullSpectrum.FullSpectrum):
             return
         parameter_str = parameter_str.replace('\n', '\n#')
 
-        num_lines = parameter_str.count('#')  # Make the number of lines constant so importing is easier
+        # Make the number of lines constant so importing is easier
+        num_lines = parameter_str.count('#')
         # for num in range(99 - num_lines): parameter_str += '\n#'
         parameter_str += '\n#' * (99 - num_lines)
         # origin_import_spec = '\nNIR frequency,Signal,Standard error\neV,arb. u.,arb. u.'
