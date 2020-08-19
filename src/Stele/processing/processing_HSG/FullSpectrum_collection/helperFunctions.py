@@ -270,15 +270,15 @@ def stitch_hsg_dicts(
     # third check looks to make a gain 110 prioritize non-110, unless the
     # non-110 includes a laser line
     scaleTo = ""
+    # TODO: altar below elif knot into a function call for Mccabe and pylama
     if need_ratio:
         if isinstance(new_obj, HSPMT.HighSidebandPMT):
             scaleTo = "new"
         elif isinstance(full_obj, HSPMT.HighSidebandPMT):
             scaleTo = "full"
-        elif (
-        # TODO: correct pre existing syntax error of below lines
-         new_obj.parameters["gain"] == 110 and
-         full_obj.parameters["gain"] != 110 and 0 not in full:)
+        # this line specifically requires the function treatment to correct
+        elif new_obj.parameters["gain"] == 110 and \
+          full_obj.parameters["gain"] != 110 and 0 not in full:
             scaleTo = "new"
         else:
             scaleTo = "full"
@@ -286,8 +286,10 @@ def stitch_hsg_dicts(
     if verbose:
         print("\tI'm adding these sidebands", sorted(new_dict.keys()))
         print("\t  With these:", sorted(full.keys()))
-    overlap = [] # The list that hold which orders are in both dictionaries
-    missing = [] # How to deal with sidebands that are missing from full but in new.
+    # The list that hold which orders are in both dictionaries
+    overlap = []
+    # How to deal with sidebands that are missing from full but in new.
+    missing = []
     for new_sb in sorted(new_dict.keys()):
         full_sbs = sorted(full.keys())
         if new_sb in full_sbs:
@@ -300,7 +302,6 @@ def stitch_hsg_dicts(
         print("\t  ( overlap:", overlap, ")")
         print("\t  ( missing:", missing, ")")
 
-
     # This if-else clause handles how to average together overlapping sidebands
     # which are seen in both spectra,
     if need_ratio:
@@ -311,17 +312,19 @@ def stitch_hsg_dicts(
             new_starter = overlap[-1]
             if verbose:
                 print("\n\tadding these ratios,", end=' ')
+            # TODO: code below appears highly redundant with stitch_hsg_dicts
+            #   and thus is prime for conversion to a function call
             if len(overlap) > 2:
-                overlap = [x for x in overlap if (x % 2 == 0)
-                           ]# and (x != min(overlap) and (x != max(overlap)))]
+                overlap = [x for x in overlap if (x % 2 == 0)]
+                # and (x != min(overlap) and (x != max(overlap)))]
             if scaleTo == "new":
                 if verbose:
                     print("scaling to new :")
                 for sb in overlap:
                     ratio_list.append(new_dict[sb][2]/full[sb][2])
                     if verbose:
-                        print("\t\t{:2.0f}: {:.3e}/{:.3e} ~ {:.3e},".format(sb, new_dict[sb][2],
-                                                               full[sb][2], ratio_list[-1]))
+                        print("\t\t{:2.0f}: {:.3e}/{:.3e} ~ {:.3e},".format(
+                            sb, new_dict[sb][2], full[sb][2], ratio_list[-1]))
                 # new_ratio = 1 06/11/18 Not sure what these were used for
                 ratio = np.mean(ratio_list)
             else:
@@ -330,13 +333,15 @@ def stitch_hsg_dicts(
                 for sb in overlap:
                     ratio_list.append(full[sb][2] / new_dict[sb][2])
                     if verbose:
-                        print("\t\t{:2.0f}: {:.3e}/{:.3e} ~ {:.3e},".format(sb, full[sb][2],
-                                                               new_dict[sb][2], ratio_list[-1]))
-                # new_ratio = np.mean(ratio_list) 06/11/18 Not sure what these were used for
+                        print("\t\t{:2.0f}: {:.3e}/{:.3e} ~ {:.3e},".format(
+                            sb, full[sb][2], new_dict[sb][2], ratio_list[-1]))
+
+                # 06/11/18 Not sure what these were used for
+                # new_ratio = np.mean(ratio_list)
 
                 ratio = np.mean(ratio_list)
-            # Maybe not the best way to do it, performance wise, since you still
-            # iterate through the list, even though you'll override it.
+            # Maybe not the best way to do it, performance wise, since you
+            # still iterate through the list, even though you'll override it.
             if isinstance(override_ratio, float):
                 ratio = override_ratio
                 if verbose:
@@ -344,9 +349,10 @@ def stitch_hsg_dicts(
             error = np.std(ratio_list) / np.sqrt(len(ratio_list))
 
         except IndexError:
-            # If there's no overlap (which you shouldn't let happen), hardcode a ratio
-            # and error. I looked at all the ratios for the overlaps from 6/15/16
-            # (540ghz para) to get the rough average. Hopefully they hold for all data.
+            # If there's no overlap (which you shouldn't let happen), hardcode
+            # a ratio and error. I looked at all the ratios for the overlaps
+            # from 6/15/16 (540ghz para) to get the rough average. Hopefully
+            # they hold for all data.
             if not overlap:
                 ratio = 0.1695
                 error = 0.02
@@ -355,41 +361,38 @@ def stitch_hsg_dicts(
             else:
                 raise
         if verbose:
-            # print "Ratio list\n\t", ("{:.3g}, "*len(ratio_list))[:-2].format(*ratio_list)
+            # print "Ratio list\n\t", ("{:.3g}, "*len(ratio_list))[:-2].format(
+            # *ratio_list)
             # print "Overlap   \n\t", [round(ii, 3) for ii in overlap]
-            print("\t Ratio: {:.3g} +- {:.3g} ({:.2f}%)\n".format(ratio, error, error/ratio*100))
+            print("\t Ratio: {:.3g} +- {:.3g} ({:.2f}%)\n".format(
+                ratio, error, error/ratio*100))
         # Adding the new sidebands to the full set and moving errors around.
-        # I don't know exactly what to do about the other aspects of the sidebands
-        # besides the strength and its error.
+        # I don't know exactly what to do about the other aspects of the
+        # sidebands besides the strength and its error.
         if scaleTo == "full":
             ratios[1] = ratio
             for sb in overlap:
                 if verbose:
-                    print("For SB {:02d}, original strength is {:.3g} +- {:.3g} ({:.3f}%)".format(int(sb), new_dict[sb][2], new_dict[sb][3],
-                                                                        new_dict[sb][3]/new_dict[sb][2]*100
-                            ))
+                    print("For SB {:02d}, original strength is {:.3g} +- {:.3g} ({:.3f}%)".format(int(sb), new_dict[sb][2], new_dict[sb][3], new_dict[sb][3]/new_dict[sb][2]*100 ))
 
-                new_dict[sb][3] = ratio * new_dict[sb][2] * np.sqrt((error / ratio) ** 2 + (new_dict[sb][3] / new_dict[sb][2]) ** 2)
+                new_dict[sb][3] = \
+                    ratio * new_dict[sb][2] * np.sqrt(
+                    (error / ratio) ** 2 +
+                    (new_dict[sb][3] / new_dict[sb][2]) ** 2)
                 new_dict[sb][2] = ratio * new_dict[sb][2]
                 if verbose:
-                    print("\t\t   scaled\t\t\t\t{:.3g} +- {:.3g} ({:.3f}%)".format(new_dict[sb][2],
-                                                                        new_dict[sb][3],
-                                                                        new_dict[sb][3]/new_dict[sb][2]*100))
-                    print("\t\t   full\t\t\t\t\t{:.3g} +- {:.3g} ({:.3f}%)".format(full[sb][2],
-                                                                        full[sb][3],
-                                                                        full[sb][3]/full[sb][2]*100))
+                    print("\t\t   scaled\t\t\t\t{:.3g} +- {:.3g} ({:.3f}%)".format(new_dict[sb][2], new_dict[sb][3], new_dict[sb][3]/new_dict[sb][2]*100))
+                    print("\t\t   full\t\t\t\t\t{:.3g} +- {:.3g} ({:.3f}%)".format(full[sb][2], full[sb][3], full[sb][3]/full[sb][2]*100))
 
-
-                sb_error = np.sqrt(full[sb][3] ** (-2) + new_dict[sb][3] ** (-2)) ** (-1)
+                sb_error = np.sqrt(full[sb][3] ** (-2) +
+                                   new_dict[sb][3] ** (-2)) ** (-1)
 
                 avg = (full[sb][2] / (full[sb][3] ** 2) + new_dict[sb][2] / (
                     new_dict[sb][3] ** 2)) / (full[sb][3] ** (-2) + new_dict[sb][3] ** (-2))
                 full[sb][2] = avg
                 full[sb][3] = sb_error
                 if verbose:
-                    print("\t\t   replaced with \t\t{:.3g} +- {:.3g} ({:.3f}%)".format(full[sb][2],
-                                                                        full[sb][3],
-                                                                        full[sb][3]/full[sb][2]*100))
+                    print("\t\t   replaced with \t\t{:.3g} +- {:.3g} ({:.3f}%)".format(full[sb][2], full[sb][3], full[sb][3]/full[sb][2]*100))
                     print()
 
                 lw_error = np.sqrt(full[sb][5] ** (-2) + new_dict[sb][5] ** (-2)) ** (-1)
