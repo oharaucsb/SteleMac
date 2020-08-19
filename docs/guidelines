@@ -12,6 +12,16 @@ These are in no particular order.
     followed what they did. The style will try to help you, but knowing why
     to do these things, not just what to do, is invaluable.
 
+- PEP 290 is also incredibly helpful for modernization of code, though less so
+    with deprecation of python 2.X
+
+- Any included C like code should comply to PEP 7. None is currently present,
+    but it is useful in case this changes in the future.
+
+- Look through the PEP index when implementing something new to see if there
+    are helpful guidelines. While not forced, they tend to be filled with a
+    great deal of wisdom from professional python developers.
+
 - One object, one file. Keep objects in their own files with clear filenames
 
 - One file, one commit. Stage your changes so each commit clearly reflects the
