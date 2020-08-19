@@ -3,6 +3,10 @@ These are in no particular order.
 
 - Use a linter with the requisite styles, currently Pep8, mccabe, pyflakes
 
+- This is the site for the Pep8 standard, it was made by people much smarter
+    than I in the ways of python and explains much of the reasoning for it.
+    https://www.python.org/dev/peps/pep-0008/
+
 - One object, one file. Keep objects in their own files with clear filenames
 
 - One file, one commit. Stage your changes so each commit clearly reflects the
@@ -19,3 +23,8 @@ These are in no particular order.
     Use your best judgment.
 
 - Have clear and informative commit messages.
+
+- If something seems unclear, read the documentation, if there is no
+    documentation, then firstly I am sorry, and secondly, please add some once
+    you feel you significantly understand the matter. Alternatively, if daring,
+    correct and update the code such that verbosity is no longer needed.
