@@ -496,8 +496,4 @@ def stitch_hsg_dicts(
     if verbose:
         print("I made this dictionary", sorted(full.keys()))
         print('-'*19)
-        return full
-        # the fuck? Why was this here?
-        return full, ratio
-
     return full
