@@ -373,7 +373,7 @@ def stitch_hsg_dicts(
             ratios[1] = ratio
             for sb in overlap:
                 if verbose:
-                    print("For SB {:02d}, original strength is {:.3g} +- {:.3g} ({:.3f}%)".format(int(sb), new_dict[sb][2], new_dict[sb][3], new_dict[sb][3]/new_dict[sb][2]*100 ))
+                    print("For SB {:02d}, original strength is {:.3g} +- {:.3g} ({:.3f}%)".format(int(sb), new_dict[sb][2], new_dict[sb][3], new_dict[sb][3]/new_dict[sb][2]*100))
 
                 new_dict[sb][3] = \
                     ratio * new_dict[sb][2] * np.sqrt(
@@ -395,72 +395,98 @@ def stitch_hsg_dicts(
                     print("\t\t   replaced with \t\t{:.3g} +- {:.3g} ({:.3f}%)".format(full[sb][2], full[sb][3], full[sb][3]/full[sb][2]*100))
                     print()
 
-                lw_error = np.sqrt(full[sb][5] ** (-2) + new_dict[sb][5] ** (-2)) ** (-1)
-                lw_avg = (full[sb][4] / (full[sb][5] ** 2) + new_dict[sb][4] / (
-                new_dict[sb][5] ** 2)) / (
-                             full[sb][5] ** (-2) + new_dict[sb][5] ** (-2))
+                lw_error = np.sqrt(full[sb][5] ** (-2) +
+                                   new_dict[sb][5] ** (-2)) ** (-1)
+                # TODO: unify low_average into a function call here and in old
+                lw_avg = (
+                    full[sb][4] / (full[sb][5] ** 2) +
+                    new_dict[sb][4] / (new_dict[sb][5] ** 2)) / (
+                    full[sb][5] ** (-2) + new_dict[sb][5] ** (-2))
                 full[sb][4] = lw_avg
-                full[sb][5] = lw_error  # This may not be the exactly right way to calculate the error
+                # This may not be the exactly right way to calculate the error
+                full[sb][5] = lw_error
         else:
             ratios[0] = ratio
             for sb in overlap:
-                full[sb][3] = ratio * full[sb][2] * np.sqrt((error / ratio) ** 2 + (full[sb][3] / full[sb][2]) ** 2)
+                full[sb][3] = ratio * full[sb][2] * np.sqrt(
+                    (error / ratio) ** 2 + (full[sb][3] / full[sb][2]) ** 2)
                 full[sb][2] = ratio * full[sb][2]
 
-                sberror = np.sqrt(full[sb][3] ** (-2) + new_dict[sb][3] ** (-2)) ** (-1)
-                avg = (full[sb][2] / (full[sb][3] ** 2) + new_dict[sb][2] / (
-                    new_dict[sb][3] ** 2)) / (full[sb][3] ** (-2) + new_dict[sb][3] ** (-2))
+                sberror = np.sqrt(
+                    full[sb][3] ** (-2) + new_dict[sb][3] ** (-2)) ** (-1)
+                avg = (
+                    full[sb][2] / (full[sb][3] ** 2) +
+                    new_dict[sb][2] / (new_dict[sb][3] ** 2)) / (
+                    full[sb][3] ** (-2) + new_dict[sb][3] ** (-2))
                 full[sb][2] = avg
                 full[sb][3] = sberror
 
-                lw_error = np.sqrt(full[sb][5] ** (-2) + new_dict[sb][5] ** (-2)) ** (-1)
-                lw_avg = (full[sb][4] / (full[sb][5] ** 2) + new_dict[sb][4] / (
-                new_dict[sb][5] ** 2)) / (
-                             full[sb][5] ** (-2) + new_dict[sb][5] ** (-2))
+                lw_error = np.sqrt(
+                    full[sb][5] ** (-2) + new_dict[sb][5] ** (-2)) ** (-1)
+                lw_avg = (
+                    full[sb][4] / (full[sb][5] ** 2) +
+                    new_dict[sb][4] / (new_dict[sb][5] ** 2)) / (
+                    full[sb][5] ** (-2) + new_dict[sb][5] ** (-2))
                 full[sb][4] = lw_avg
-                full[sb][5] = lw_error  # This may not be the exactly right way to calculate the error
+                # This may not be the exactly right way to calculate the error
+                full[sb][5] = lw_error
 
-
-    else: # not needing a new ratio
+    # not needing a new ratio
+    # TODO: rectify below redundancy with stitch_hsg_dicts_old using functions
+    else:
         try:
-            new_starter = overlap[-1] # This grabs the sideband order where only the new dictionary has
-                                      # sideband information.  It's not clear why it necessarily has to be
-                                      # at this line.
-            overlap = [x for x in overlap if (x % 2 == 0)
-                       ] # and (x != min(overlap) and (x != max(overlap)))]
-            # This cuts out the lowest order sideband in the overlap for mysterious reasons
-            for sb in overlap: # This for loop average two data points weighted by their relative errors
+            # This grabs the sideband order where only the new dictionary has
+            # sideband information.  It's not clear why it necessarily has to
+            # be at this line.
+            new_starter = overlap[-1]
+            # This cuts out the lowest order sideband in the overlap for
+            # mysterious reasons
+            overlap = [x for x in overlap if (x % 2 == 0)]
+            #   and (x != min(overlap) and (x != max(overlap)))]
+            # This for loop average two data points weighted by
+            # their relative errors
+            for sb in overlap:
                 if verbose:
                     print("The sideband", sb)
                     print("Old value", full[sb][4] * 1000)
                     print("Add value", new_dict[sb][4] * 1000)
                 try:
-                    error = np.sqrt(full[sb][3] ** (-2) + new_dict[sb][3] ** (-2)) ** (-1)
-                    avg = (full[sb][2] / (full[sb][3] ** 2) + new_dict[sb][2] / (new_dict[sb][3] ** 2)) / (
+                    error = np.sqrt(
+                        full[sb][3] ** (-2) + new_dict[sb][3] ** (-2)) ** (-1)
+                    avg = (
+                        full[sb][2] / (full[sb][3] ** 2) +
+                        new_dict[sb][2] / (new_dict[sb][3] ** 2)) / (
                         full[sb][3] ** (-2) + new_dict[sb][3] ** (-2))
                     full[sb][2] = avg
                     full[sb][3] = error
                 except RuntimeWarning:
                     raise IOError()
 
-                lw_error = np.sqrt(full[sb][5] ** (-2) + new_dict[sb][5] ** (-2)) ** (-1)
-                lw_avg = (full[sb][4] / (full[sb][5] ** 2) + new_dict[sb][4] / (new_dict[sb][5] ** 2)) / (
-                full[sb][5] ** (-2) + new_dict[sb][5] ** (-2))
+                lw_error = np.sqrt(
+                    full[sb][5] ** (-2) + new_dict[sb][5] ** (-2)) ** (-1)
+                lw_avg = (
+                    full[sb][4] / (full[sb][5] ** 2) +
+                    new_dict[sb][4] / (new_dict[sb][5] ** 2)) / (
+                    full[sb][5] ** (-2) + new_dict[sb][5] ** (-2))
                 full[sb][4] = lw_avg
-                full[sb][5] = lw_error  # This may not be the exactly right way to calculate the error
+                # This may not be the exactly right way to calculate the error
+                full[sb][5] = lw_error
                 if verbose:
                     print("New value", lw_avg * 1000)
-        except:
-            new_starter = 0  # I think this makes things work when there's no overlap
+        except Exception:
+            # I think this makes things work when there's no overlap
+            new_starter = 0
     if verbose:
         print("appending new elements. new_starter={}".format(new_starter))
 
-
-    for sb in [x for x in list(new_dict.keys()) if ((x > new_starter) or (x in missing))]:
+    for sb in [x for x in list(new_dict.keys()) if (
+     (x > new_starter) or (x in missing))]:
         full[sb] = new_dict[sb]
         if scaleTo == "full":
             full[sb][2] = ratio * full[sb][2]
-            full[sb][3] = full[sb][2] * np.sqrt((error / ratio) ** 2 + (ratio * full[sb][3] / full[sb][2]) ** 2)
+            full[sb][3] = full[sb][2] * np.sqrt(
+                (error / ratio) ** 2 +
+                (ratio * full[sb][3] / full[sb][2]) ** 2)
     if scaleTo == "new":
         for sb in set(full.keys()) - set(sorted(new_dict.keys())[:]):
             full[sb][2] *= ratio
@@ -471,6 +497,7 @@ def stitch_hsg_dicts(
         print("I made this dictionary", sorted(full.keys()))
         print('-'*19)
         return full
-        return full, ratio #the fuck? Why was this here?
+        # the fuck? Why was this here?
+        return full, ratio
 
     return full
