@@ -7,6 +7,11 @@ These are in no particular order.
     than I in the ways of python and explains much of the reasoning for it.
     https://www.python.org/dev/peps/pep-0008/
 
+- No seriously, read the Pep8 documentation. It was in part the basis for the
+    refactoring. If my code looks like I know python, it is because I just
+    followed what they did. The style will try to help you, but knowing why
+    to do these things, not just what to do, is invaluable.
+
 - One object, one file. Keep objects in their own files with clear filenames
 
 - One file, one commit. Stage your changes so each commit clearly reflects the
