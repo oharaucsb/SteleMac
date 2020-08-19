@@ -18,25 +18,26 @@ def stitch_hsg_dicts(
     11/14/16
     --------
     This function has been updated to take the CCD objects themselves to be
-    more intelligent about stitching. Consider two scans, (a) spec step 0 with 1 gain, spec
-    step 2 with 110 gain and (b) spec step 0 with 50 gain and spec step 1 with 110 gain.
-    The old version would always take spec step 0 to scale to, so while comparisons
-    between spec step 0 and 1 for either case is valid, comparison between (a) and (b)
-    were not, since they were scaled to different gain parameters. This new code will
-    check what the gain values are and scale to the 110 data set, if present. This seems
-    valid because we currently always have a 110 gain exposure for higher order
-    sidebands.
-    The exception is if the laser is present (sideband 0), as that is an absolute
+    more intelligent about stitching. Consider two scans, (a) spec step 0 with
+    1 gain, spec step 2 with 110 gain and (b) spec step 0 with 50 gain and spec
+    step 1 with 110 gain. The old version would always take spec step 0 to
+    scale to, so while comparisons between spec step 0 and 1 for either case is
+    valid, comparison between (a) and (b) were not, since they were scaled to
+    different gain parameters. This new code will check what the gain values
+    are and scale to the 110 data set, if present. This seems valid because we
+    currently always have a 110 gain exposure for higher order sidebands. The
+    exception is if the laser is present (sideband 0), as that is an absolute
     measure to which all else should be related.
     TODO: run some test cases to test this.
 
     06/11/18
     --------
-    That sometimes was breaking if there were only 3-4 sidebands to fit with poor
-    SNR. I've added the override_ratio to be passed to set a specific ratio to scale
-    by. From data on 06/03/18, the 50gain to 110gain is a ~3.6 ratio. I haven't done
-    a clean way of specifying which data set it should be scaled. Right now,
-    it leaves the laser line data, or the 110 gain data alone.
+    That sometimes was breaking if there were only 3-4 sidebands to fit with
+    poor SNR. I've added the override_ratio to be passed to set a specific
+    ratio to scale by. From data on 06/03/18, the 50gain to 110gain is a ~3.6
+    ratio. I haven't done a clean way of specifying which data set it should be
+    scaled. Right now, it leaves the laser line data, or the 110 gain data
+    alone.
 
 
     Inputs:
@@ -44,18 +45,19 @@ def stitch_hsg_dicts(
            that it contains lower orders than the new_dict.
     new_dict = another full_dict.
     need_ratio = If gain or other parameters aren't equal and must resort to
-                 calculating the ratio instead of the measurements being equivalent.
-                 Changing integration time still means N photons made M counts,
-                 but changing gain or using PMT or whatever does affect things.
+                 calculating the ratio instead of the measurements being
+                 equivalent. Changing integration time still means N photons
+                 made M counts, but changing gain or using PMT or whatever does
+                 affect things.
     ratios: Will update with the values to the ratios needed to scale the data.
             ratios[0] is the ratio for the "full_obj"
             ratios[1] is the ratio for the "new_obj"
-            one of them will be one, one will be the appropriate scale, since one of
-            them is unscaled. This is strictly speaking an output
+            one of them will be one, one will be the appropriate scale, since
+            one of them is unscaled. This is strictly speaking an output
     override_ratio: Pass a float to specify the ratio that should be used.
-    ignore_weaker_lowers: Sometimes, a SB is in the short pass filter so a lower
-        order is weaker than the next highest. If True, causes script to ignore all
-        sidebands which are weaker and lower order.
+    ignore_weaker_lowers: Sometimes, a SB is in the short pass filter so a
+        lower order is weaker than the next highest. If True, causes script to
+        ignore all sidebands which are weaker and lower order.
 
     Returns:
     full = extended version of the input full.  Overlapping sidebands are
