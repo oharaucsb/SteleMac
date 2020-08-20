@@ -1,6 +1,11 @@
 from __future__ import division
 import numpy as np
 from .processsing_jones import jones
+import numpy.pi as pi
+
+
+pideg = 180./pi
+degpi = pi/180.
 
 
 class JonesVector(object):
