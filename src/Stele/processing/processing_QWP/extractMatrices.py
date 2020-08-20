@@ -139,7 +139,7 @@ def findJ(alphas, gammas=None, **kwargs):
     # angles for a specific sideband and NIR alpha
     sbGetter = SbStateGetter(alphas[1:, 1:], gammas[1:, 1:], sbs, nirAlphas)
 
-    ## Initialize the matrices
+    # Initialize the matrices
     outputFlatJMatrix = np.empty((len(sbs), 9))
     outputJMatrix = np.empty((2, 2, len(sbs)), dtype=complex)
 
@@ -178,49 +178,38 @@ def findJ(alphas, gammas=None, **kwargs):
 
 def saveT(T, sbs, out):
     """
-    Save a complex T matrix, input as an Nx2x2, into a text file. Dumps it as a CSV
-    where the first four columns are the real components, the last four are imaginary
+    Save a complex T matrix, input as an Nx2x2, into a text file. Dumps it as a
+    CSV where the first four columns are the real components, the last four are
+    imaginary
     :param T:
     :param out:
     :return:
     """
     T = np.array(T.transpose(2, 0, 1))
 
-    ## I'm nervous of trusting how numpy handles .view() on complex types. I feel like
-    # I've seen it swap orders or something, where I've had to change the loadT function
-    # to compensate. I guess when in doubt, process data from scratch, save it and
-    # reload it and make sure the memory and disk matrices agree.
-
-    # 01/04/19 No, fuck this. I don't trust view at all. I'm looking at two different
-    # T matrices, and in one instance this gets reordered as
+    # I don't trust numpy .view() on complex types at all. I'm looking at two
+    # different T matrices, and in one instance this gets reordered as
     #     ReT++,ReT+-,ReT-+,ReT--,ImT++,ImT+-,ImT-+,ImT--
     # while in another, it does it as
     #     ReT++,ImT++,ReT+-,ImT+-,ReT-+,ImT-+,ReT--,ImT--
-    #
-    # I have no fucking clue why it does it that way, but I'm sick and fucking tired of it
-    # So no more
-    #
-    # flatT = T.reshape(-1, 4).view(float).reshape(-1, 8)
 
     flatT = T.reshape(-1, 4)
     flatT = np.column_stack((flatT.real, flatT.imag))
 
-    # I'm also going to complicate this, because I want to save it like qile's matlab
-    # code save his files, so that we can use the same loading.
+    # I'm also going to complicate this, because I want to save it like qile's
+    # matlab code save his files, so that we can use the same loading.
     # As of 12/19/18, I believe the above code should be ordering columns as,
 
-    ###   0    1     2     3      4     5    6     7
-    ### ReT++,ReT+-,ReT-+,ReT--,ImT++,ImT+-,ImT-+,ImT--
+    #   0    1     2     3      4     5    6     7
+    # ReT++,ReT+-,ReT-+,ReT--,ImT++,ImT+-,ImT-+,ImT--
 
     # Qile saves as
-    ###   0    1     2     3      4     5    6     7
-    ### ReT--,ImT--,ReT+-,ImT+-,ReT-+,ImT-+,ReT++,ImT++
+    #   0    1     2     3      4     5    6     7
+    # ReT--,ImT--,ReT+-,ImT+-,ReT-+,ImT-+,ReT++,ImT++
 
-    reorder = [ 3, 7, 1, 5, 2, 6, 0, 4 ]
+    reorder = [3, 7, 1, 5, 2, 6, 0, 4]
 
     flatT = flatT[:, reorder]
-
-
 
     flatT = np.column_stack((sbs, flatT))
 
@@ -233,30 +222,26 @@ def saveT(T, sbs, out):
                fmt="%.6f")
     print("saved {}\n".format(out))
 
+
 def loadT(name):
     """
     Load the file saved by saveT
     :param name:
     :return:
     """
-    d = np.genfromtxt(name, delimiter=',')[1:] # label line
+    d = np.genfromtxt(name, delimiter=',')[1:]  # label line
 
-    sbs = d[:,0]
+    sbs = d[:, 0]
 
     T = d[:, 1:5]+1j*d[:, 5:]
-    # T = d[:, 1::2] + 1j * d[:, 2::2]
     T = T.reshape(-1, 2, 2)
     T = T.transpose(1, 2, 0)
 
-
     T = d[:, 1::2] + 1j * d[:, 2::2]
 
-    ## Reversing the axis gets back into
-    # T++, T+-, T-+, T--, which makes it easier to then
-    #             reshape it to appropriate 2x2 matrices
-    #  and then                      put them in the correct indices.
+    # Reversing the axis gets back into T++, T+-, T-+, T--, which makes it
+    # easier to then reshape it to appropriate 2x2 matrices and then put them
+    # in the correct indices.
     T = T[:, ::-1].reshape(-1, 2, 2).transpose(2, 1, 0)
-    # T = T.reshape(-1, 2, 2)
-
 
     return T, sbs
