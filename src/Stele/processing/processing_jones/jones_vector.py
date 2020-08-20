@@ -305,7 +305,7 @@ class JonesVector(object):
 
 
 if __name__ == '__main__':
-    from hsganalysis.jones import JonesVector as JV
+    from .processsing_jones.jones_vector import JonesVector as JV
     a = JV(alpha=[-45, 0, 45, 90], gamma=0)
     a.to_Stokes()
     a = JonesVector(phi=np.arange(0, 90, 5), delta=np.ones(90/5))
