@@ -6,8 +6,9 @@ import Stele.ipg as pg
 
 """
 12/17/18
-This is an older version of making fan diagrams, it would create indpedent polarImagePlots
-and then add them on top of each other, and things were a little gross.
+This is an older version of making fan diagrams, it would create indpedent
+polarImagePlots and then add them on top of each other, and things were a
+little gross.
 
 the fanDiagram class is a little bit cleaner, keeping everything together and
 is a bit tidier. At least, it makes much nicer plots for figures
@@ -34,8 +35,9 @@ def createFan(alphas, gammas,
 
     Assumes both alphas/gammas are the same shape
 
-    Alternatively, pass nirAlpha and SBs as 1st/2nd args (as 1D arrays) to have it
-    create the fan without any data
+    Alternatively, pass nirAlpha and SBs as 1st/2nd args (as 1D arrays) to have
+    it create the fan without any data
+
     :param alphas:
     :param gammas:
     :param kwargs:
@@ -66,7 +68,6 @@ def createFan(alphas, gammas,
         gammas[1:, 0] = sbs
         gammas[0, 1:] = nirAlphas
 
-
     sbs = alphas[1:, 0]
     maxSB = sbs.max()
     nirAlphas = alphas[0, 1:]
@@ -91,7 +92,8 @@ def createFan(alphas, gammas,
     palp.setLevels(-90, 90)
 
     # p(olarplot)gam(ma)
-    pgam = PolarImagePlot(r=sbs, theta=180 + nirAlphas, imageData=gammas[1:, 1:])
+    pgam = PolarImagePlot(
+        r=sbs, theta=180 + nirAlphas, imageData=gammas[1:, 1:])
     pgam.ui.histogram.gradient.restoreState({
         "mode": "rgb",
         "ticks": [
@@ -105,20 +107,20 @@ def createFan(alphas, gammas,
     palp.addItem(pgam.imageItem)
 
     palp.ui.histogram.axis.setTickSpacing(30, 15)
-    palp.ui.histogram.axis.setLabel("&alpha; (&deg;)", **{'font-family': 'Times',
-                                                          "font-size":  "18pt"})
+    palp.ui.histogram.axis.setLabel(
+        "&alpha; (&deg;)", **{'font-family': 'Times', "font-size":  "18pt"})
 
     pgam.ui.histogram.axis.setTickSpacing(15, 5)
-    pgam.ui.histogram.axis.setLabel("&gamma; (&deg;)", **{'font-family': 'Times',
-                                                          "font-size":  "18pt"})
+    pgam.ui.histogram.axis.setLabel(
+        "&gamma; (&deg;)", **{'font-family': 'Times', "font-size":  "18pt"})
 
-    # For some reason, this is important. It doesn't seem to re-render it properly
-    # showing the full gamma range.
+    # For some reason, this is important. It doesn't seem to re-render it
+    # properly showing the full gamma range.
     pgam.ui.histogram.autoHistogramRange()
     palp.ui.histogram.autoHistogramRange()
 
 
-    #p(olarziation)e(llipse)
+    # p(olarziation)e(llipse)
     pe = pg.PolarizationEllipseItem()
     pe.setGeometry(-7, -7, 14, 14)
     pe.setEllipseCurve(45, 45)
@@ -139,15 +141,14 @@ def createFan(alphas, gammas,
     )
 
     def updateCurve(info):
-        # a = alphaData[info.ridx, info.tidx]
-        # gamma = gammaData[info.ridx, info.tidx]
         a = palp.imageItem.image[info.ridx, info.tidx]
         gamma = pgam.imageItem.image[info.ridx, info.tidx]
         pe.setEllipseCurve(a, gamma)
         textItem.setHtml(
             f"r={info.r:.0f}, &theta;={info.t:.0f},<br>"
-            f"  &alpha;(r, &theta;)={a:.3f}<br>  &gamma;(r, &theta;)={gamma:.3f}"
-        )
+            f"  &alpha;(r, &theta;)={a:.3f}<br>"
+            "&gamma;(r, &theta;)={gamma:.3f}"
+            )
 
     palp.imageItem.sigPointClicked.connect(updateCurve)
     pgam.imageItem.sigPointClicked.connect(updateCurve)
@@ -165,11 +166,10 @@ def createFan(alphas, gammas,
 
             # Hardcoded guess-and-check
             e.setPos(0, 20 + 78*(90-a)/30)
-            # e.setScale(0.7)
 
-            # Stupid pos curve item has some weird race conditions, and it rarely
-            # orients the arrow correctly. So, disable it and set the rotations
-            # manually.
+            # Stupid pos curve item has some weird race conditions, and it
+            # rarely orients the arrow correctly. So, disable it and set the
+            # rotations manually.
             arr = e.addArrow(rotate=False)
             arr.setIndex(24)
             arr.rotate(-2*a)
@@ -185,28 +185,24 @@ def createFan(alphas, gammas,
             e.setEllipseCurve(0, g)
             # Hardcoded guess-and-check
             e.setPos(-0, 0 + 170*(45-g)/30)
-            # e.setScale(0.7)
-
 
             arr = e.addArrow(rotate=False)
             arr.setIndex(0)
-            # arr.rotate(-2*a)
 
             arr = e.addArrow()
             arr._rotate = False
             arr.setIndex(50)
-
-
 
     palp.show()
     if defaults["showGamma"]:
         pgam.show()
     return palp, pgam
 
+
 def saveAndRenderFan(p1, p2, fname, hideHistograms=False):
     """
-    Save fan diagrams to file, with the full image, and color bars on the alpha/gamma
-    values
+    Save fan diagrams to file, with the full image, and color bars on the
+        alpha/gamma values
     :param p1: palp coming from the createFan function above
     :param p2: pgam coming from the createFan function above
     :param fname: the fname to save as
@@ -215,12 +211,6 @@ def saveAndRenderFan(p1, p2, fname, hideHistograms=False):
         hideHistograms - (True) Prevent rendering the histograms
     :return:
     """
-
-    # defaults = {
-    #     "hideHistograms": False
-    # }
-    #
-    # defaults.update(kwargs)
 
     doSvg = fname.endswith(".svg")
 
@@ -251,21 +241,18 @@ def saveAndRenderFan(p1, p2, fname, hideHistograms=False):
         outputImage.setFileName(fname)
         outputImage.setSize(QtCore.QSize(int(width), int(height)))
 
-        outputImage.setResolution(96) # I'm not sure why it has to be this...
+        # I'm not sure why it has to be this...
+        outputImage.setResolution(96)
     else:
-        outputImage = QtGui.QImage(width*4, height*4, QtGui.QImage.Format_ARGB32)
-        # outputImage.setDotsPerMeterX(650 * 100 / 2.54)
-        # outputImage.setDotsPerMeterY(650 * 100 / 2.54)
+        outputImage = QtGui.QImage(
+            width*4, height*4, QtGui.QImage.Format_ARGB32)
         outputImage.setDevicePixelRatio(4)
         outputImage.fill(QtGui.QColor("white"))
 
     outputPainter = QtGui.QPainter(outputImage)
 
-
     r2.setHeight(height)
     r1.setHeight(height)
-
-
 
     hist2.render(outputPainter, r2)
     rc.moveLeft(r2.width())
