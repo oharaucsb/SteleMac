@@ -44,7 +44,7 @@ class JonesVector(object):
             alpha = np.array(alpha)
             gamma = np.array(gamma)
             v = np.array([jones.cos(gamma), 1j*jones.sin(gamma)])
-            r = make_rotation(alpha)
+            r = jones.make_rotation(alpha)
             # pass single alpha and gamma
             if alpha.size == 1 and gamma.size == 1:
                 v = np.einsum("ij,j->i", r, v)
@@ -77,11 +77,13 @@ class JonesVector(object):
 
     def __repr__(self):
         st = '['
-        if self.vec.ndim==1:
-            st += "\t" + ', '.join(["{:.3f} exp({:.3f}i)".format(np.abs(ii), np.angle(ii, deg=True)) for ii in self.vec])
+        if self.vec.ndim == 1:
+            st += "\t" + ', '.join(["{:.3f} exp({:.3f}i)".format(
+                np.abs(ii), np.angle(ii, deg=True)) for ii in self.vec])
         else:
             for r in self.vec:
-                st += "\t[" + ', '.join(["{:.3f} exp({:.3f}i)]".format(np.abs(ii), np.angle(ii, deg=True)) for ii in r]) + "]\n"
+                st += "\t[" + ', '.join(["{:.3f} exp({:.3f}i)]".format(
+                    np.abs(ii), np.angle(ii, deg=True)) for ii in r]) + "]\n"
         st += ']'
 
         return st
@@ -101,12 +103,13 @@ class JonesVector(object):
         ang = np.angle(v, deg=True)
         return np.squeeze(ang[1]-ang[0])
 
+    # TODO: determine what pideg and degpi are meant to be and assign them
     @property
     def phi(self):
         # v = self.vec[:,None,None]
         v = self.vec
         mag = np.abs(v)
-        return np.squeeze(np.arctan2(mag[1],mag[0]))*pideg
+        return np.squeeze(np.arctan2(mag[1], mag[0]))*pideg
 
     @property
     def alpha(self):
@@ -116,7 +119,7 @@ class JonesVector(object):
         return np.squeeze(np.arctan2(
                 np.abs(2*np.tan(phi))*np.cos(delta), (1-np.tan(phi)**2)
             )
-        )/2.*pideg
+            )/2.*pideg
 
         return np.squeeze(np.arctan2(
                 np.abs(2*np.tan(phi)/(1-np.tan(phi)**2))*np.cos(delta), 1.
@@ -130,9 +133,7 @@ class JonesVector(object):
         delta = self.delta * degpi
 
         return np.squeeze(np.arcsin(
-                2*np.tan(phi)/(1+np.tan(phi)**2) * np.sin(delta)
-            )
-        )/2.*pideg
+            2*np.tan(phi)/(1+np.tan(phi)**2) * np.sin(delta)))/2.*pideg
 
     @property
     def oldalpha(self):
@@ -140,7 +141,9 @@ class JonesVector(object):
         v = self.vec
         ang = np.angle(v)
         mag = np.abs(v)
-        return np.squeeze(np.arctan2(2*mag[0]*mag[1]*np.cos(ang[1]-ang[0]), (mag[0]**2-mag[1]**2))/2*180/3.14159)
+        return np.squeeze(np.arctan2(
+            2*mag[0]*mag[1]*np.cos(ang[1]-ang[0]),
+            (mag[0]**2-mag[1]**2))/2*180/3.14159)
 
     @property
     def oldgamma(self):
@@ -148,8 +151,9 @@ class JonesVector(object):
         v = self.vec
         mag = np.abs(v)
 
-
-        return np.squeeze(np.arcsin(2*mag[0]*mag[1]*np.sin(self.delta*np.pi/180)/(mag[0]**2+mag[1]**2))/2*180/3.14159)
+        return np.squeeze(np.arcsin(
+            2*mag[0]*mag[1]*np.sin(self.delta*np.pi/180)
+            / (mag[0]**2+mag[1]**2))/2*180/3.14159)
 
     def apply_hwp(self, theta=0):
         """
@@ -175,8 +179,9 @@ class JonesVector(object):
         internal vector.
 
 
-        As such, there's a lot of checks on the number of dimensions of the transformation
-        and the vector to intelligently handle what things should be contracted.
+        As such, there's a lot of checks on the number of dimensions of the
+        transformation and the vector to intelligently handle what things
+        should be contracted.
 
         :param theta:
         :param eta:
@@ -185,39 +190,39 @@ class JonesVector(object):
         theta = np.array(theta)
         eta = np.array(eta)
         if theta.ndim == eta.ndim == 1:
-            theta = theta[:,None]
+            theta = theta[:, None]
             if len(theta) == len(eta) != 1:
-                msg = "Caution: I don't think things will work if you have theta/eta" \
-                      "being the same dimensions"
+                msg = "Caution: I don't think things will work if you have" \
+                    "theta/eta being the same dimensions"
                 raise ValueError(msg)
-        transform = make_birefringent(theta, eta)
+        transform = jones.make_birefringent(theta, eta)
 
         ret = self.apply_transformation(transform)
 
     def vertical_projection(self):
-        m = [[0,0],[0,1]]
+        m = [[0, 0], [0, 1]]
         return self.apply_transformation(m, update_state=False)
 
     def horizontal_projection(self):
-        m = [[1,0],[0,0]]
+        m = [[1, 0], [0, 0]]
         return self.apply_transformation(m, update_state=False)
 
     def apply_transformation(self, transform, update_state=True):
         """
-        I tried to make this really general. If you pass it an array of theta/eta
-        because you want to look at rotating the FA (via theta) or different retardences
-        (via eta), it'll do them all here, instead of needign to loop over it.
-        Hopefully this odesn't lead to complications, and I hope I have all the indices
-        proper.
+        I tried to make this really general. If you pass it an array of
+        theta/eta because you want to look at rotating the FA (via theta) or
+        different retardences (via eta), it'll do them all here, instead of
+        needing to loop over it.  Hopefully this odesn't lead to complications,
+        and I hope I have all the indices proper.
 
-        :param transform: Arbitrary 2x2(xNxM) matrix. Could probably be much less
-         hardcoded, but it was easier to do this way for now.
+        :param transform: Arbitrary 2x2(xNxM) matrix. Could probably be much
+            less hardcoded, but it was easier to do this way for now.
         :return:
         """
         transform = np.array(transform)
         if not transform.shape[0] == transform.shape[1] == 2:
-            raise ValueError("Transform matrix must have 2x2 on first two indices,"
-                             "not {}".format(transform.shape))
+            raise ValueError("Transform matrix must have 2x2 on first two"
+                             "indices, not {}".format(transform.shape))
 
         tndim = transform.ndim
         tsh = transform.shape
@@ -227,7 +232,7 @@ class JonesVector(object):
             einIndices = "ij,j->i"
         elif tndim == 3 and vndim == 1:
             einIndices = "ijm,j->im"
-        elif tndim==4 and vndim == 1:
+        elif tndim == 4 and vndim == 1:
             einIndices = "ijmn,j->ijm"
         elif tndim == 2 and vndim == 2:
             einIndices = "ij,jk->ik"
