@@ -2,32 +2,35 @@ import numpy as np
 from scipy.optimize import minimize
 
 from Stele.jones import JonesVector as JV
-from .expFanCompiler import *
 
 
 def rtd(a):
     # radians to degrees
     return a*180/np.pi
 
+
 def dtr(a):
     # degrees to radians
     return a*np.pi/180
 
+
 def makeU(t):
     # unitary rotation matrix between x/y and sigma+- bases
-    # t is the crystal rotation angle. By note below, it should be relative to [011]
-    # t = dtr(t-45) # +45 because I'm relative to [011], Matrix wants [010]
-    #             # I SHOULD DOUBLE CHECK THAT IT'S +45 NOT -45
+    # t is the crystal rotation angle. By note below, it should be relative to
+    # [011] t = dtr(t-45) # +45 because I'm relative to [011], Matrix wants
+    # [010]
+    # I SHOULD DOUBLE CHECK THAT IT'S +45 NOT -45
 
-    # no, fuck it, I'm tired of thinking of angles right now. Pass the damn angle relative
-    # to [010], sort it out yourself.
+    # no, fuck it, I'm tired of thinking of angles right now. Pass the damn
+    # angle relative to [010], sort it out yourself.
     t = dtr(t)
-    a =    np.exp(-1j * t)
-    b =   -np.exp( 1j * t)
+    a = np.exp(-1j * t)
+    b = -np.exp(1j * t)
     c = 1j*np.exp(-1j * t)
-    d = 1j*np.exp( 1j * t)
-    mat = np.array([[a, b],[c,d]])/np.sqrt(2)
+    d = 1j*np.exp(1j * t)
+    mat = np.array([[a, b], [c, d]])/np.sqrt(2)
     return mat
+
 
 def makeT(J, ang):
     """take a J matrix as saved from processing,
@@ -41,12 +44,12 @@ def makeT(J, ang):
         # Shape it correctly
         J = J[:, :4] + 1j * J[:, 4:]
         J = J.reshape(-1, 2, 2)
-    # J = J.transpose(1, 2, 0)
 
     U = makeU(ang)
     T = np.einsum("ij,jlx,lm->imx", U.conj().T, J, U)
 
     return T
+
 
 def makeJfromT(T, ang):
     """take a T matrix as saved from processing,
@@ -60,9 +63,10 @@ def makeJfromT(T, ang):
 
 def unflattenJ(jVec):
     jVec = np.array(jVec)
-    j =  (jVec[:3]+1j*jVec[3:])
+    j = (jVec[:3]+1j*jVec[3:])
     j = np.append([1], j)
-    return j.reshape(2,2)
+    return j.reshape(2, 2)
+
 
 def solver(r, J):
     """ Reminder:
@@ -78,10 +82,8 @@ def solver(r, J):
     cN = np.cos(np.deg2rad(nir.phi))
     sN = np.sin(np.deg2rad(nir.phi))
 
-    # cotH = 1./np.tan(np.deg2rad(sb.phi))
-    # return cotH*eH*(Jyx*cN + Jyy*sN*eN)-cN-Jxy*sN*eN
-
     return cH*eH*(Jyx*cN + Jyy*sN*eN) - sH*(cN + sN*eN*Jxy)
+
 
 def findJ(alphas, gammas=None, **kwargs):
     """
@@ -100,8 +102,8 @@ def findJ(alphas, gammas=None, **kwargs):
 
     kwarg options:
        returnFlat-- return a flattened (Nx9) Jones matrix, of form
-         [[sb#, Re(Jxx), Re(Jxy), Re(Jyx), Re(Jyy), Im(Jxx), Im(Jxy), Im(Jyx), Im(Jyy)],
-          [  .. ]
+         [[sb#, Re(Jxx), Re(Jxy), Re(Jyx), Re(Jyy), Im(Jxx), Im(Jxy), Im(Jyx),
+         Im(Jyy)], [  .. ]
           ]
         useful for saving to file.
         If false, return an 2x2xN,
@@ -113,11 +115,11 @@ def findJ(alphas, gammas=None, **kwargs):
 
         NOTE: You probably shouldn't use the "Return Flat" argument for saving.
         Instead, get the J matrix back and use saveT() to avoid accidentally
-        introducing errors from difference in the order of the columns of the flattened
-        matrix in this function vs saveT/loadT
+        introducing errors from difference in the order of the columns of the
+        flattened matrix in this function vs saveT/loadT
 
-    You can also just pass a FanCompiler object and it'll pull the alpha/gamma from
-    that.
+    You can also just pass a FanCompiler object and it'll pull the alpha/gamma
+    from that.
 
     :return:
     """
@@ -130,7 +132,7 @@ def findJ(alphas, gammas=None, **kwargs):
     if gammas is None and isinstance(alphas, FanCompiler):
         alphas, gammas, _ = alphas.build(withErrors=False)
 
-    sbs = alphas[1:,0]
+    sbs = alphas[1:, 0]
     nirAlphas = alphas[0, 1:]
     nirGammas = gammas[0, 1:]
     # This SbStateGetter makes it more convenient to get the alpha and gamma
@@ -138,11 +140,11 @@ def findJ(alphas, gammas=None, **kwargs):
     sbGetter = SbStateGetter(alphas[1:, 1:], gammas[1:, 1:], sbs, nirAlphas)
 
     ## Initialize the matrices
-    outputFlatJMatrix = np.empty((len(sbs),9))
+    outputFlatJMatrix = np.empty((len(sbs), 9))
     outputJMatrix = np.empty((2, 2, len(sbs)), dtype=complex)
 
-    # There's one J matrix for each sideband order, so naturally have to iterate over
-    # each sideband
+    # There's one J matrix for each sideband order, so naturally have to
+    # iterate over each sideband
     for idx, sb in enumerate(sbs):
         # Get the list of alpha and gamma angles for each of the NIR Alphas used
         als, gms = zip(*[sbGetter(sb, ii) for ii in nirAlphas])
