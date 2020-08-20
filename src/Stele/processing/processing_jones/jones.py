@@ -5,12 +5,6 @@ import numpy as np
 p0 = [0.5, 2, 90., 0.5]
 
 
-def cos(x, *p):
-    A, b, mu, c = p
-
-    return A*np.cos(np.pi/180. * (x-mu)*b)+c
-
-
 class AngleWrapper(object):
     """
     Class which will force angles to be within the specified bounds
