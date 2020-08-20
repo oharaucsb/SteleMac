@@ -1,7 +1,8 @@
 from __future__ import division
 import numpy as np
-# import interactivePG as pg
-# import pyqtgraph as pg
+
+
+p0 = [0.5, 2, 90., 0.5]
 
 
 def cos(x, *p):
@@ -9,16 +10,18 @@ def cos(x, *p):
 
     return A*np.cos(np.pi/180. * (x-mu)*b)+c
 
-p0 = [0.5, 2, 90., 0.5]
 
 class AngleWrapper(object):
     """
     Class which will force angles to be within the specified bounds
     """
     def __init__(self, mn, mx):
-        self._min = mn; self._max=mx
+        self._min = mn
+        self._max = mx
+
     def __contains__(self, item):
         return self._min < item < self._max
+
     def wrap(self, datum):
         bnd = (self._max - self._min)
         datum = np.array(datum)
@@ -26,11 +29,14 @@ class AngleWrapper(object):
         datum[datum < self._min] = bnd - abs(datum[datum < self._min])
         return datum
 
+
 def cos(x):
     return np.cos(x * np.pi/180.)
 
+
 def sin(x):
     return np.sin(x * np.pi/180.)
+
 
 exp = np.exp
 pi = np.pi
@@ -38,14 +44,20 @@ pi = np.pi
 pideg = 180./pi
 degpi = pi/180.
 
+
 def printMat(m):
     print('[')
-    if m.ndim==1:
-        print("\t" + ', '.join(["{:.3f} exp({:.3f}i)".format(np.abs(ii), np.angle(ii, deg=True)) for ii in m]))
+    if m.ndim == 1:
+        print(
+            "\t" + ', '.join(["{:.3f} exp({:.3f}i)".format(
+                np.abs(ii), np.angle(ii, deg=True)) for ii in m]))
     else:
         for r in m:
-            print("\t[" + ', '.join(["{:.3f} exp({:.3f}i)]".format(np.abs(ii), np.angle(ii, deg=True)) for ii in r]) + "]")
+            print(
+                "\t[" + ', '.join(["{:.3f} exp({:.3f}i)]".format(
+                    np.abs(ii), np.angle(ii, deg=True)) for ii in r]) + "]")
     print(']')
+
 
 def make_birefringent(theta, eta=pi, phi=0):
     """
@@ -60,13 +72,14 @@ def make_birefringent(theta, eta=pi, phi=0):
     c = (exp(1j * eta/2) - exp(-1j * eta/2))*exp(1j*phi)*cos(theta)*sin(theta)
     d = exp(1j * eta/2)*sin(theta)**2 + exp(-1j * eta/2)*cos(theta)**2
 
-    retMat = np.array([[a,b], [c, d]])
+    retMat = np.array([[a, b], [c, d]])
 
     # need to remove issues from machine precision
     retMat.real[abs(retMat.real) < 1e-4] = 0.0
     retMat.imag[abs(retMat.imag) < 1e-4] = 0.0
 
     return retMat
+
 
 def make_rotation(theta):
     """
@@ -80,13 +93,10 @@ def make_rotation(theta):
     c = sin(theta)
     d = cos(theta)
 
-    retMat = np.array([[a,b], [c, d]])
-
-    # need to remove issues from machine precision
-    # retMat.real[abs(retMat.real) < 1e-4] = 0.0
-    # retMat.imag[abs(retMat.imag) < 1e-4] = 0.0
+    retMat = np.array([[a, b], [c, d]])
 
     return retMat
+
 
 def dot(m, v):
     """
@@ -113,23 +123,23 @@ def dot(m, v):
         print("input m", m.shape)
         print("input v", v.shape)
     if m.ndim == 3 and v.ndim == 1:
-        newv = v[:,None,None] * np.ones(m.shape[2])[None,None,:]
+        newv = v[:, None, None] * np.ones(m.shape[2])[None, None, :]
         return dot(m, newv)
     if m.ndim == 2 and v.ndim == 1:
-        newm = m[:,:,None]
-        newv = v[:,None,None] * np.ones(newm.shape[2])[None,None,:]
-        return dot(newm, newv)[:,0,0]
+        newm = m[:, :, None]
+        newv = v[:, None, None] * np.ones(newm.shape[2])[None, None, :]
+        return dot(newm, newv)[:, 0, 0]
     if m.ndim == 3 and v.ndim == 2:
-        newv = v[:,:,None] * np.ones(m.shape[2])[None,None,:]
+        newv = v[:, :, None] * np.ones(m.shape[2])[None, None, :]
         return dot(m, newv)
     elif m.ndim == 2 and v.ndim == 2:
-        return dot(m[:,:,None], v[:,:,None])[:,:,0]#.T
+        return dot(m[:, :, None], v[:, :, None])[:, :, 0]
     elif m.ndim == 2 and v.ndim == 3:
-        newm = m[:,:,None] * np.ones(v.shape[2])[None, None, :]
+        newm = m[:, :, None] * np.ones(v.shape[2])[None, None, :]
         return dot(newm, v)
     elif m.ndim == 3 and v.ndim == 3:
         retmat = []
         for idx in range(m.shape[2]):
-            retmat.append(np.dot(m[:,:,idx], v[:,:,idx]))
+            retmat.append(np.dot(m[:, :, idx], v[:, :, idx]))
         print("return shape", np.array(retmat).shape)
-        return np.array(retmat).transpose([1,2,0])
+        return np.array(retmat).transpose([1, 2, 0])
