@@ -3,7 +3,7 @@ import numpy as np
 from .processsing_jones import jones
 import numpy.pi as pi
 
-
+# TODO: change these to private members or eliminate altogether
 pideg = 180./pi
 degpi = pi/180.
 
