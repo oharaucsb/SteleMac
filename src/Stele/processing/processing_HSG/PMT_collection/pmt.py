@@ -4,10 +4,10 @@ import json
 class PMT(object):
     def __init__(self, file_name):
         """
-        Initializes a SPEX spectrum.  It'll open a file, and bring in the details
-        of a sideband spectrum into the object.  There isn't currently any reason
-        to use inheritance here, but it could be extended later to include PLE or
-        something of the sort.
+        Initializes a SPEX spectrum.  It'll open a file, and bring in the
+        details of a sideband spectrum into the object.  There isn't currently
+        any reason to use inheritance here, but it could be extended later to
+        include PLE or something of the sort.
 
         attributes:
             self.parameters - dictionary of important experimental parameters
@@ -24,7 +24,9 @@ class PMT(object):
         # self.files_included = [file_name]
         with open(file_name, 'r') as f:
             param_str = ''
-            line = f.readline()  # Needed to move past the first line, which is the sideband order.  Not generally useful
+            # Needed to move past the first line, which is the sideband order.
+            # Not generally useful
+            line = f.readline()
             line = f.readline()
             while line[0] == '#':
                 param_str += line[1:]
