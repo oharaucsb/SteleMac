@@ -1,24 +1,26 @@
 from __future__ import division
 import numpy as np
+from .processsing_jones import jones
 
 
 class JonesVector(object):
-    def __init__(self, Ex=1, Ey=0, phi=None, delta=None, alpha=None, gamma=None):
+    def __init__(
+            self, Ex=1, Ey=0, phi=None, delta=None, alpha=None, gamma=None):
         """
-        A class containing a jones vector which can be manipulated (sent through some
-        birefrengent material). Several initializers are possible.
+        A class containing a jones vector which can be manipulated (sent
+        through some birefrengent material). Several initializers are possible.
 
         self.vec is a 1D, len 2 complex vector where the 0th index is the
-        magnitude of Ex and 1st is Ey. All phase is kept on Ey, and vector is kept
-        normalized. That is, vec = [cos(phi), exp(i delta)sin(phi)].
+        magnitude of Ex and 1st is Ey. All phase is kept on Ey, and vector is
+        kept normalized. That is, vec = [cos(phi), exp(i delta)sin(phi)].
 
         Specifying Ex and Ey will set the inputs directly.
 
         Specifying phi and delta will define the vector as listed above
 
-        Specifying alpha and gamma will define elliptical light whose semimajor axis
-        makes an angle alpha with horizontal, and whose semimajor/minor axis define a
-        right triangle with angle gamma (tan gamma = min/maj)
+        Specifying alpha and gamma will define elliptical light whose semimajor
+        axis makes an angle alpha with horizontal, and whose semimajor/minor
+        axis define a right triangle with angle gamma (tan gamma = min/maj)
 
         all angles should be in degrees
 
@@ -30,36 +32,42 @@ class JonesVector(object):
         elif None not in [phi, delta]:
             phi = np.array(phi)
             delta = np.array(delta)
-            Ex = cos(phi)
-            Ey = sin(phi) * np.exp(1j*delta * np.pi/180.)
+            Ex = jones.cos(phi)
+            Ey = jones.sin(phi) * np.exp(1j*delta * np.pi/180.)
         elif alpha is not None and gamma is not None:
             """
-            I've found that the proper way to construct a jones vector
-            from elliptical coordinates is to create elliptical oriented along the
-            horizontal, where Ex and Ey must be 90deg out of phase, and then rotate
-            the vector.
+            I've found that the proper way to construct a jones vector from
+            elliptical coordinates is to create elliptical oriented along the
+            horizontal, where Ex and Ey must be 90deg out of phase, and then
+            rotate the vector.
             """
             alpha = np.array(alpha)
             gamma = np.array(gamma)
-            v = np.array([cos(gamma), 1j*sin(gamma)])
+            v = np.array([jones.cos(gamma), 1j*jones.sin(gamma)])
             r = make_rotation(alpha)
-            # r = make_birefringent(alpha/2, eta=pi)
-            if alpha.size == 1 and gamma.size == 1: # pass single alpha and gamma
+            # pass single alpha and gamma
+            if alpha.size == 1 and gamma.size == 1:
                 v = np.einsum("ij,j->i", r, v)
                 Ex = np.abs(v[0])
                 Ey = np.abs(v[1]) * np.exp(1j * np.diff(np.angle(v))[0])
-            elif alpha.size == 1:  # pass single alpha, multiple gamma
+            # pass single alpha, multiple gamma
+            elif alpha.size == 1:
                 v = np.einsum("ij,jk->ik", r, v)
                 Ex = np.abs(v[0])
-                Ey = np.abs(v[1]) * np.exp(1j * np.diff(np.angle(v), axis=0)[0])
-            elif gamma.size == 1:  # pass single gamma, multiple alpha
+                Ey = np.abs(v[1]) * np.exp(1j * np.diff(
+                    np.angle(v), axis=0)[0])
+            # pass single gamma, multiple alpha
+            elif gamma.size == 1:
                 v = np.einsum("ijk,j->ik", r, v)
                 Ex = np.abs(v[0])
-                Ey = np.abs(v[1]) * np.exp(1j * np.diff(np.angle(v), axis=0)[0])
-            else: # pass multiple alpha/gamma
+                Ey = np.abs(v[1]) * np.exp(1j * np.diff(
+                    np.angle(v), axis=0)[0])
+            # pass multiple alpha/gamma
+            else:
                 v = np.einsum("ijk,jk->ik", r, v)
-                Ex = np.abs(v[0,:])
-                Ey = np.abs(v[1,:]) * np.exp(1j * np.diff(np.angle(v), axis=0)[0,:])
+                Ex = np.abs(v[0, :])
+                Ey = np.abs(v[1, :]) * np.exp(1j * np.diff(
+                    np.angle(v), axis=0)[0, :])
 
         mag = np.sqrt(np.abs(Ex)**2 + np.abs(Ey)**2)
         Ex /= mag
@@ -185,7 +193,6 @@ class JonesVector(object):
         transform = make_birefringent(theta, eta)
 
         ret = self.apply_transformation(transform)
-        # self.vec = ret
 
     def vertical_projection(self):
         m = [[0,0],[0,1]]
@@ -229,11 +236,7 @@ class JonesVector(object):
                 einIndices = "ijm,jm->im"
             else:
                 einIndices = "ijm,jk->imk"
-            # else:
-            #     msg = "Do not know how to parse transform and vector shapes " \
-            #           "(requested transformations not equal to previous one?) " \
-            #           "{} vs {}".format(tsh, vsh)
-            #     raise ValueError(msg)
+
         elif tndim == 4 and vndim == 2:
             # also not fully tested
             if tsh[2] == vsh[1]:
