@@ -1,5 +1,7 @@
 from __future__ import division
 import numpy as np
+import numpy.exp as exp
+import numpy.pi as pi
 
 
 p0 = [0.5, 2, 90., 0.5]
@@ -30,13 +32,6 @@ def cos(x):
 
 def sin(x):
     return np.sin(x * np.pi/180.)
-
-
-exp = np.exp
-pi = np.pi
-
-pideg = 180./pi
-degpi = pi/180.
 
 
 def printMat(m):
