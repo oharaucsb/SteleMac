@@ -7,59 +7,61 @@ class FanCompiler(object):
     """
     Helper class for compiling the data of a polarimetry NIR alpha sweep.
     This class helps to normalize the datasets: it will make sure each slice of
-    a different NIR_alpha has the same sideband orders, preventing issues when not all
-    data sets saw the same number of orders.
+    a different NIR_alpha has the same sideband orders, preventing issues when
+    not all data sets saw the same number of orders.
 
     Typical use scenario:
 
-    datasets = [ ... list of folders, each being a dataset of different NIR alphas ...]
-    outputs = FanComilier(<whatever sideband orders you want compiled>)
+    datasets = [ ... list of folders, each being a dataset of different NIR
+    alphas ...] outputs = FanComilier(<whatever sideband orders you want
+    compiled>)
     for data in datasets:
-        laserParams, rawData = hsg.hsg_combine_qwp_sweep(folder, save=False, verbose=False)
-        _, fitDict = hsg.proc_n_fit_qwp_data(rawData, laserParams, vertAnaDir="VAna" in folder,
-                                        series=folder)
+        laserParams, rawData = hsg.hsg_combine_qwp_sweep(folder, save=False,
+        verbose=False) _, fitDict = hsg.proc_n_fit_qwp_data(rawData,
+        laserParams, vertAnaDir="VAna" in folder, series=folder)
         outputs.addSet(nira, fitDict)
 
     outputs.buildAndSave(fname)
 
-    This is put together in the static method, fromDataFolder, where you pass the
-    folder which contains the folders of polarimetry data
+    This is put together in the static method, fromDataFolder, where you pass
+    the folder which contains the folders of polarimetry data
 
-    build() will return a dictionary where each key is a diferent angle parameter
-    The values of the dict are the 2D datasets from polarimetry
+    build() will return a dictionary where each key is a diferent angle
+    parameter The values of the dict are the 2D datasets from polarimetry
 
     """
-    def __init__(self, wantedSBs, keepErrors = False, negateNIR = True):
+    def __init__(self, wantedSBs, keepErrors=False, negateNIR=True):
         """
 
         :param wantedSBs:
-        :param keepErrors: Whether the errors in the angles/values are kept inthe
-            data sets or not. Defaults to false because they are often not used (this
-            class getting passed to FanDiagrams and such)
-        :param negateNIR: flag for whether to negate the NIR alpha value. Currently,
-        this is done because the PAX views -z direction, while home-built views +z (
+        :param keepErrors: Whether the errors in the angles/values are kept in
+            the data sets or not. Defaults to false because they are often not
+            used (this class getting passed to FanDiagrams and such)
+        :param negateNIR: flag for whether to negate the NIR alpha value.
+            Currently, this is done because the PAX views -z direction,\
+            while home-built views +z (
         with NIR)
         """
         self.want = np.array(wantedSBs)
 
         # I guess you could make this a kwarg to the class and pass it, but
         # I don't think it really matters here
-        keys = [ "S0", "S1", "S2", "S3", "alpha", "gamma", "DOP"]
+        keys = ["S0", "S1", "S2", "S3", "alpha", "gamma", "DOP"]
 
         # Keep an array for each of the datasets directly
         self.outputArrays = {ii: wantedSBs.reshape(-1, 1) for ii in keys}
 
-        # Keep track of the NIR alpha/gamma's which are provided to the compiler
+        # Tracking the NIR alpha/gamma's which are provided to the compiler
         self.nirAlphas = []
         self.nirGammas = []
         # A flag used when loading data to determine whether or not to keep the
         # errors along
         self._e = keepErrors
 
-        # Flag for whether the NIR alphas should be negated or not. It prints an error
-        # as it seemed like a bad thing to need to arbitrarily negate an angle,
-        # before it was realized the PAX and polarimeter measure different reference
-        # frames
+        # Flag for whether the NIR alphas should be negated or not. It prints
+        # an error as it seemed like a bad thing to need to arbitrarily negate
+        # an angle, before it was realized the PAX and polarimeter measure
+        # different reference frames
         self._n = 1
         if negateNIR:
             print("WARNING: NEGATING NIR ALPHA")
@@ -69,21 +71,20 @@ class FanCompiler(object):
     def fromDataFolder(folder, wantedSBs, keepErrors = False, negateNIR = True,
                        eta=None, doNorms = False):
         """
-        Create a fan compiler by passing the data path. Handles looping through the
-        folder's sub-folders to find
+        Create a fan compiler by passing the data path. Handles looping through
+            the folder's sub-folders to find
         :param folder: The folder to search through. Alternatively, if it's a
         list/iterable, iterate through that instead. Useful if external code is
         directly removing sets of data.
         :return:
         """
         comp = FanCompiler(wantedSBs, keepErrors, negateNIR)
-        # If it's a string, assume it's a single path that wants to be searached
+        # If it's a string, assume a single path that wants to be searached
         if isinstance(folder, str):
             wantFolders = hsg.natural_glob(folder, "*")
         else:
             # Otherwise, assume they've passed an iterable to search through
             wantFolders = folder
-
 
         for nirFolder in wantFolders:
             # Provide ways to skip over data sets by mis-naming/flagging them
