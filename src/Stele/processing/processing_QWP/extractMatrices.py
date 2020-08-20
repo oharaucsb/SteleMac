@@ -146,32 +146,33 @@ def findJ(alphas, gammas=None, **kwargs):
     # There's one J matrix for each sideband order, so naturally have to
     # iterate over each sideband
     for idx, sb in enumerate(sbs):
-        # Get the list of alpha and gamma angles for each of the NIR Alphas used
+        # Get a list of alpha and gamma angles for each of the NIR Alphas used
         als, gms = zip(*[sbGetter(sb, ii) for ii in nirAlphas])
-        # Check to make sure all of the data is reasonable (not nan, meaning the sideband
-        # wasn't observed for all NIRalpha, or infinite when the fits fucked up)
-        # Leaving these in causes issues for the minimizer, so they have to be skipped
+        # Check to make sure all of the data is reasonable (not nan, meaning
+        # the sideband wasn't observed for all NIRalpha, or infinite when the
+        # fits fucked up)
+        # Leaving these in causes issues for the minimizer, so they have to be
+        # skipped
         if not any(np.isfinite(als)) or not any(np.isfinite(gms)):
-            # Do some python magic so I can still use p.x further and not have to
-            # wrap everything in a try/except
+            # Do some python magic so I can still use p.x further and not have
+            # to wrap everything in a try/except
             p = type("_", (object, ), {"x": np.array([np.nan]*3 + [0]*3)})
         else:
             sbJones = JV(alpha=als, gamma=gms)
             nirJones = JV(alpha=nirAlphas, gamma=nirGammas)
             # Note: We current'y don't do error propagation at this step
-            costfunc = lambda jmatrix: np.linalg.norm(solver([nirJones, sbJones], jmatrix))
+            costfunc = lambda jmatrix: np.linalg.norm(
+                solver([nirJones, sbJones], jmatrix))
 
             p = minimize(costfunc, x0=np.ones(6))
         J = unflattenJ(p.x)
         outputJMatrix[..., idx] = J
 
-        outputFlatJMatrix[idx] = np.array([sb, 1] # Re(Jxx) === 1
-                                          + p.x[:3].tolist() # Re(Jxy-Jyy)
-                                          + [0]  # Im(Jxx) === 0
-                                          + p.x[3:].tolist() # Im(Jxy-Jyy)
-                                          )
+        outputFlatJMatrix[idx] = np.array(
+            [sb, 1] + p.x[:3].tolist() + [0] + p.x[3:].tolist())
 
-    if defaults["returnFlat"]: return outputFlatJMatrix
+    if defaults["returnFlat"]:
+        return outputFlatJMatrix
     return outputJMatrix
 
 
