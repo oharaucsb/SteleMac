@@ -406,8 +406,9 @@ class HighSidebandPMTOld(PMT):
             except Exception:
                 complete = np.array(self.sb_dict[sideband])
 
-        np.savetxt(os.path.join(folder_str, spectra_fname), complete, delimiter=',',
-                   header=spec_header, comments='', fmt='%0.6e')
+        np.savetxt(
+            os.path.join(folder_str, spectra_fname), complete, delimiter=',',
+            header=spec_header, comments='', fmt='%0.6e')
 
         try:
             np.savetxt(os.path.join(folder_str, fit_fname), self.sb_results,
