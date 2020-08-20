@@ -2,6 +2,8 @@ import numpy as np
 from scipy.optimize import minimize
 
 from Stele.jones import JonesVector as JV
+from .processing_QWP.sb_state_getter import SbStateGetter
+from .processing_QWP.fan_compiler import FanCompiler
 
 
 def rtd(a):
