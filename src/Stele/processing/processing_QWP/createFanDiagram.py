@@ -119,6 +119,10 @@ def createFan(alphas, gammas,
     pgam.ui.histogram.autoHistogramRange()
     palp.ui.histogram.autoHistogramRange()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> a82377c369beb78dfe6077f9ac49efc2cf7dc9e6
     # p(olarziation)e(llipse)
     pe = pg.PolarizationEllipseItem()
     pe.setGeometry(-7, -7, 14, 14)
