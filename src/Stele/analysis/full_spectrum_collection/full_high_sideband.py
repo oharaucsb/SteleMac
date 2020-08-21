@@ -81,9 +81,6 @@ class FullHighSideband(FullSpectrum):
         if (arr[0, sbarr.SBNUM] > 0 and arr[1, sbarr.SBNUM] > 0 and
             # and the fact the area is less
                 arr[0, sbarr.AREA] < arr[1, sbarr.AREA]):
-            # print "REMOVING FIRST SIDEBAND FROM FULLSIDEBAND"
-            # print arr[0]
-            # print arr[1]
             arr = arr[1:]
 
         full_dict = {}
@@ -112,9 +109,6 @@ class FullHighSideband(FullSpectrum):
             # everything should be in a kwarg
             calc = kwargs.pop("need_ratio")
         try:
-            # self.full_dict = stitch_hsg_dicts(
-            #    self.full_dict, ccd_object.full_dict, need_ratio=calc,
-            #    verbose=verbose)
             self.full_dict = helpers.stitch_hsg_dicts(
                 self, ccd_object, need_ratio=calc, verbose=verbose, **kwargs)
             self.parameters['files_here'].append(
@@ -136,19 +130,11 @@ class FullHighSideband(FullSpectrum):
         This method will be called by the stitch_hsg_results function to add
         the PMT data to the spectrum.
         """
-        # print "I'm adding PMT once"
-    # self.full_dict = stitch_hsg_dicts(pmt_object.full_dict, self.full_dict,
-    # need_ratio=True, verbose=False)
         self.full_dict = helpers.stitch_hsg_dicts(
             pmt_object, self, need_ratio=True, verbose=verbose)
-        # if verbose:
-        #     self.full_dict, ratio = self.full_dict
-        # print "I'm done adding PMT data"
         self.parameters['files_here'].append(
             pmt_object.parameters['files included'])
         self.make_results_array()
-        # if verbose:
-        #     return ratio
 
     def make_results_array(self):
         """
@@ -156,17 +142,13 @@ class FullHighSideband(FullSpectrum):
         finished full_dict dictionary.
         """
         self.sb_results = None
-        # print "I'm making the results array:", sorted(self.full_dict.keys())
         for sb in sorted(self.full_dict.keys()):
-            # print "Going to add this", sb
             try:
                 # too many parenthesis?
                 self.sb_results = np.vstack(
                     (self.sb_results, np.hstack((sb, self.full_dict[sb]))))
             except ValueError:
-                # print "It didn't exist yet!"
                 self.sb_results = np.hstack((sb, self.full_dict[sb]))
-                # print "and I made this array:", self.sb_results[:, 0]
 
     def save_processing(
      self, file_name, folder_str, marker='', index='', verbose=''):
@@ -198,20 +180,18 @@ class FullHighSideband(FullSpectrum):
 
         temp = np.array(self.sb_results)
 
-        ampli = np.array([temp[:, 3] / temp[:, 5]])  # I'm pretty sure this is
+        # I'm pretty sure this is
         # amplitude, not area
-        temp[:, 5:7] = temp[:, 5:7] * 1000  # For meV linewidths
+        ampli = np.array([temp[:, 3] / temp[:, 5]])
+        # For meV linewidths
+        temp[:, 5:7] = temp[:, 5:7] * 1000
         if verbose:
             print("sb_results", self.sb_results.shape)
             print("ampli", ampli.shape)
         save_results = np.hstack((temp, ampli.T))
 
-        # spectra_fname = file_name + '_' + marker + '_' + str(index) + '.txt'
         fit_fname = file_name + '_' + marker + '_' + str(index) + '_full.txt'
-        # self.save_name = spectra_fname
 
-        # self.parameters['addenda'] = self.addenda
-        # self.parameters['subtrahenda'] = self.subtrahenda
         try:
             # PMT files add unnecessary number of lines, dump it into one line
             # by casting it to a string.
@@ -228,12 +208,7 @@ class FullHighSideband(FullSpectrum):
 
         # Make the number of lines constant so importing is easier
         num_lines = parameter_str.count('#')
-        # for num in range(99 - num_lines): parameter_str += '\n#'
         parameter_str += '\n#' * (99 - num_lines)
-        # origin_import_spec = '\nNIR frequency,Signal,Standard error' +
-        #   '\neV,arb. u.,arb. u.'
-        # spec_header = '#' + parameter_str + '\n#' +
-        #    self.description[:-2] + origin_import_spec
 
         origin_import_fits = '\nSideband,Center energy,error,Sideband' \
                              + 'strength,error,Linewidth,error,Amplitude' \
@@ -241,8 +216,6 @@ class FullHighSideband(FullSpectrum):
                              + ','.join([marker]*8)
         fits_header = '#' + parameter_str + origin_import_fits
 
-        # np.savetxt(os.path.join(folder_str, spectra_fname), self.proc_data,
-        #            delimiter=',', header=spec_header, comments='', fmt='%f')
         np.savetxt(os.path.join(folder_str, fit_fname), save_results,
                    delimiter=',', header=fits_header, comments='', fmt='%0.6e')
 
