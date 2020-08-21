@@ -118,10 +118,6 @@ class Absorbance(CCD):
         :type inspectPlots: bool
         :return: None
         """
-        # self.fixed = -np.log10(abs(self.raw_data[:, 1])
-        #              / abs(self.ref_data[:, 1]))
-        # self.fixed = np.nan_to_num(self.proc_data[:, 1])
-        # self.fixed = np.column_stack((self.raw_data[:, 0], self.fixed))
         self.parameters['fourier cutoff'] = cutoff
         self.clean = low_pass_filter(
             self.proc_data[:, 0], self.proc_data[:, 1], cutoff, inspectPlots)
@@ -166,14 +162,11 @@ class Absorbance(CCD):
 
         # Make the number of lines constant so importing into Origin is easier
         num_lines = parameter_str.count('#')
-        # for num in range(99 - num_lines): parameter_str += '\n#'
         parameter_str += '\n#' * (99 - num_lines)
 
         origin_import_spec = (
             '\nNIR frequency,Signal,Standard error\neV,arb. u.,arb. u.')
         spec_header = '#' + parameter_str + origin_import_spec
-        # spec_header = ('#' + parameter_str +
-        # '\n#' + self.description[:-2] + origin_import_spec)
 
         np.savetxt(
             os.path.join(folder_str, spectra_fname), self.proc_data,
@@ -184,12 +177,3 @@ class Absorbance(CCD):
             header=spec_header, comments='', fmt='%0.6e')
         print("Save image.\nDirectory: {}".format(
             os.path.join(folder_str, spectra_fname)))
-
-# class LaserLineCCD(HighSidebandCCD):
-#     """
-#     Class for use when doing alinging/testing by sending the laser
-#     directly into the CCD. Modifies how "sidebands" and guess and fit,
-#     simply looking at the max signal.
-#     """
-#     def guess_sidebands(self, cutoff=8, verbose=False, plot=False):
-#         pass
