@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import Stele as hsg
+from .processing_QWP.fan_compiler import FanCompiler
 
 
 class FanCompilerWithoutStokes(object):
@@ -24,7 +25,7 @@ class FanCompilerWithoutStokes(object):
     outputs.buildAndSave(fname)
 
     """
-    def __init__(self, wantedSBs, keepErrors = False, negateNIR = True):
+    def __init__(self, wantedSBs, keepErrors=False, negateNIR=True):
         """
 
         :param wantedSBs:
@@ -60,23 +61,22 @@ class FanCompilerWithoutStokes(object):
         :return:
         """
         comp = FanCompiler(wantedSBs, keepErrors, negateNIR)
-        # If it's a string, assume it's a single path that wants to be searached
+        # If it's a string, assume a single path that wants to be searached
         if isinstance(folder, str):
             wantFolders = hsg.natural_glob(folder, "*")
         else:
             # Otherwise, assume they've passed an iterable to search through
             wantFolders = folder
 
-
         for nirFolder in wantFolders:
-            if "skip" in nirFolder.lower(): continue
-            laserParams, rawData = hsg.hsg_combine_qwp_sweep(nirFolder, save=False,
-                                                             verbose=False,
-                                                             loadNorm=False)
+            if "skip" in nirFolder.lower():
+                continue
+            laserParams, rawData = hsg.hsg_combine_qwp_sweep(
+                nirFolder, save=False, verbose=False, loadNorm=False)
 
-            _, fitDict = hsg.proc_n_fit_qwp_data(rawData, laserParams,
-                                                 vertAnaDir="VAna" in nirFolder,
-                                                 series=nirFolder)
+            _, fitDict = hsg.proc_n_fit_qwp_data(
+                rawData, laserParams, vertAnaDir="VAna" in nirFolder,
+                series=nirFolder)
             comp.addSet(fitDict)
         return comp
 
@@ -100,10 +100,14 @@ class FanCompilerWithoutStokes(object):
                 # not a numpy array. Further complicated because if the list
                 # comprehension returns nothing, it doesn't append anything,
                 # hence casting to a list.
-                newAData.append(list(*[ii[1:] for ii in alphaSet if ii[0] == sb]))
-                newGData.append(list(*[ii[1:] for ii in gammaSet if ii[0] == sb]))
-                newSData.append(list(*[ii[1:] for ii in s0Set if ii[0] == sb]))
-                if not newAData[-1]: # no data was found.
+                newAData.append(
+                    list(*[ii[1:] for ii in alphaSet if ii[0] == sb]))
+                newGData.append(
+                    list(*[ii[1:] for ii in gammaSet if ii[0] == sb]))
+                newSData.append(
+                    list(*[ii[1:] for ii in s0Set if ii[0] == sb]))
+                # no data was found.
+                if not newAData[-1]:
                     newAData[-1] = [np.nan, np.nan]
                     newGData[-1] = [np.nan, np.nan]
                     newSData[-1] = [np.nan, np.nan]
@@ -114,7 +118,8 @@ class FanCompilerWithoutStokes(object):
                 newAData.append([ii[1] for ii in alphaSet if ii[0] == sb])
                 newGData.append([ii[1] for ii in gammaSet if ii[0] == sb])
                 newSData.append([ii[1] for ii in s0Set if ii[0] == sb])
-                if not newAData[-1]: # no data was found.
+                # no data was found.
+                if not newAData[-1]:
                     newAData[-1] = [np.nan]
                     newGData[-1] = [np.nan]
                     newSData[-1] = [np.nan]
@@ -123,7 +128,7 @@ class FanCompilerWithoutStokes(object):
             self.arrA = np.column_stack((self.arrA, newAData))
             self.arrG = np.column_stack((self.arrG, newGData))
             self.arrS = np.column_stack((self.arrS, newSData))
-        except:
+        except Exception:
             print(self.arrA.shape)
             print(np.array(newAData).shape)
             raise
@@ -146,9 +151,9 @@ class FanCompilerWithoutStokes(object):
 
     def buildAndSave(self, fname, *args):
         """
-        fname: filename to save to. Must have a least one string formatter position
-        to allow for saving separate alpha/gamma/s0 files. *args are passed to any
-        other formatting positions.
+        fname: filename to save to. Must have a least one string formatter
+        position to allow for saving separate alpha/gamma/s0 files. *args are
+        passed to any other formatting positions.
         :param fname:
         :param args:
         :return:
@@ -162,17 +167,17 @@ class FanCompilerWithoutStokes(object):
 
         fullDataA, fullDataG, fullDataS = self.build()
 
-        # fullData = np.append([-1], self.nirAlphas)
-        # fullData = np.row_stack((fullData, self.arrA))
-        np.savetxt(fname.format("alpha", *args), fullDataA, header=oh, delimiter=',',
-                   comments='')
+        np.savetxt(
+            fname.format("alpha", *args), fullDataA, header=oh, delimiter=',',
+            comments=''
+            )
 
-        # fullData = np.append([-1], self.nirAlphas)
-        # fullData = np.row_stack((fullData, self.arrG))
-        np.savetxt(fname.format("gamma", *args), fullDataG, header=oh, delimiter=',',
-                   comments='')
+        np.savetxt(
+            fname.format("gamma", *args), fullDataG, header=oh, delimiter=',',
+            comments=''
+            )
 
-        # fullData = np.append([-1], self.nirAlphas)
-        # fullData = np.row_stack((fullData, self.arrS))
-        np.savetxt(fname.format("S0", *args), fullDataS, header=oh, delimiter=',',
-                   comments='')
+        np.savetxt(
+            fname.format("S0", *args), fullDataS, header=oh, delimiter=',',
+            comments=''
+            )
