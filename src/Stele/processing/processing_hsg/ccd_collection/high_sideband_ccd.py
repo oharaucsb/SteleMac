@@ -5,9 +5,9 @@ import json
 import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
-from .CCD_collection import CCD
-import processing.processing_HSG.helperFunctions as procHSGHelp
-import CCD_collection.helperFunctions as helperFunctions
+from .ccd_collection import CCD
+from processing.processing_hsg.helper_functions import gauss
+from ccd_collection.helper_functions import calc_laser_frequencies
 
 np.set_printoptions(linewidth=500)
 
@@ -1091,7 +1091,7 @@ class HighSidebandCCD(CCD.CCD):
                     data_temp[0, 0], data_temp[-1, 0], num=500)
                 if elem != 0:
                     try:
-                        plt.plot(x_vals, procHSGHelp.gauss(x_vals, *p0),
+                        plt.plot(x_vals, gauss(x_vals, *p0),
                                  # I don't really know. Mostly
                                  plt.gca().get_lines()[-1].get_color() + '--',
                                  # just looked around at what functions
@@ -1100,12 +1100,12 @@ class HighSidebandCCD(CCD.CCD):
                     # to prevent weird mac issues with the matplotlib things?
                     except Exception:
                         plt.plot(
-                            x_vals, procHSGHelp.gauss(x_vals, *p0), '--',
+                            x_vals, gauss(x_vals, *p0), '--',
                             linewidth=linewidth)
 
                 else:
                     plt.plot(
-                        x_vals, procHSGHelp.gauss(x_vals, *p0), '--',
+                        x_vals, gauss(x_vals, *p0), '--',
                         linewidth=linewidth)
 
             try:
@@ -1190,7 +1190,7 @@ class HighSidebandCCD(CCD.CCD):
                     data_temp[0, 0], data_temp[-1, 0], num=500)
                 if elem != 0:
                     try:
-                        plt.plot(x_vals, procHSGHelp.gauss(x_vals, *coeff),
+                        plt.plot(x_vals, gauss(x_vals, *coeff),
                                  plt.gca().get_lines()[-1].get_color() + '--',
                                  # I don't really know. Mostly
                                  # just looked around at what functions
@@ -1199,12 +1199,12 @@ class HighSidebandCCD(CCD.CCD):
                     # to prevent weird mac issues with the matplotlib things?
                     except Exception:
                         plt.plot(
-                            x_vals, procHSGHelp.gauss(x_vals, *coeff), '--',
+                            x_vals, gauss(x_vals, *coeff), '--',
                             linewidth=linewidth)
 
                 else:
                     plt.plot(
-                        x_vals, procHSGHelp.gauss(x_vals, *coeff), '--',
+                        x_vals, gauss(x_vals, *coeff), '--',
                         linewidth=linewidth)
         sb_fits_temp = np.asarray(sb_fits)
         reorder = [0, 1, 5, 2, 6, 3, 7, 4, 8]
@@ -1252,14 +1252,14 @@ class HighSidebandCCD(CCD.CCD):
         :return: freqNIR, freqTHz, the frequencies in the appropriate units
         """
         # force same units for in dict
-        freqNIR, freqTHz = helperFunctions.calc_laser_frequencies(
+        freqNIR, freqTHz = calc_laser_frequencies(
             self, "wavenumber", "wavenumber", bad_points)
 
         self.parameters["calculated NIR freq (cm-1)"] = "{}".format(
             freqNIR, nir_units)
         self.parameters["calculated THz freq (cm-1)"] = "{}".format(
             freqTHz, freqTHz)
-        freqNIR, freqTHz = helperFunctions.calc_laser_frequencies(
+        freqNIR, freqTHz = calc_laser_frequencies(
             self, nir_units, thz_units, bad_points)
         return freqNIR, freqTHz
 
