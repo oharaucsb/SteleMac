@@ -1,7 +1,8 @@
 import copy
 import numpy as np
-from .FullSpectrum_collection import FullHighSideband
-from .processing.PMT_collection import HighSidebandPMT as HSPMT
+from .full_spectrum_collection.full_high_sideband import parse_sb_array
+from .processing.processing_hsg.pmt_collection.high_sideband_pmt \
+    import HighSidebandPMT
 
 
 def stitch_hsg_dicts_old(full, new_dict, need_ratio=False, verbose=False):
@@ -252,9 +253,9 @@ def stitch_hsg_dicts(
     # (from noise?)
     if ignore_weaker_lowers:
         full_obj.full_dict, full_obj.sb_results = (
-            FullHighSideband.parse_sb_array(full_obj.sb_results))
+            parse_sb_array(full_obj.sb_results))
         new_obj.new_dict, new_obj.sb_results = (
-            FullHighSideband.parse_sb_array(new_obj.sb_results))
+            parse_sb_array(new_obj.sb_results))
 
     # was messing around with references and causing updates to arrays when
     # it shouldn't be
@@ -272,9 +273,9 @@ def stitch_hsg_dicts(
     scaleTo = ""
     # TODO: altar below elif knot into a function call for Mccabe and pylama
     if need_ratio:
-        if isinstance(new_obj, HSPMT.HighSidebandPMT):
+        if isinstance(new_obj, HighSidebandPMT):
             scaleTo = "new"
-        elif isinstance(full_obj, HSPMT.HighSidebandPMT):
+        elif isinstance(full_obj, HighSidebandPMT):
             scaleTo = "full"
         # this line specifically requires the function treatment to correct
         elif new_obj.parameters["gain"] == 110 and \
