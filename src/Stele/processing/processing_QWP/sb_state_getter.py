@@ -1,7 +1,7 @@
 class SbStateGetter(object):
     """
-    sister function to FanCompiler. Useful for taking the arrays out of a FanCompiler
-    allowing indexing based on sb number and nir alpha angles.
+    sister function to FanCompiler. Useful for taking the arrays out of a
+        FanCompiler allowing indexing based on sb number and nir alpha angles.
 
     Example creation:
     fc = FanCompiler(wantSBs)
