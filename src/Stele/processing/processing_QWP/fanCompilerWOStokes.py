@@ -7,18 +7,19 @@ class FanCompilerWithoutStokes(object):
     """
     Helper class for compiling the data of a polarimetry NIR alpha sweep
 
-    Note: I'm not sure why you would want to use this class anymore. It should be
-    deprecated and the standard FanCompiler should be sufficient for all needs (and
-    better maintained)
+    Note: I'm not sure why you would want to use this class anymore. It should
+    be deprecated and the standard FanCompiler should be sufficient for all
+    needs (and better maintained)
 
     Typical use scenario:
 
-    datasets = [ ... list of folders, each being a dataset of different NIR alphas ...]
-    outputs = FanComilier(<whatever sideband orders you want compiled>)
+    datasets = [ ... list of folders, each being a dataset of different NIR
+    alphas ...] outputs = FanComilier(<whatever sideband orders you want
+    compiled>)
     for data in datasets:
-        laserParams, rawData = hsg.hsg_combine_qwp_sweep(folder, save=False, verbose=False)
-        _, fitDict = hsg.proc_n_fit_qwp_data(rawData, laserParams, vertAnaDir="VAna" in folder,
-                                        series=folder)
+        laserParams, rawData = hsg.hsg_combine_qwp_sweep(folder, save=False,
+        verbose=False)_, fitDict = hsg.proc_n_fit_qwp_data(rawData,
+        laserParams, vertAnaDir="VAna" in folder, series=folder)
         outputs.addSet(nira, fitDict)
     outputs.buildAndSave(fname)
 
@@ -28,14 +29,17 @@ class FanCompilerWithoutStokes(object):
 
         :param wantedSBs:
         :param keepErrors:
-        :param negateNIR: flag for whether to negate the NIR alpha value. Currently,
-        this is done because the PAX views -z direction, while home-built views +z (
-        with NIR)
+        :param negateNIR: flag for whether to negate the NIR alpha value.
+            Currently, this is done because the PAX views -z direction, while
+            home-built views +z (with NIR)
         """
         self.want = np.array(wantedSBs)
-        self.arrA = wantedSBs.reshape(-1, 1) # so I can stack in the opposite direction
-        self.arrG = wantedSBs.reshape(-1, 1)  # so I can stack in the opposite direction
-        self.arrS = wantedSBs.reshape(-1, 1)  # so I can stack in the opposite direction
+        # so I can stack in the opposite direction
+        self.arrA = wantedSBs.reshape(-1, 1)
+        # so I can stack in the opposite direction
+        self.arrG = wantedSBs.reshape(-1, 1)
+        # so I can stack in the opposite direction
+        self.arrS = wantedSBs.reshape(-1, 1)
         self.nirAlphas = []
         self.nirGammas = []
         self._e = keepErrors
@@ -44,13 +48,12 @@ class FanCompilerWithoutStokes(object):
             print("WARNING: NEGATING NIR ALPHA")
             self._n = -1
 
-
-
     @staticmethod
-    def fromDataFolder(folder, wantedSBs, keepErrors = False, negateNIR = True):
+    def fromDataFolder(
+            folder, wantedSBs, keepErrors=False, negateNIR=True):
         """
-        Create a fan compiler by passing the data path. Handles looping through the
-        folder's sub-folders to find
+        Create a fan compiler by passing the data path. Handles looping through
+            the folder's sub-folders to find
         :param folder: The folder to search through. Alternatively, if it's a
         list/iterable, iterate through that instead. Useful if external code is
         directly removing sets of data.
