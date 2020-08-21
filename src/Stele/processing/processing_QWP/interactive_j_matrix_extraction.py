@@ -1,89 +1,31 @@
 import numpy as np
 import Stele.ipg as pg
-import matplotlib.pylab as plt
-import glob
-import os
-import json
-import Stele as hsg
-from Stele.ipg import PolarImagePlot
-from PyQt5 import QtCore, QtGui, QtWidgets
 from scipy.optimize import minimize
+from PyQt5 import QtCore, QtWidgets
 from Stele import newhsganalysis
 from Stele import JonesVector as JV
+from .create_fan_diagram import createFan
+
 newhsganalysis.plt = pg
 np.set_printoptions(linewidth=400)
 
-from .createFanDiagram import createFan
-from .extractMatrices import *
-from .expFanCompiler import *
-from .polarPlot import *
 
-## For the +54deg data
-# alpha54FullDatas = np.genfromtxt(alpha54File, delimiter=',')
-# alpha54SBs = alpha54FullDatas[1:,0]
-# alpha54AlphaNIRS = alpha54FullDatas[0,1:]
-# alpha54Data = alpha54FullDatas[1:, 1:]
-#
-# gamma54FullDatas = np.genfromtxt(gamma54File, delimiter=',')
-# gamma54SBs = gamma54FullDatas[1:,0]
-# gamma54AlphaNIRS = gamma54FullDatas[0,1:]
-# gamma54Data = gamma54FullDatas[1:, 1:]
-#
-# sbs54 = np.array(alpha54SBs, dtype=int)
-# nirAlphas54 = np.array(gamma54AlphaNIRS, dtype=int)
-#
-# para54Data = np.genfromtxt(para54Spec, delimiter=',')[3:]
-# perp54Data = np.genfromtxt(perp54Spec, delimiter=',')[3:]
-#
-# para54Data = para54Data[(8<=para54Data[:,0]) & (para54Data[:,0]<=36)]
-# perp54Data = perp54Data[(8<=perp54Data[:,0]) & (perp54Data[:,0]<=36)]
-# intensity54Data = np.column_stack((para54Data[:,0], perp54Data[:, 3]/para54Data[:, 3]))
-#
-#
-# ## For the -3deg data
-# alpham3FullDatas = np.genfromtxt(alpham3File, delimiter=',')
-# alpham3SBs = alpham3FullDatas[2:,0] # cut out 6th order with [2:...] slice
-# alpham3AlphaNIRS = alpham3FullDatas[0,1:]
-# alpham3Data = alpham3FullDatas[2:, 1:] # cut out 6th order with [2:...] slice
-#
-# gammam3FullDatas = np.genfromtxt(gammam3File, delimiter=',')
-# gammam3SBs = gammam3FullDatas[2:,0] # cut out 6th order with [2:...] slice
-# gammam3AlphaNIRS = gammam3FullDatas[0,1:]
-# gammam3Data = gammam3FullDatas[2:, 1:] # cut out 6th order with [2:...] slice
-#
-#
-# sbsm3 = np.array(alpham3SBs, dtype=int)
-# nirAlphasm3 = np.array(gammam3AlphaNIRS, dtype=int)
-#
-# param3Data = np.genfromtxt(param3Spec, delimiter=',')[3:]
-# perpm3Data = np.genfromtxt(perpm3Spec, delimiter=',')[3:]
-#
-# param3Data = param3Data[(8<=param3Data[:,0]) & (param3Data[:,0]<=36)]
-# perpm3Data = perpm3Data[(8<=perpm3Data[:,0]) & (perpm3Data[:,0]<=36)]
-# intensitym3Data = np.column_stack((param3Data[:,0], perpm3Data[:, 3]/param3Data[:, 3]))
-
-
-## This attempt is going to try and reuse the code that was used for the DBR paper
-## It uses some system of equations that come from doing the matrix multipliations
-## out and stuff
-##
+# This attempt is going to try and reuse the code that was used for the DBR
+# paper.  It uses some system of equations that come from doing the matrix
+# multipliations out and stuff
 
 totalcount = 0
 
+
 def unflattenJ(jVec):
-    j =  (jVec[:3]+1j*jVec[3:])
+    j = (jVec[:3]+1j*jVec[3:])
     j = np.append([1], j)
-    return j.reshape(2,2)
+    return j.reshape(2, 2)
+
 
 def solver(r, J):
     global totalcount
-    totalcount+=1
-    # print "total runs", totalcount
-    # print r.shape
-    # print J.shape
-    # N = len(r)//2
-    # rVec = (r[:N]+1j*r[N:]).reshape(-1, 2)
-    # print "in vector", rVec
+    totalcount += 1
     Jxy, Jyx, Jyy = (J[:3]+1j*J[3:])
     nir, sb = r
     eN = np.exp(1j*np.deg2rad(nir.delta))
@@ -93,6 +35,7 @@ def solver(r, J):
     sN = np.sin(np.deg2rad(nir.phi))
 
     return cotH*eH*(Jyx*cN + Jyy*sN*eN)-cN-Jxy*sN*eN
+
 
 def findJBad(obj):
     mod = QtWidgets.QApplication.keyboardModifiers()
@@ -112,46 +55,44 @@ def findJBad(obj):
     pgam = obj.pgam
     intRatioCurve = obj.intRatioCurve
 
-
-    outputAlphaData = np.empty((alphaSBs.shape[0]+1, alphaAlphaNIRS.shape[0]+1)) * \
-                      np.nan
+    outputAlphaData = np.empty(
+        (alphaSBs.shape[0]+1, alphaAlphaNIRS.shape[0]+1)) * np.nan
     outputAlphaData[1:, 0] = alphaSBs
     outputAlphaData[0, 1:] = alphaAlphaNIRS
 
-    outputGammaData = np.empty((gammaSBs.shape[0] + 1, gammaAlphaNIRS.shape[0] + 1)) * \
-                      np.nan
+    outputGammaData = np.empty(
+        (gammaSBs.shape[0] + 1, gammaAlphaNIRS.shape[0] + 1)) * np.nan
     outputGammaData[1:, 0] = gammaSBs
     outputGammaData[0, 1:] = gammaAlphaNIRS
-    outputJMatrix = np.empty((len(sbs),9))
+    outputJMatrix = np.empty((len(sbs), 9))
 
-    wantNIRAlphas = [ii for ii in nirAlphas if cboxGroup.button(int(ii)).isChecked()]
-    wantNIRIndices = np.array([nirAlphas.tolist().index(ii) for ii in wantNIRAlphas])
+    wantNIRAlphas = [ii for ii in nirAlphas if
+                     cboxGroup.button(int(ii)).isChecked()]
+    wantNIRIndices = np.array(
+        [nirAlphas.tolist().index(ii) for ii in wantNIRAlphas])
 
     for idx, sb in enumerate(sbs):
         als, gms = zip(*[sbGetter(sb, ii) for ii in wantNIRAlphas])
         sbJones = JV(alpha=als, gamma=gms)
         nirJones = JV(alpha=wantNIRAlphas, gamma=0)
 
-        costfunc = lambda jmatrix: np.linalg.norm(solver([nirJones, sbJones], jmatrix))
+        costfunc = lambda jmatrix: np.linalg.norm(
+            solver([nirJones, sbJones], jmatrix))
 
         p = minimize(costfunc, x0=np.ones(6))
         J = unflattenJ(p.x)
 
-
-        ### FOR ONLY SHOWING WHAT WAS USED IN FIT
-        # nirJones.apply_transformation(J)
-        # outputAlphaData[idx + 1, wantNIRIndices + 1] = nirJones.alpha
-        # outputGammaData[idx + 1, wantNIRIndices + 1] = nirJones.gamma
-
-        ### FOR ONLY SHOWING EVERYTHING
+        # FOR SHOWING EVERYTHING
         nirJones = JV(alpha=nirAlphas, gamma=0)
         nirJones.apply_transformation(J)
 
         outputAlphaData[idx+1, 1:] = nirJones.alpha
         outputGammaData[idx+1, 1:] = nirJones.gamma
 
-        np.set_printoptions(formatter={"float_kind":lambda x:"{: 6.2f}".format(x)})
-        outputJMatrix[idx] = np.array([sb, 1] + p.x[:3].tolist() + [0] + p.x[3:].tolist())
+        np.set_printoptions(
+            formatter={"float_kind": lambda x: "{: 6.2f}".format(x)})
+        outputJMatrix[idx] = np.array(
+            [sb, 1] + p.x[:3].tolist() + [0] + p.x[3:].tolist())
 
     palp.setImage(outputAlphaData[1:, 1:])
     palp.setLevels(-90, 90)
@@ -159,21 +100,12 @@ def findJBad(obj):
     pgam.setLevels(-45, 45)
     palp.imageItem.render()
 
-    # header = "#{}\n".format(
-    #      [ii for ii in nirAlphas if cboxGroup.button(int(ii)).isChecked()]
-    # )+"#\n"*99 + "\n\n"
-    # np.savetxt("BackedOutFromJones_alpha.txt", outputAlphaData, delimiter=',',
-    #            header=header, comments='', fmt="%0.6e")
-    # np.savetxt("BackedOutFromJones_gamma.txt", outputGammaData, delimiter=',',
-    #            header=header, comments='', fmt="%0.6e")
-    # np.savetxt("JonesMatrix.txt", outputJMatrix, delimiter=',',
-    #            header=header, comments='', fmt="%0.6e")
-
     intRatioCurve.setData(alphaSBs, np.sqrt(
         np.abs(outputJMatrix[:, 4]**2+1j*outputJMatrix[:, -1]**2))
                           )
 
     obj.outputJMatrix = outputJMatrix
+
 
 def updateTCurves():
     try:
@@ -212,17 +144,16 @@ def updateTCurves():
     p54TmmMag.setData(sbsm3, T54mm)
 
 
-def makeInteractiveFanWidget(compiledAlpha, compiledGamma, crystalOrientation,
-               intensityData = [],
-               plotFanNIRs = np.arange(-90, 90, 5),
-               sliceInExp = True,
-               calculationCallback = lambda J, T: T,
-                **kwargs):
+def makeInteractiveFanWidget(
+        compiledAlpha, compiledGamma, crystalOrientation, intensityData=[],
+        plotFanNIRs=np.arange(-90, 90, 5), sliceInExp=True,
+        calculationCallback=lambda J, T: T, **kwargs):
     """
 
     :param compiledAlpha: saved files created from a FanCompiler.buildAndSave()
     :param compiledGamma:
-    :param calculationCallback: function to be called when T/J matrices are recalculated
+    :param calculationCallback: function to be called when T/J matrices are
+        recalculated
     :return:
     """
     NMax = kwargs.get("NMax", 12)
@@ -250,7 +181,6 @@ def makeInteractiveFanWidget(compiledAlpha, compiledGamma, crystalOrientation,
     tabWid = QtWidgets.QTabWidget(mainwid)
 
     palp, pgam = createFan(plotFanNIRs, sbs)
-    # from hsganalysis.QWPProcessing.fanDiagram import FanDiagram
 
 
     def updateJ():
@@ -259,45 +189,52 @@ def makeInteractiveFanWidget(compiledAlpha, compiledGamma, crystalOrientation,
         if mod & QtCore.Qt.ShiftModifier:
             print("Skipping")
             return
-        # Which NIR alpha angles you've selected to include in the J matrix calculation
+        # Which NIR alpha angles you've selected to include in the J matrix
+        # calculation
         wantNIRAlphas = [ii for ii in nirAlphas if
                          cboxGroup.button(int(ii)).isChecked()]
-        # And converting those to indices. Include the 0th order to include the SB
-        wantNIRIndices = [0] + \
-                         [nirAlphas.tolist().index(ii)+1 for ii in wantNIRAlphas]
+        # And converting those to indices. Include the 0th order to include
+        # the SB
+        wantNIRIndices = \
+            [0] + [nirAlphas.tolist().index(ii)+1 for ii in wantNIRAlphas]
 
         toFitAlphas = compiledAlpha[:, wantNIRIndices]
-        # print(f"Fitting to: \n{toFitAlphas}")
         toFitGammas = compiledGamma[:, wantNIRIndices]
 
         J = findJ(toFitAlphas, toFitGammas)
         reconstructedAlpha, reconstructedGamma = jonesToFans(
             sbs, J, wantNIR=plotFanNIRs)
-        # print(f"Recon to: \n{reconstructedAlpha}")
 
         if sliceInExp:
             for idx, _ in enumerate(nirAlphas):
 
                 niralpha = compiledAlpha[0, idx+1]
-                if np.abs(compiledGamma[0, idx+1])>1: continue # finite gamma don't make
+                # finite gamma don't make
                 # sense in this plot
+                if np.abs(compiledGamma[0, idx+1]) > 1:
+                    continue
                 try:
-                    reconstructedAlpha[1:,
-                        np.argwhere(reconstructedAlpha[0, :].astype(int) == niralpha)[0][0]
-                    ] = compiledAlpha[1:, idx+1]
+                    reconstructedAlpha[
+                        1:,
+                        np.argwhere(
+                            reconstructedAlpha[0, :].astype(int)
+                            == niralpha)[0][0]
+                        ] = compiledAlpha[1:, idx+1]
 
-                    reconstructedGamma[1:,
-                        np.argwhere(reconstructedGamma[0, :].astype(int) == niralpha)[0][0]
-                    ] = compiledGamma[1:, idx+1]
+                    reconstructedGamma[
+                        1:,
+                        np.argwhere(
+                            reconstructedGamma[0, :].astype(int)
+                            == niralpha)[0][0]
+                        ] = compiledGamma[1:, idx+1]
                 except IndexError:
-                    print("Warning! Unable to slice in NIR alpha = {}".format(niralpha))
+                    print("Warning! Unable to slice in NIR alpha = {}".format(
+                        niralpha))
 
         palp.setImage(reconstructedAlpha[1:, 1:])
         pgam.setImage(reconstructedGamma[1:, 1:])
 
-        # palp.ui.histogram.setHistogramRange(-90, 90)
         palp.setLevels(-90, 90)
-        # pgam.ui.histogram.setHistogramRange(-45, 45)
         pgam.setLevels(-45, 45)
 
 
@@ -305,27 +242,38 @@ def makeInteractiveFanWidget(compiledAlpha, compiledGamma, crystalOrientation,
 
 
 
-        TppPolar.setData(sbs[:NMax]+np.abs(T[0, 0, :NMax]), np.angle(T[0, 0, :NMax],
-                                                                 deg=False))
-        TpmPolar.setData(sbs[:NMax]+np.abs(T[0, 1, :NMax]), np.angle(T[0, 1, :NMax],
-                                                                 deg=False))
-        TmpPolar.setData(sbs[:NMax]+np.abs(T[1, 0, :NMax]), np.angle(T[1, 0, :NMax],
-                                                                 deg=False))
-        TmmPolar.setData(sbs[:NMax]+np.abs(T[1, 1, :NMax]), np.angle(T[1, 1, :NMax],
-                                                                deg=False))
+        TppPolar.setData(
+            sbs[:NMax]+np.abs(T[0, 0, :NMax]), np.angle(
+                T[0, 0, :NMax], deg=False)
+            )
+        TpmPolar.setData(
+            sbs[:NMax]+np.abs(T[0, 1, :NMax]), np.angle(
+                T[0, 1, :NMax], deg=False)
+            )
+        TmpPolar.setData(
+            sbs[:NMax]+np.abs(T[1, 0, :NMax]), np.angle(
+                T[1, 0, :NMax], deg=False)
+            )
+        TmmPolar.setData(
+            sbs[:NMax]+np.abs(T[1, 1, :NMax]), np.angle(
+                T[1, 1, :NMax], deg=False)
+            )
 
         TppLinear.setData(sbs[:NMax], np.abs(T[0, 0, :NMax]))
-        TppALinear.setData(sbs[:NMax], np.angle(T[0, 0, :NMax],deg=True))
+        TppALinear.setData(sbs[:NMax], np.angle(T[0, 0, :NMax], deg=True))
         TpmLinear.setData(sbs[:NMax], np.abs(T[0, 1, :NMax]))
-        TpmALinear.setData(sbs[:NMax], np.angle(T[0, 1, :NMax],deg=True))
+        TpmALinear.setData(sbs[:NMax], np.angle(T[0, 1, :NMax], deg=True))
         TmpLinear.setData(sbs[:NMax], np.abs(T[1, 0, :NMax]))
-        TmpALinear.setData(sbs[:NMax], np.angle(T[1, 0, :NMax],deg=True))
+        TmpALinear.setData(sbs[:NMax], np.angle(T[1, 0, :NMax], deg=True))
         TmmLinear.setData(sbs[:NMax], np.abs(T[1, 1, :NMax]))
-        TmmALinear.setData(sbs[:NMax], np.angle(T[1, 1, :NMax],deg=True))
+        TmmALinear.setData(sbs[:NMax], np.angle(T[1, 1, :NMax], deg=True))
 
-        TppoTmmLinear.setData(sbs[:NMax], np.abs(T[0, 0, :NMax] / T[1, 1, :NMax]))
-        TppoTmmALinear.setData(sbs[:NMax], np.angle(T[0, 0, :NMax] / T[1, 1, :NMax],
-                               deg=True))
+        TppoTmmLinear.setData(
+            sbs[:NMax], np.abs(T[0, 0, :NMax] / T[1, 1, :NMax]))
+        TppoTmmALinear.setData(
+            sbs[:NMax], np.angle(
+                T[0, 0, :NMax] / T[1, 1, :NMax], deg=True)
+            )
 
         TpmoTmpLinear.setData(sbs[:NMax], np.abs(T[0, 1, :NMax] / T[1, 0, :NMax]))
         TpmoTmpALinear.setData(sbs[:NMax], np.angle(T[0, 1, :NMax] / T[1, 0, :NMax],
