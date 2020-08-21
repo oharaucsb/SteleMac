@@ -5,14 +5,14 @@ import json
 import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
-from .ccd_collection import CCD
+from .ccd_collection.ccd import CCD
 from processing.processing_hsg.helper_functions import gauss
 from ccd_collection.helper_functions import calc_laser_frequencies
 
 np.set_printoptions(linewidth=500)
 
 
-class HighSidebandCCD(CCD.CCD):
+class HighSidebandCCD(CCD):
     def __init__(
      self, hsg_thing, parameter_dict=None, spectrometer_offset=None):
         """
