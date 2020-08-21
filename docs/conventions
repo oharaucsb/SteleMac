@@ -1,0 +1,11 @@
+Much of this object is meant to follow PEP 8, reading those is critical
+
+from PEP 8
+
+module names are lower_case
+object names are MixedCase
+function names are mixedCase
+variable names are lowercase
+
+objects reside in their own unique, similarly named, files
+  ex. ObjectX resides in file object_x
