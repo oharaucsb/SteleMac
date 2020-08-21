@@ -2,8 +2,8 @@ import os
 import errno
 import json
 import numpy as np
-from .FullSpectrum_collection import FullSpectrum
-from .FullSpectrum_collection import helperFunctions as helpers
+from .full_spectrum_collection.full_spectrum import FullSpectrum
+from .full_spectrum_collection import helper_functions as helpers
 
 np.set_printoptions(linewidth=500)
 
@@ -26,7 +26,7 @@ class sbarr(object):
     WIDTHERR = 6
 
 
-class FullHighSideband(FullSpectrum.FullSpectrum):
+class FullHighSideband(FullSpectrum):
     """
     I'm imagining this class is created with a base CCD file, then gobbles up
     other spectra that belong with it, then grabs the PMT object to normalize
