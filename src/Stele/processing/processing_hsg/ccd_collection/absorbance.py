@@ -2,13 +2,13 @@ import os
 import errno
 import json
 import numpy as np
-from .CCD_collection import CCD
-from .CCD_collection import helperFunctions
+from .ccd_collection.ccd import CCD
+from .ccd_collection.helper_functions import low_pass_filter
 
 np.set_printoptions(linewidth=500)
 
 
-class Absorbance(CCD.CCD):
+class Absorbance(CCD):
     def __init__(self, fname):
         """
         There are several ways Absorbance data can be loaded
@@ -123,7 +123,7 @@ class Absorbance(CCD.CCD):
         # self.fixed = np.nan_to_num(self.proc_data[:, 1])
         # self.fixed = np.column_stack((self.raw_data[:, 0], self.fixed))
         self.parameters['fourier cutoff'] = cutoff
-        self.clean = helperFunctions.low_pass_filter(
+        self.clean = low_pass_filter(
             self.proc_data[:, 0], self.proc_data[:, 1], cutoff, inspectPlots)
 
     def save_processing(self, file_name, folder_str, marker='', index=''):
