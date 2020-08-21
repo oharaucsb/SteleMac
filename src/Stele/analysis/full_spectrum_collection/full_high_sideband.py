@@ -124,7 +124,8 @@ class FullHighSideband(FullSpectrum):
             sb_results = np.array(sb_results)
             self.sb_results = sb_results[sb_results[:, 0].argsort()]
         except AttributeError:
-            print('Error, not enough sidebands to fit here! {}, {}, {}, {}'.format(
+            print('Error, not enough sidebands to fit here! {}, {}, {}, {}'
+                  .format(
                     self.parameters["series"],
                     self.parameters["spec_step"],
                     ccd_object.parameters["series"],
@@ -234,8 +235,10 @@ class FullHighSideband(FullSpectrum):
         # spec_header = '#' + parameter_str + '\n#' +
         #    self.description[:-2] + origin_import_spec
 
-        origin_import_fits = '\nSideband,Center energy,error,Sideband strength,error,Linewidth,error,Amplitude'+\
-                             '\norder,eV,,arb. u.,,meV,,arb. u.\n' + ','.join([marker]*8)
+        origin_import_fits = '\nSideband,Center energy,error,Sideband' \
+                             + 'strength,error,Linewidth,error,Amplitude' \
+                             + '\norder,eV,,arb. u.,,meV,,arb. u.\n' \
+                             + ','.join([marker]*8)
         fits_header = '#' + parameter_str + origin_import_fits
 
         # np.savetxt(os.path.join(folder_str, spectra_fname), self.proc_data,
