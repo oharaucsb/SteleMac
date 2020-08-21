@@ -275,25 +275,16 @@ def makeInteractiveFanWidget(
                 T[0, 0, :NMax] / T[1, 1, :NMax], deg=True)
             )
 
-        TpmoTmpLinear.setData(sbs[:NMax], np.abs(T[0, 1, :NMax] / T[1, 0, :NMax]))
-        TpmoTmpALinear.setData(sbs[:NMax], np.angle(T[0, 1, :NMax] / T[1, 0, :NMax],
-                               deg=True))
-
-
+        TpmoTmpLinear.setData(
+            sbs[:NMax], np.abs(T[0, 1, :NMax] / T[1, 0, :NMax]))
+        TpmoTmpALinear.setData(
+            sbs[:NMax], np.angle(T[0, 1, :NMax] / T[1, 0, :NMax], deg=True))
 
         calculationCallback(J, T)
-    mainwid.updateJ = updateJ # need to keep a reference
-
+    # need to keep a reference
+    mainwid.updateJ = updateJ
 
     tabWid.addTab(palp, "Fan Diagram")
-
-    # intRatioWid = pg.plot(intRatioWidtensityData, fmt="ko-")
-    # intRatioWid = pg.PlotContainerWindow()
-    # intRatioCurve = intRatioWid.plot(intensityData, fmt="ko-")
-    # intRatioCurve = intRatioWid.plot(fmt="ro-")
-    #
-    # tabWid.addTab(intRatioWid, "Ratio")
-
 
     TPolars = makePolarPlot()
     pg.legend()
@@ -323,11 +314,6 @@ def makeInteractiveFanWidget(
 
     tabWid.addTab(TLinears, "T Matrices (Linear)")
 
-
-
-
-
-
     double2 = pg.DoubleYPlot()
     TLinears2 = pg.PlotContainerWindow(plotWidget=double2)
     TLinears2.addLegend()
@@ -339,16 +325,9 @@ def makeInteractiveFanWidget(
     TpmoTmpALinear = TLinears2.plot('ro--', name="ph(T+-/T-+)")
     double2.p2.addItem(TpmoTmpALinear)
 
-
     tabWid.addTab(TLinears2, "T Matrices (Ratios)")
 
-
-
-
-
-    # mainwid.findJ = lambda :findJ(mainwid)
     cboxGroup.buttonToggled.connect(updateJ)
-
 
     layout.addWidget(tabWid)
     mainwid.setLayout(layout)
