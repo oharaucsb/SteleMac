@@ -58,6 +58,12 @@ def hsg_combine_spectra(spectra_list, verbose=False, **kwargs):
     same_freq = lambda x,y: x.parameters["fel_lambda"] == y.parameters["fel_lambda"]
 
 # TODO: correct to proper loop structure
+#       it appears to remove items from the list and put them into temp until
+#       it runs out of elements to pop, raising an exception and exiting
+#       exception usage in this case appears to be correctly used, loop should
+#       terminate at end of range for spectra_list
+#       HOWEVER, as for what this does, it appears to take the last element in
+#       spectra_list and assign it to temp, then delete spectra list?
     for index in range(len(spectra_list)):
         try:
             temp = spectra_list.pop(0)
