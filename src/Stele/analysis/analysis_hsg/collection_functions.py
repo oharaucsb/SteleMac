@@ -14,9 +14,9 @@ np.set_printoptions(linewidth=500)
 def hsg_combine_spectra(spectra_list, verbose=False, **kwargs):
     """
     This function is all about smooshing different parts of the same hsg
-    spectrum together.  It takes a list of HighSidebandCCD spectra and turns the
-    zeroth spec_step into a FullHighSideband object.  It then uses the function
-    stitch_hsg_dicts over and over again for the smooshing.
+    spectrum together.  It takes a list of HighSidebandCCD spectra and turns
+    the zeroth spec_step into a FullHighSideband object.  It then uses the
+    function stitch_hsg_dicts over and over again for the smooshing.
 
     Input:
     spectra_list = list of HighSidebandCCD objects that have sideband spectra
@@ -26,7 +26,8 @@ def hsg_combine_spectra(spectra_list, verbose=False, **kwargs):
     good_list = A list of FullHighSideband objects that have been combined as
                 much as can be.
 
-    :param spectra_list: randomly-ordered list of HSG spectra, some of which can be stitched together
+    :param spectra_list: randomly-ordered list of HSG spectra, some of which
+        can be stitched together
     :type spectra_list: List of HighSidebandCCD objects
     kwargs gets passed onto add_item
     :return: fully combined list of full hsg spectra.  No PMT business yet.
@@ -43,8 +44,6 @@ def hsg_combine_spectra(spectra_list, verbose=False, **kwargs):
     spec_steps = {}
 
     for elem in spectra_list:
-        # if verbose:
-        #     print "Spec_step is", elem.parameters["spec_step"]
         current_steps = spec_steps.get(elem.parameters["series"], [])
         current_steps.append(elem.parameters["spec_step"])
         spec_steps[elem.parameters["series"]] = current_steps
@@ -58,12 +57,13 @@ def hsg_combine_spectra(spectra_list, verbose=False, **kwargs):
 
     same_freq = lambda x,y: x.parameters["fel_lambda"] == y.parameters["fel_lambda"]
 
+# TODO: correct to proper loop structure
     for index in range(len(spectra_list)):
         try:
             temp = spectra_list.pop(0)
             if verbose:
                 print("\nStarting with this guy", temp, "\n")
-        except:
+        except Exception:
             break
 
         good_list.append(FullHighSideband(temp))
@@ -72,41 +72,52 @@ def hsg_combine_spectra(spectra_list, verbose=False, **kwargs):
         temp_list = list(spectra_list)
         for piece in temp_list:
             if verbose:
-                print("\tchecking this spec_step", piece.parameters["spec_step"], end=' ')
+                print(
+                    "\tchecking this spec_step",
+                    piece.parameters["spec_step"], end=' '
+                    )
                 print(", the counter is", counter)
             if not same_freq(piece, temp):
                 if verbose:
-                    print("\t\tnot the same fel frequencies ({} vs {})".format(piece.parameters["fel_lambda"], temp.parameters["fel_lambda"]))
+                    print("\t\tnot the same fel frequencies ({} vs {})".format(
+                        piece.parameters["fel_lambda"],
+                        temp.parameters["fel_lambda"]))
                 continue
             if temp.parameters["series"] == piece.parameters["series"]:
-                if piece.parameters["spec_step"] == spec_steps[temp.parameters["series"]][counter]:
+                if piece.parameters["spec_step"] \
+                        == spec_steps[temp.parameters["series"]][counter]:
                     if verbose:
                         print("I found this one", piece)
                     counter += 1
                     good_list[-1].add_CCD(piece, verbose=verbose, **kwargs)
                     spectra_list.remove(piece)
                 else:
-                    print("\t\tNot the right spec step?", type(piece.parameters["spec_step"]))
+                    print(
+                        "\t\tNot the right spec step?",
+                        type(piece.parameters["spec_step"])
+                        )
 
             else:
                 if verbose:
                     print("\t\tNot the same series ({} vs {}".format(
-                        piece.parameters["series"],temp.parameters["series"]))
+                        piece.parameters["series"], temp.parameters["series"]))
         good_list[-1].make_results_array()
     return good_list
 
-def hsg_combine_spectra_arb_param(spectra_list, param_name="series", verbose = False):
+
+def hsg_combine_spectra_arb_param(
+        spectra_list, param_name="series", verbose=False):
     """
     This function is all about smooshing different parts of the same hsg
-    spectrum together.  It takes a list of HighSidebandCCD spectra and turns the
-    zeroth spec_step into a FullHighSideband object.  It then uses the function
-    stitch_hsg_dicts over and over again for the smooshing.
+    spectrum together.  It takes a list of HighSidebandCCD spectra and turns
+    the zeroth spec_step into a FullHighSideband object.  It then uses the
+    function stitch_hsg_dicts over and over again for the smooshing.
 
-    This is different than hsg_combine_spectra in that you pass which
-    criteria distinguishes the files to be the "same". Since it can be any arbitrary
-    value, things won't be exactly the same (field strength will never be identical
-    between images). It will start with the first (lowest) spec step, then compare the
-    number of images in the next step. Whichever has
+    This is different than hsg_combine_spectra in that you pass which criteria
+    distinguishes the files to be the "same". Since it can be any arbitrary
+    value, things won't be exactly the same (field strength will never be
+    identical between images). It will start with the first (lowest) spec step,
+    then compare the number of images in the next step. Whichever has
 
     Input:
     spectra_list = list of HighSidebandCCD objects that have sideband spectra
@@ -116,7 +127,8 @@ def hsg_combine_spectra_arb_param(spectra_list, param_name="series", verbose = F
     good_list = A list of FullHighSideband objects that have been combined as
                 much as can be.
 
-    :param spectra_list: randomly-ordered list of HSG spectra, some of which can be stitched together
+    :param spectra_list: randomly-ordered list of HSG spectra, some of which
+        can be stitched together
     :type spectra_list: list of HighSidebandCCD
     :return: fully combined list of full hsg spectra.  No PMT business yet.
     :rtype: list of FullHighSideband
