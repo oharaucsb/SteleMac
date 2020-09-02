@@ -131,7 +131,6 @@ class JonesVector(object):
             )
         )/2.*pideg
 
-
     @property
     def gamma(self):
         phi = self.phi * degpi
