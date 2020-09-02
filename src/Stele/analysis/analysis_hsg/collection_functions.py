@@ -173,7 +173,8 @@ def hsg_combine_spectra_arb_param(
     good_list = []
     already_added = set()
     for elem in spectra_list:
-        if elem in already_added: continue
+        if elem in already_added:
+            continue
         already_added.add(elem)
         good_list.append(FullHighSideband(elem))
 
@@ -214,10 +215,13 @@ def hsg_combine_spectra_arb_param(
         new_std = np.std(best_values)
 
         if isinstance(good_list[-1].parameters[param_name], dict):
-            best_values = np.array([x.parameters[param_name]["mean"] for x in best_match])
-            best_std = np.array([x.parameters[param_name]["std"] for x in best_match])
-            new_value = np.average(best_values, weights = best_std)
-            new_std = np.sqrt(np.average((best_values-new_value)**2, weights=best_std))
+            best_values = np.array(
+                [x.parameters[param_name]["mean"] for x in best_match])
+            best_std = np.array(
+                [x.parameters[param_name]["std"] for x in best_match])
+            new_value = np.average(best_values, weights=best_std)
+            new_std = np.sqrt(
+                np.average((best_values-new_value)**2, weights=best_std))
 
         good_list[-1].parameters[param_name] = {
             "mean": new_value,
@@ -225,7 +229,8 @@ def hsg_combine_spectra_arb_param(
         }
     return good_list
 
-def pmt_sorter(folder_path, plot_individual = True):
+
+def pmt_sorter(folder_path, plot_individual=True):
     """
     This function will be fed a folder with a bunch of PMT data files in it.
     The folder should contain a bunch of spectra with at least one sideband in
@@ -237,7 +242,8 @@ def pmt_sorter(folder_path, plot_individual = True):
                         part of a parameter sweep
     :type folder_path: str
     :param plot_individual: Whether to plot each sideband itself
-    :return: A list of all the possible hsg pmt spectra, organized by series tag
+    :return: A list of all the possible hsg pmt spectra, organized by series
+        tag
     :rtype: list of HighSidebandPMT
     """
     file_list = glob.glob(os.path.join(folder_path, '*[0-9].txt'))
@@ -248,59 +254,45 @@ def pmt_sorter(folder_path, plot_individual = True):
 
     if plot_individual:
         plt.figure("PMT data")
+
         def plot_sb(spec):
             spec = copy.deepcopy(spec)
             spec.process_sidebands()
             elem = spec.sb_dict[spec.initial_sb]
-            plt.errorbar(elem[:, 0], elem[:, 1], elem[:, 2],
-                     marker='o',
-                     label="{} {}, {}.{} ".format(
-                         spec.parameters["series"], spec.initial_sb,
-                         spec.parameters["pm_hv"],
-                         't' if spec.parameters.get("photon counted", False) else 'f')
-                         )
+            plt.errorbar(
+                elem[:, 0], elem[:, 1], elem[:, 2],
+                marker='o',
+                label="{} {}, {}.{} ".format(
+                    spec.parameters["series"], spec.initial_sb,
+                    spec.parameters["pm_hv"],
+                    't' if spec.parameters.get(
+                        "photon counted", False) else 'f')
+                )
 
     for sb_file in file_list:
         temp = HighSidebandPMT(sb_file)
         plot_sb(temp)
         try:
             for pmt_spectrum in pmt_list:  # pmt_spectrum is a pmt object
-                if temp.parameters['series'] == pmt_spectrum.parameters['series']:
+                if temp.parameters['series'] \
+                        == pmt_spectrum.parameters['series']:
                     pmt_spectrum.add_sideband(temp)
                     break
             else:  # this will execute IF the break was NOT called
                 pmt_list.append(temp)
-        except:
+        except Exception:
             pmt_list.append(temp)
-    # for sb_file in file_list:
-    #     with open(sb_file,'rU') as f:
-    #         param_str = ''
-    #         line = f.readline()
-    #         line = f.readline()
-    #         while line[0] == '#':
-    #             param_str += line[1:]
-    #             line = f.readline()
-    #
-    #         parameters = json.loads(param_str)
-    #     try:
-    #         for pmt_spectrum in pmt_list: # pmt_spectrum is a pmt object?
-    #             if parameters['series'] == pmt_spectrum.parameters['series']:
-    #                 pmt_spectrum.add_sideband(sb_file)
-    #                 break
-    #         else: # this will execute IF the break was NOT called
-    #             pmt_list.append(HighSidebandPMT(sb_file))
-    #     except:
-    #         pmt_list.append(HighSidebandPMT(sb_file))
-
     for pmt_spectrum in pmt_list:
         pmt_spectrum.process_sidebands()
     return pmt_list
 
+
 def stitch_abs_results(main, new):
     raise NotImplementedError
 
-def hsg_combine_qwp_sweep(path, loadNorm = True, save = False, verbose=False,
-                          skipOdds = True):
+
+def hsg_combine_qwp_sweep(
+        path, loadNorm=True, save=False, verbose=False, skipOdds=True):
     """
     Given a path to data taken from rotating the QWP (doing polarimetry),
     process the data (fit peaks), and parse it into a matrix of sb strength vs
@@ -310,9 +302,9 @@ def hsg_combine_qwp_sweep(path, loadNorm = True, save = False, verbose=False,
 
     Return should be passed directly into fitting
 
-         -1     |     SB1     |   SB1  |     SB2     |   SB2  |    ...    |   ...  |     SBn     |   SBn  |
-      angle1    | SB Strength | SB err | SB Strength | SB Err |
-      angle2    |     ...     |    .   |
+     -1  |      SB1    |  SB1 |    SB2    |  SB2 | ... | ... | SBn | SBn |
+  angle1 | SB Strength |SB err|SB Strength|SB Err|
+  angle2 |     ...     |   .  |
       .
       .
       .
@@ -328,7 +320,8 @@ def hsg_combine_qwp_sweep(path, loadNorm = True, save = False, verbose=False,
     """
     def getData(fname):
         """
-        Helper function for loading the data and getting the header information for incident NIR stuff
+        Helper function for loading the data and getting the header information
+            for incident NIR stuff
         :param fname:
         :return:
         """
@@ -338,13 +331,15 @@ def hsg_combine_qwp_sweep(path, loadNorm = True, save = False, verbose=False,
             else:
                 ending = "_snip.txt"
             header = ''
-            with open(os.path.join("Processed QWP Dependence", fname + ending)) as fh:
+            with open(os.path.join(
+                    "Processed QWP Dependence", fname + ending)) as fh:
                 ln = fh.readline()
                 while ln[0] == '#':
                     header += ln[1:]
                     ln = fh.readline()
-            data = np.genfromtxt(os.path.join("Processed QWP Dependence", fname + ending),
-                                 delimiter=',', dtype=str)
+            data = np.genfromtxt(
+                os.path.join("Processed QWP Dependence", fname + ending),
+                delimiter=',', dtype=str)
         if isinstance(fname, io.BytesIO):
             header = b''
             ln = fname.readline()
@@ -356,29 +351,32 @@ def hsg_combine_qwp_sweep(path, loadNorm = True, save = False, verbose=False,
                                  delimiter=',', dtype=str)
 
         header = json.loads(header)
-        return data, float(header["lAlpha"]), float(header["lGamma"]), float(header["nir"]), float(header["thz"])
-        ######### End getData
+        return data, float(header["lAlpha"]), float(header["lGamma"]), \
+            float(header["nir"]), float(header["thz"])
 
     try:
         sbData, lAlpha, lGamma, nir, thz = getData(path)
-    except:
+        # TODO: correct control structure to not be reliant on Exception
+    except Exception:
         # Do the processing on all the files
         specs = proc_n_plotCCD(path, keep_empties=True, verbose=verbose)
 
         for sp in specs:
             try:
-                sp.parameters["series"] = round(float(sp.parameters["rotatorAngle"]), 2)
+                sp.parameters["series"] = round(float(
+                    sp.parameters["rotatorAngle"]), 2)
             except KeyError:
                 # Old style of formatting
-                sp.parameters["series"] = round(float(sp.parameters["detectorHWP"]), 2)
+                sp.parameters["series"] = round(float(
+                    sp.parameters["detectorHWP"]), 2)
         specs = hsg_combine_spectra(specs, ignore_weaker_lowers=False)
         if not save:
-            # If you don't want to save them, set everything up for doing Bytes objects
-            # to replacing saving files
+            # If you don't want to save them, set everything up for doing Bytes
+            # objects to replacing saving files
             full, snip, norm = io.BytesIO(), io.BytesIO(), io.BytesIO()
             if "nir_pola" not in specs[0].parameters:
-                # in the olden days. Force them. Hopefully making them outside of ±360
-                # makes it obvious
+                # in the olden days. Force them. Hopefully making them outside
+                # of ±360 makes it obvious
                 specs[0].parameters["nir_pola"] = 361
                 specs[0].parameters["nir_polg"] = 361
             keyName = "rotatorAngle"
