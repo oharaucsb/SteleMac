@@ -1,5 +1,7 @@
 __author__ = 'Sphinx'
 
+# TODO: Add factor of one half to stokes parameters, check normalization
+
 """
 expFanCompiler broken into fanCompiler, fanCompilerWOStokes, jonesToFans,
     and SbStateGetter
