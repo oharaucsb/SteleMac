@@ -8,13 +8,20 @@ def lingauss(x, *p):
 
     :param x: The independent variable
     :type x: np.array, or int or float
-    :param p: [mean, area, width, constant offset of background, slope of background] to be unpacked
+    :param p: [mean, area, width, constant offset of background, slope of
+        background] to be unpacked
     :type p: list of floats or ints
     :return: Depends on x, returns another np.array or float or int
     :rtype: type(x)
     """
     mu, A, sigma, y0, m = p
-    return (A / sigma) * np.exp(-(x - mu) ** 2 / (2. * sigma ** 2)) + y0 + m * x
+    return (
+        (A / sigma)
+        * np.exp(-(x - mu) ** 2 / (2. * sigma ** 2))
+        + y0
+        + m * x
+    )
+
 
 def lorentzian(x, *p):
     """
@@ -22,13 +29,15 @@ def lorentzian(x, *p):
 
     :param x: The independent variable
     :type x: np.array, or int or float
-    :param p: [mean, area, width, constant offset of background, slope of background] to be unpacked
+    :param p: [mean, area, width, constant offset of background, slope of
+        background] to be unpacked
     :type p: list of floats or ints
     :return: Depends on x, returns another np.array or float or int
     :rtype: type(x)
     """
     mu, A, gamma, y0 = p
     return (A / np.pi) * (gamma / ((x - mu) ** 2 + gamma ** 2)) + y0
+
 
 def background(x, *p):
     """
@@ -46,13 +55,15 @@ def background(x, *p):
     a, b = p
     return a * (1 / x) ** b
 
+
 def gaussWithBackground(x, *p):
     """
     Gaussian with pink-noise background function
 
     :param x: independent variable
     :type x: np.array, or int or float
-    :param p: [mean, area, width, constant background, proportionality of power law, exponent of power law]
+    :param p: [mean, area, width, constant background, proportionality of power
+        law, exponent of power law]
     :type p: list of floats or ints
     :return: Depends on x
     :rtype: type(x)
