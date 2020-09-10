@@ -7,7 +7,8 @@ np.set_printoptions(linewidth=500)
 
 
 def savitzky_golay(y, window_size, order, deriv=0, rate=1):
-    r"""Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    r"""Smooth (and optionally differentiate) data with a
+        Savitzky-Golay filter.
     The Savitzky-Golay filter removes high frequency noise from data.
     It has the advantage of preserving the original shape and
     features of the signal better than other types of filtering
@@ -22,7 +23,8 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
         the order of the polynomial used in the filtering.
         Must be less then `window_size` - 1.
     deriv: int
-        the order of the derivative to compute (default = 0 means only smoothing)
+        the order of the derivative to compute
+        (default = 0 means only smoothing)
     Returns
     -------
     ys : ndarray, shape (N)
@@ -72,7 +74,13 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     order_range = list(range(order + 1))
     half_window = (window_size - 1) // 2
     # precompute coefficients
-    b = np.mat([[k ** i for i in order_range] for k in range(-half_window, half_window + 1)])
+    b = np.mat(
+        [
+            [k ** i for i in order_range] for k in range(
+                -half_window, half_window + 1
+            )
+        ]
+    )
     m = np.linalg.pinv(b).A[deriv] * rate ** deriv * factorial(deriv)
     # pad the signal at the extremes with
     # values taken from the signal itself
@@ -82,19 +90,25 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     return np.convolve(m[::-1], y, mode='valid')
 
 
-def fft_filter(data, cutoffFrequency=1520, inspectPlots=False, tryFitting=False, freqSigma=50, ftol=1e-4,
-               isInteractive=False):
+def fft_filter(
+        data, cutoffFrequency=1520, inspectPlots=False, tryFitting=False,
+        freqSigma=50, ftol=1e-4, isInteractive=False
+):
     """
     Performs an FFT, then fits a peak in frequency around the
     input with the input width.
-    If only data is given, it will cut off all frequencies above the default value.
-    inspectPlots = True will plot the FFT and the filtering at each step, as well as the results
-    tryFitting = True will try to fit the peak in frequency space centered at the cutoffFrequency
-    and with a width of freqSigma, using the background function above. Will replace
-    the peak with the background function. Feature not very well tested
-    isInteractive: Will pop up interactive windows to move the cutoff frequency and view the
-    FFT in real time. Requires pyqtgraph and PyQt4 installed (pyqt4 is standard with
-    anaconda/winpython, but pyqtgraph is not)
+    If only data is given, it will cut off all frequencies above the
+        default value.
+    inspectPlots = True will plot the FFT and the filtering at each step,
+        as well as the results
+    tryFitting = True will try to fit the peak in frequency space centered
+        at the cutoffFrequency
+    and with a width of freqSigma, using the background function above. Will
+        replace the peak with the background function.
+        Feature not very well tested.
+    isInteractive: Will pop up interactive windows to move the cutoff frequency
+        and view the FFT in real time. Requires pyqtgraph and PyQt4 installed
+        (pyqt4 is standard with anaconda/winpython, but pyqtgraph is not)
     """
     # Make a copy so we can return the same thing
     retData = np.array(data)
@@ -108,10 +122,15 @@ def fft_filter(data, cutoffFrequency=1520, inspectPlots=False, tryFitting=False,
         try:
             import pyqtgraph as pg
             from PyQt5 import QtCore, QtWidgets
-        except:
-            raise ImportError("Cannot do interactive plotting without pyqtgraph installed")
+        # TODO: Ensure except is not used as control structure, it appears not.
+        # TODO: Change except class from Exception to more narrow error class.
+        except Exception:
+            raise ImportError(
+                "Cannot do interactive plotting without pyqtgraph installed"
+            )
 
-        # Need to make some basic classes fir signals and slots to make things simple
+        # Need to make some basic classes fir signals and slots to make
+        # things simple
         class FFTWin(pg.PlotWindow):
             sigCutoffChanged = QtCore.pyqtSignal(object)
             sigClosed = QtCore.pyqtSignal()
@@ -125,7 +144,9 @@ def fft_filter(data, cutoffFrequency=1520, inspectPlots=False, tryFitting=False,
                 # Connect signals so the textbox updates and the
                 # realspace window can recalcualte the FFT
                 self.line = pg.InfiniteLine(cutoffFrequency, movable=True)
-                self.line.sigPositionChanged.connect(lambda x: self.sigCutoffChanged.emit(x.value()))
+                self.line.sigPositionChanged.connect(
+                    lambda x: self.sigCutoffChanged.emit(x.value())
+                )
                 self.line.sigPositionChanged.connect(self.updateText)
                 self.addItem(self.line)
                 # Set up the textbox so user knows the frequency
@@ -182,7 +203,9 @@ def fft_filter(data, cutoffFrequency=1520, inspectPlots=False, tryFitting=False,
                 self.sigClosed.emit()
                 try:
                     self.fftWin.win.close()
-                except:
+                # TODO: Ensure except is not used as control structure.
+                # TODO: Change except class from Exception to specific error.
+                except Exception:
                     pass
                 self.oldClose(ev)
 
@@ -234,18 +257,29 @@ def fft_filter(data, cutoffFrequency=1520, inspectPlots=False, tryFitting=False,
     if tryFitting:
         try:
             # take +/- 4 sigma points around peak to fit to
-            sl = np.abs(k - cutoffFrequency).argmin() + np.array([-1, 1]) * 10 * freqSigma / np.abs(k[0] - k[1])
+            sl = np.abs(k - cutoffFrequency).argmin() \
+                + np.array([-1, 1]) * 10 * freqSigma / np.abs(k[0] - k[1])
             sl = slice(*[int(j) for j in sl])
-            p0 = [cutoffFrequency,
-                  np.abs(Y)[sl].max() * freqSigma,  # estimate the height baased on the max in the set
-                  freqSigma,
-                  0.14, 2e3, 1.1]  # magic test numbers, they fit the background well
+            p0 = [
+                cutoffFrequency,
+                # estimate the height baased on the max in the set
+                np.abs(Y)[sl].max() * freqSigma,
+                freqSigma,
+                # magic test numbers, they fit the background well
+                0.14, 2e3, 1.1]
 
             if inspectPlots:
-                plt.semilogy(k[sl], gaussWithBackground(k[sl], *p0), label="Peak with initial values")
-            p, _ = curve_fit(gaussWithBackground, k[sl], np.abs(Y)[sl], p0=p0, ftol=ftol)
+                plt.semilogy(
+                    k[sl], gaussWithBackground(k[sl], *p0),
+                    label="Peak with initial values"
+                )
+            p, _ = curve_fit(
+                gaussWithBackground, k[sl], np.abs(Y)[sl], p0=p0, ftol=ftol
+            )
             if inspectPlots:
-                plt.semilogy(k[sl], gaussWithBackground(k[sl], *p), label="Fitted Peak")
+                plt.semilogy(
+                    k[sl], gaussWithBackground(k[sl], *p), label="Fitted Peak"
+                )
 
             # Want to remove data within 5 sigma ( arb value... )
             st = int(p[0] - 5 * p[2])
@@ -260,8 +294,13 @@ def fft_filter(data, cutoffFrequency=1520, inspectPlots=False, tryFitting=False,
             # to get the negative side of the data
             Y[refitRangeIdx] = background(k[refitRangeIdx], *p[-2:])
             Y[refitRangeIdxNeg] = background(k[refitRangeIdx], *p[-2:])[::-1]
-        except:
-            print("ERROR: Trouble fitting the peak in frequency space.\n\t Defaulting to cutting off")
+        # TODO: ensure exception is not used as control struct, it seems not.
+        # TODO: Change class from Exception to more specific expected error.
+        except Exception:
+            print(
+                "ERROR: Trouble fitting the peak in frequency space.\n"
+                + "\t Defaulting to cutting off"
+            )
 
             # Assume cutoffFrequency was the peak, not the actual cutoff
             # Leaving it alone means half the peak would remain and the data
@@ -320,6 +359,8 @@ def fft_filter(data, cutoffFrequency=1520, inspectPlots=False, tryFitting=False,
     retData[:, -1] = y
     return retData
 
+
+# TODO: create functions for parts shared between high_pass and band_pass
 def high_pass_filter(x_vals, y_vals, cutoff, inspectPlots=True):
     """
     Replicate origin directy
@@ -336,7 +377,9 @@ def high_pass_filter(x_vals, y_vals, cutoff, inspectPlots=True):
         plt.plot(x_vals, y_vals, label="Non-nan Data")
 
     zeroPadding = len(x_vals)
-    print("zero padding", zeroPadding)  # This needs to be this way because truncation is bad and actually zero padding
+    # This needs to be this way because truncation is bad and actually
+    # zero padding
+    print("zero padding", zeroPadding)
     N = len(x_vals)
     onePerc = int(0.01 * N)
     x1 = np.mean(x_vals[:onePerc])
@@ -366,26 +409,6 @@ def high_pass_filter(x_vals, y_vals, cutoff, inspectPlots=True):
     # Define where to remove the data
     band_start = cutoff
     band_end = int(max(abs(x_fourier))) + 1
-
-    '''
-    # Find the indices to remove the data
-    refitRangeIdx = np.argwhere((x_fourier > band_start) & (x_fourier <= band_end))
-    refitRangeIdxNeg = np.argwhere((x_fourier < -band_start) & (x_fourier >= -band_end))
-
-    #print "x_fourier", x_fourier[795:804]
-    #print "max(x_fourier)", max(x_fourier)
-    #print "refitRangeIdxNeg", refitRangeIdxNeg[:-400]
-
-    # Kill it all after the cutoff
-    y_fourier[refitRangeIdx] = 0
-    y_fourier[refitRangeIdxNeg] = 0
-
-    # This section does a square filter on the remaining code.
-    smoothIdx = np.argwhere((-band_start < x_fourier) & (x_fourier < band_start))
-    smoothr = -1 / band_start**2 * x_fourier[smoothIdx]**2 + 1
-
-    y_fourier[smoothIdx] *= smoothr
-    '''
 
     print(abs(y_fourier[-10:]))
     butterworth = 1 - np.sqrt(1 / (1 + (x_fourier / cutoff) ** 50))
@@ -436,7 +459,9 @@ def band_pass_filter(x_vals, y_vals, cutoff, inspectPlots=True):
         plt.plot(x_vals, y_vals, label="Non-nan Data")
 
     zeroPadding = len(x_vals)
-    print("zero padding", zeroPadding)  # This needs to be this way because truncation is bad and actually zero padding
+    # This needs to be this way because truncation is bad and actually
+    #   zero padding
+    print("zero padding", zeroPadding)
     N = len(x_vals)
     onePerc = int(0.01 * N)
     x1 = np.mean(x_vals[:onePerc])
@@ -466,26 +491,6 @@ def band_pass_filter(x_vals, y_vals, cutoff, inspectPlots=True):
     # Define where to remove the data
     band_start = cutoff
     band_end = int(max(abs(x_fourier))) + 1
-
-    '''
-    # Find the indices to remove the data
-    refitRangeIdx = np.argwhere((x_fourier > band_start) & (x_fourier <= band_end))
-    refitRangeIdxNeg = np.argwhere((x_fourier < -band_start) & (x_fourier >= -band_end))
-
-    #print "x_fourier", x_fourier[795:804]
-    #print "max(x_fourier)", max(x_fourier)
-    #print "refitRangeIdxNeg", refitRangeIdxNeg[:-400]
-
-    # Kill it all after the cutoff
-    y_fourier[refitRangeIdx] = 0
-    y_fourier[refitRangeIdxNeg] = 0
-
-    # This section does a square filter on the remaining code.
-    smoothIdx = np.argwhere((-band_start < x_fourier) & (x_fourier < band_start))
-    smoothr = -1 / band_start**2 * x_fourier[smoothIdx]**2 + 1
-
-    y_fourier[smoothIdx] *= smoothr
-    '''
 
     print(abs(y_fourier[-10:]))
     butterworth = 1 - np.sqrt(1 / (1 + (x_fourier / cutoff[0]) ** 50))
