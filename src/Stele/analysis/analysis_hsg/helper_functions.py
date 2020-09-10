@@ -193,14 +193,14 @@ def stitchData(dataList, plot=False):
 
 def stitchData(dataList, plot=False):
     """
-    Attempt to stitch together absorbance data. Will translate the second data set
-    to minimize leastsq between the two data sets.
+    Attempt to stitch together absorbance data. Will translate the second data
+        set to minimize leastsq between the two data sets.
     :param dataList: Iterable of the data sets to be fit. Currently
-            it only takes the first two elements of the list, but should be fairly
-            straightforward to recursivly handle a list>2. Shifts the second
-            data set to overlap the first
-             elements of dataList can be either np.arrays or Absorbance class,
-              where it will take the proc_data itself
+            it only takes the first two elements of the list, but should be
+            fairly straightforward to recursivly handle a list>2. Shifts the
+            second data set to overlap the first elements of dataList can be
+            either np.arrays or Absorbance class, where it will take the
+            proc_data itself.
     :param plot: bool whether or not you want the fit iterations to be plotted
             (for debugging)
     :return: a, a (2,) np.array of the shift
@@ -268,21 +268,30 @@ def stitchData(dataList, plot=False):
         newShift = shiftF(immutable[fOlIdx[0]:fOlIdx[1], 0])
 
         if plot:
-            plt.plot(*immutable[fOlIdx[0]:fOlIdx[1], :].T, marker='o', label="imm", markersize=10)
-            plt.plot(immutable[fOlIdx[0]:fOlIdx[1], 0], newShift, marker='o', label="shift")
+            plt.plot(
+                *immutable[fOlIdx[0]:fOlIdx[1], :].T, marker='o',
+                label="imm", markersize=10
+            )
+            plt.plot(
+                immutable[fOlIdx[0]:fOlIdx[1], 0], newShift, marker='o',
+                label="shift"
+            )
         imm = immutable[fOlIdx[0]:fOlIdx[1], 1]
         shift = newShift
         return imm - shift
 
-    a, _, _, msg, err = spo.leastsq(fitter, [0.0001, 0.01 * max(first[:, 1])], args=(second, first), full_output=1)
-    # print "a", a
+    a, _, _, msg, err = spo.leastsq(
+        fitter, [0.0001, 0.01 * max(first[:, 1])],
+        args=(second, first), full_output=1
+    )
     if plot:
         # Revert back to the original figure, as per top comments
         plt.figure(firstFig.number)
 
     # Need to invert the shift if we flipped which
     # model we're supposed to move
-    if flipped: a *= -1
+    if flipped:
+        a *= -1
 
     return a
 
