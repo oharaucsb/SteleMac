@@ -55,7 +55,7 @@ def hsg_combine_spectra(spectra_list, verbose=False, **kwargs):
     for series in spec_steps:
         spec_steps[series].sort()
 
-    same_freq = lambda x,y: x.parameters["fel_lambda"] == y.parameters["fel_lambda"]
+    same_freq = lambda x, y: x.parameters["fel_lambda"] == y.parameters["fel_lambda"]
 
 # TODO: correct to proper loop structure
 #       it appears to remove items from the list and put them into temp until
@@ -165,7 +165,6 @@ def hsg_combine_spectra_arb_param(
         current_steps.append(elem)
         spec_steps[elem.parameters["spec_step"]] = current_steps
 
-
     # Next, loop over all of the elements. For each element, if it has not
     # already been added to a spectra, look at all of the combinations from
     # other spec steps to figure out which has the smallest overall deviation
@@ -197,7 +196,7 @@ def hsg_combine_spectra_arb_param(
         best_values = list(map(paramGetter, best_match))
         for spec in best_match:
             print("Adding new spec step\n\tStarted with spec={},series={}".format(
-                good_list[-1].parameters["spec_step"],good_list[-1].parameters["series"]
+                good_list[-1].parameters["spec_step"], good_list[-1].parameters["series"]
             ))
             print("\tAdding with spec={},series={}\n".format(
                 spec.parameters["spec_step"],
@@ -563,7 +562,7 @@ def proc_n_fit_qwp_data(
         sbNum = allSbData[0, sbIdx]
         if sbNum not in wantedSBs:
             continue
-        if skipOdds and sbNum%2:
+        if skipOdds and sbNum % 2:
             continue
         sbData = allSbData[1:, sbIdx]
         sbDataErr = allSbData[1:, sbIdx + 1]
