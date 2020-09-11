@@ -7,7 +7,7 @@ setup(
 
     # ***package setup***
     name='Stele',  # package name
-    version='0.1a1',
+    version='0.1a2',
             # what version, pre release codes are 'anything' < 'final'
             # equivelat post finals, c = pre = preview = rc
             # post release codes are 'anything' > 'final'
@@ -39,6 +39,8 @@ setup(
         'jsonschema>=2.6.0',
         'matplotlib>=2.2.2',
         'numpy>=1.14.3',
+        # style collection used for this distribution, optional dependency
+        'pylama>=7.7.1',
         'PyQt5==5.14.0',
         'pyqtgraph>=0.10.0',
         'scipy>=1.1.0'
