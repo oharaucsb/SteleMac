@@ -13,6 +13,8 @@ np.set_printoptions(linewidth=500)
 
 def hsg_combine_spectra(spectra_list, verbose=False, **kwargs):
     """
+    Smooshes an HSG spectrum together using stitch_hsg_dicts.
+
     This function is all about smooshing different parts of the same hsg
     spectrum together.  It takes a list of HighSidebandCCD spectra and turns
     the zeroth spec_step into a FullHighSideband object.  It then uses the
@@ -23,6 +25,7 @@ def hsg_combine_spectra(spectra_list, verbose=False, **kwargs):
                    larger than the spectrometer can see.
 
     Returns:
+    -------
     good_list = A list of FullHighSideband objects that have been combined as
                 much as can be.
 
@@ -32,6 +35,8 @@ def hsg_combine_spectra(spectra_list, verbose=False, **kwargs):
     kwargs gets passed onto add_item
     :return: fully combined list of full hsg spectra.  No PMT business yet.
     :rtype: list of FullHighSideband
+
+
     """
     good_list = []
     spectra_list = spectra_list.copy()
