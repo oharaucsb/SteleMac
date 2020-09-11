@@ -42,6 +42,8 @@ setup(
         'PyQt5==5.14.0',
         'pyqtgraph>=0.10.0',
         'scipy>=1.1.0'
+        # automatic documentation support via doclines, optional dependency
+        'Sphinx>=3.2.1'
         ],
     # packages required for the distribution package to function
 
