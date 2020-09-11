@@ -56,6 +56,8 @@ setup(
         'scipy>=1.1.0'
         ],
     # dependencies that are necessary for additional usages of the distro
+    # install extras via brackets concattenated to the package name in pip
+    # EX "pip install Stele[dev]"
     extras_requires={
         # dependencies for development of the distribution package
         "dev": [
