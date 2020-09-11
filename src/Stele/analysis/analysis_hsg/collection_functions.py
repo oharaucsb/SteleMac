@@ -119,6 +119,8 @@ def hsg_combine_spectra(spectra_list, verbose=False, **kwargs):
 def hsg_combine_spectra_arb_param(
         spectra_list, param_name="series", verbose=False):
     """
+    Smooshes like combine_spectra, but allows you to pick what is the "same".
+
     This function is all about smooshing different parts of the same hsg
     spectrum together.  It takes a list of HighSidebandCCD spectra and turns
     the zeroth spec_step into a FullHighSideband object.  It then uses the
@@ -135,6 +137,7 @@ def hsg_combine_spectra_arb_param(
                    larger than the spectrometer can see.
 
     Returns:
+    -------
     good_list = A list of FullHighSideband objects that have been combined as
                 much as can be.
 
@@ -143,6 +146,7 @@ def hsg_combine_spectra_arb_param(
     :type spectra_list: list of HighSidebandCCD
     :return: fully combined list of full hsg spectra.  No PMT business yet.
     :rtype: list of FullHighSideband
+
     """
     if not spectra_list:
         raise RuntimeError("Passed an empty spectra list!")
@@ -236,6 +240,8 @@ def hsg_combine_spectra_arb_param(
 
 def pmt_sorter(folder_path, plot_individual=True):
     """
+    Turn a folder of PMT files into a list of HighSidebandPMT objects.
+
     This function will be fed a folder with a bunch of PMT data files in it.
     The folder should contain a bunch of spectra with at least one sideband in
     them, each differing by the series entry in the parameters dictionary.
@@ -249,6 +255,7 @@ def pmt_sorter(folder_path, plot_individual=True):
     :return: A list of all the possible hsg pmt spectra, organized by series
         tag
     :rtype: list of HighSidebandPMT
+
     """
     file_list = glob.glob(os.path.join(folder_path, '*[0-9].txt'))
 
@@ -298,6 +305,8 @@ def stitch_abs_results(main, new):
 def hsg_combine_qwp_sweep(
         path, loadNorm=True, save=False, verbose=False, skipOdds=True):
     """
+    Process polarimetry data into a matrix of sb strength, QWP angle, sb #.
+
     Given a path to data taken from rotating the QWP (doing polarimetry),
     process the data (fit peaks), and parse it into a matrix of sb strength vs
     QWP angle vs sb number.
@@ -306,9 +315,9 @@ def hsg_combine_qwp_sweep(
 
     Return should be passed directly into fitting
 
-     -1  |      SB1    |  SB1 |    SB2    |  SB2 | ... | ... | SBn | SBn |
-  angle1 | SB Strength |SB err|SB Strength|SB Err|
-  angle2 |     ...     |   .  |
+        -1  |      SB1    |  SB1 |    SB2    |  SB2 | ... | ... | SBn | SBn |
+     angle1 | SB Strength |SB err|SB Strength|SB Err|
+     angle2 |     ...     |   .  |
       .
       .
       .
@@ -324,6 +333,8 @@ def hsg_combine_qwp_sweep(
     """
     def getData(fname):
         """
+        Load incident NIR data and collect header information.
+
         Helper function for loading the data and getting the header information
             for incident NIR stuff
         :param fname:
@@ -477,7 +488,8 @@ def proc_n_fit_qwp_data(
         **kwargs
         ):
     """
-    Fit a set of sideband data vs QWP angle to get the stoke's parameters
+    Fit a set of sideband data vs QWP angle to get the stoke's parameters.
+
     :param data: data in the form of the return of hsg_combine_qwp_sweep
     :param laserParams: dictionary of the parameters of the laser, the angles
         and frequencies. See function for expected keys. I don't think the
