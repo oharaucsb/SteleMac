@@ -1,6 +1,6 @@
 from setuptools import find_namespace_packages, setup
 
-# to understand how setuptools and many following commannds work, see
+# to understand how setuptools and many following commands work, see
 # https://setuptools.readthedocs.io/en/latest/setuptools.html
 
 setup(
