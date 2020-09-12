@@ -10,7 +10,7 @@ setup(
     author='Cameron Cannon',
     author_email='c_cannon@ucsb.edu',
     license='MIT',
-    description="Monolithic python distribution to eventually house ITST code."
+    description="Monolithic python distribution to house ITST's HSG code.",
 
 
     # ***package setup***
@@ -60,11 +60,11 @@ setup(
     # EX "pip install Stele[dev]"
     extras_requires={
         # dependencies for development of the distribution package
-        "dev": [
+        'dev': [
             # style collection used for this distribution, optional dependency
             'pylama>=7.7.1',
             # automatic documentation support via doclines, optional dependency
-            'Sphinx>=3.2.1'
+            'Sphinx>=3.2.1',
             # darkmode HTML theme for sphinx generated documentation
             'sphinx_pdj_theme=>0.2.1'
             ]
