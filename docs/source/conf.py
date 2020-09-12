@@ -39,6 +39,7 @@ release = '0.1a2'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.autodoc'
 ]
 
 # The file extensions of source files.
