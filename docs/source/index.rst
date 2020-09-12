@@ -10,7 +10,10 @@ Welcome to Stele's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-
+   introduction
+   conventions
+   guidelines
+   outline
 
 Indices and tables
 ==================
