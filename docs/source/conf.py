@@ -1,3 +1,7 @@
+# Documentation on current and possible settings located at link below
+# https://www.sphinx-doc.org/en/master/usage/configuration.html
+
+# theme used for generating documentation
 import sphinx_pdj_theme
 # Configuration file for the Sphinx documentation builder.
 #
@@ -11,9 +15,9 @@ import sphinx_pdj_theme
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../..'))
 
 
 # -- Project information -----------------------------------------------------
@@ -22,7 +26,10 @@ project = 'Stele'
 copyright = '2020, Cameron Cannon'
 author = 'Cameron Cannon'
 
-# The full version, including alpha/beta/rc tags
+# The major project version, used as the replacement for |version|.
+version = '0.1'
+# The full project version, used as the replacement for |release|.
+# Includes alpha/beta/rc tags.
 release = '0.1a2'
 
 
@@ -33,6 +40,13 @@ release = '0.1a2'
 # ones.
 extensions = [
 ]
+
+# The file extensions of source files.
+# Sphinx considers the files with this suffix as sources.
+# The value can be a dictionary mapping file extensions to file types.
+source_suffix = {
+    '.rst': 'restructuredtext'
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
