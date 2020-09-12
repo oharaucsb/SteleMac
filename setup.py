@@ -65,6 +65,8 @@ setup(
             'pylama>=7.7.1',
             # automatic documentation support via doclines, optional dependency
             'Sphinx>=3.2.1'
+            # darkmode HTML theme for sphinx generated documentation
+            'sphinx_pdj_theme=>0.2.1'
             ]
         # TODO: Look at utilizing extras for correllated modules that are only
         #   required in rare cases but bring many new dependency requirements.

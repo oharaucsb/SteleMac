@@ -1,3 +1,4 @@
+import sphinx_pdj_theme
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -47,7 +48,13 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_pdj_theme'
+htm_theme_path = [sphinx_pdj_theme.get_html_theme_path()]
+
+# sets the darker appearence
+html_theme_options = {
+    'style': 'darker'
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
