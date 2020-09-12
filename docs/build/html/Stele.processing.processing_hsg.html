@@ -65,8 +65,8 @@
 <li><a class="reference internal" href="#">Stele.processing.processing_hsg package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#stele-processing-processing-hsg-helper-functions-module">Stele.processing.processing_hsg.helper_functions module</a></li>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li><a class="reference internal" href="#module-Stele.processing.processing_hsg.helper_functions">Stele.processing.processing_hsg.helper_functions module</a></li>
+<li><a class="reference internal" href="#module-Stele.processing.processing_hsg">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -131,9 +131,9 @@
 <li class="toctree-l2"><a class="reference internal" href="Stele.processing.processing_hsg.pmt_collection.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Stele.processing.processing_hsg.pmt_collection.html#stele-processing-processing-hsg-pmt-collection-high-sideband-pmt-module">Stele.processing.processing_hsg.pmt_collection.high_sideband_pmt module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Stele.processing.processing_hsg.pmt_collection.html#stele-processing-processing-hsg-pmt-collection-high-sideband-pmt-old-module">Stele.processing.processing_hsg.pmt_collection.high_sideband_pmt_old module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Stele.processing.processing_hsg.pmt_collection.html#stele-processing-processing-hsg-pmt-collection-pmt-module">Stele.processing.processing_hsg.pmt_collection.pmt module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Stele.processing.processing_hsg.pmt_collection.html#module-Stele.processing.processing_hsg.pmt_collection.pmt">Stele.processing.processing_hsg.pmt_collection.pmt module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Stele.processing.processing_hsg.pmt_collection.html#stele-processing-processing-hsg-pmt-collection-time-trace-module">Stele.processing.processing_hsg.pmt_collection.time_trace module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Stele.processing.processing_hsg.pmt_collection.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Stele.processing.processing_hsg.pmt_collection.html#module-Stele.processing.processing_hsg.pmt_collection">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -142,11 +142,52 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="stele-processing-processing-hsg-helper-functions-module">
-<h2>Stele.processing.processing_hsg.helper_functions module<a class="headerlink" href="#stele-processing-processing-hsg-helper-functions-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-Stele.processing.processing_hsg.helper_functions">
+<span id="stele-processing-processing-hsg-helper-functions-module"></span><h2>Stele.processing.processing_hsg.helper_functions module<a class="headerlink" href="#module-Stele.processing.processing_hsg.helper_functions" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="Stele.processing.processing_hsg.helper_functions.fourier_prep">
+<code class="sig-prename descclassname">Stele.processing.processing_hsg.helper_functions.</code><code class="sig-name descname">fourier_prep</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x_vals</span></em>, <em class="sig-param"><span class="n">y_vals</span></em>, <em class="sig-param"><span class="n">num</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.processing.processing_hsg.helper_functions.fourier_prep" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will take a Nx2 array with unevenly spaced x-values and make
+them evenly spaced for use in fft-related things.</p>
+<p>And remove nans!</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.processing.processing_hsg.helper_functions.gauss">
+<code class="sig-prename descclassname">Stele.processing.processing_hsg.helper_functions.</code><code class="sig-name descname">gauss</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">p</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.processing.processing_hsg.helper_functions.gauss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gaussian fit function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>np.array</em><em>, or </em><em>int</em><em> or </em><em>float</em>) – The independent variable</p></li>
+<li><p><strong>p</strong> (<em>list of floats</em><em> or </em><em>ints</em>) – [mean, area, width, y offset] to be unpacked</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Depends on x, returns another np.array or float or int</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>type(x)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.processing.processing_hsg.helper_functions.handle_nans">
+<code class="sig-prename descclassname">Stele.processing.processing_hsg.helper_functions.</code><code class="sig-name descname">handle_nans</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y_vals</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.processing.processing_hsg.helper_functions.handle_nans" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function removes nans and replaces them with linearly interpolated
+values.  It requires that the array maps from equally spaced x-values.
+Taken from Stack Overflow: “Interpolate NaN values in a numpy array”</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.processing.processing_hsg.helper_functions.my_lambda">
+<code class="sig-prename descclassname">Stele.processing.processing_hsg.helper_functions.</code><code class="sig-name descname">my_lambda</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.processing.processing_hsg.helper_functions.my_lambda" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-Stele.processing.processing_hsg">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-Stele.processing.processing_hsg" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 

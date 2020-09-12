@@ -64,9 +64,9 @@
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">Stele.analysis.analysis_ipg.items package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#stele-analysis-analysis-ipg-items-dateaxis-module">Stele.analysis.analysis_ipg.items.DateAxis module</a></li>
-<li><a class="reference internal" href="#stele-analysis-analysis-ipg-items-polaraxisitem-module">Stele.analysis.analysis_ipg.items.PolarAxisItem module</a></li>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li><a class="reference internal" href="#module-Stele.analysis.analysis_ipg.items.DateAxis">Stele.analysis.analysis_ipg.items.DateAxis module</a></li>
+<li><a class="reference internal" href="#module-Stele.analysis.analysis_ipg.items.PolarAxisItem">Stele.analysis.analysis_ipg.items.PolarAxisItem module</a></li>
+<li><a class="reference internal" href="#module-Stele.analysis.analysis_ipg.items">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -114,14 +114,135 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="stele-analysis-analysis-ipg-items-dateaxis-module">
-<h2>Stele.analysis.analysis_ipg.items.DateAxis module<a class="headerlink" href="#stele-analysis-analysis-ipg-items-dateaxis-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-Stele.analysis.analysis_ipg.items.DateAxis">
+<span id="stele-analysis-analysis-ipg-items-dateaxis-module"></span><h2>Stele.analysis.analysis_ipg.items.DateAxis module<a class="headerlink" href="#module-Stele.analysis.analysis_ipg.items.DateAxis" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="Stele.analysis.analysis_ipg.items.DateAxis.DateAxis">
+<em class="property">class </em><code class="sig-prename descclassname">Stele.analysis.analysis_ipg.items.DateAxis.</code><code class="sig-name descname">DateAxis</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_ipg.items.DateAxis.DateAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pyqtgraph.graphicsItems.AxisItem.AxisItem</span></code></p>
+<dl class="py method">
+<dt id="Stele.analysis.analysis_ipg.items.DateAxis.DateAxis.drawPicture">
+<code class="sig-name descname">drawPicture</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p</span></em>, <em class="sig-param"><span class="n">axisSpec</span></em>, <em class="sig-param"><span class="n">tickSpecs</span></em>, <em class="sig-param"><span class="n">textSpecs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_ipg.items.DateAxis.DateAxis.drawPicture" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rotate the tick text labels to make them fit a little
+better.
+:param p:
+:type p: QtGui.QPainter
+:param axisSpec:
+:param tickSpecs:
+:param textSpecs:
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Stele.analysis.analysis_ipg.items.DateAxis.DateAxis.tickSpacing">
+<code class="sig-name descname">tickSpacing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">minVal</span></em>, <em class="sig-param"><span class="n">maxVal</span></em>, <em class="sig-param"><span class="n">size</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_ipg.items.DateAxis.DateAxis.tickSpacing" title="Permalink to this definition">¶</a></dt>
+<dd><p>I delcare that my desired possible spacings are every
+1s, 5s, 10s, 15s, 30s,
+1m, 5m, 10m, 15m, 30m,
+1h, 5h, 10h
+And hopefully no further than that?</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Stele.analysis.analysis_ipg.items.DateAxis.DateAxis.tickStrings">
+<code class="sig-name descname">tickStrings</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">values</span></em>, <em class="sig-param"><span class="n">scale</span></em>, <em class="sig-param"><span class="n">spacing</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_ipg.items.DateAxis.DateAxis.tickStrings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overwrite the default tickStrings to return
+the values in clock-time
+:param values:
+:param scale:
+:param spacing:
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="stele-analysis-analysis-ipg-items-polaraxisitem-module">
-<h2>Stele.analysis.analysis_ipg.items.PolarAxisItem module<a class="headerlink" href="#stele-analysis-analysis-ipg-items-polaraxisitem-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-Stele.analysis.analysis_ipg.items.PolarAxisItem">
+<span id="stele-analysis-analysis-ipg-items-polaraxisitem-module"></span><h2>Stele.analysis.analysis_ipg.items.PolarAxisItem module<a class="headerlink" href="#module-Stele.analysis.analysis_ipg.items.PolarAxisItem" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis">
+<em class="property">class </em><code class="sig-prename descclassname">Stele.analysis.analysis_ipg.items.PolarAxisItem.</code><code class="sig-name descname">PolarAxis</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">orientation</span></em>, <em class="sig-param"><span class="n">pen</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">linkView</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parent</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">maxTickLength</span><span class="o">=</span><span class="default_value">- 5</span></em>, <em class="sig-param"><span class="n">showValues</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">radialBounds</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">azimuthalBounds</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pyqtgraph.graphicsItems.AxisItem.AxisItem</span></code></p>
+<dl class="py method">
+<dt id="Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.boundingRect">
+<code class="sig-name descname">boundingRect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em><span class="sig-paren">)</span> &#x2192; QRectF<a class="headerlink" href="#Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.boundingRect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.drawPicture">
+<code class="sig-name descname">drawPicture</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p</span></em>, <em class="sig-param"><span class="n">opt</span></em>, <em class="sig-param"><span class="n">widget</span></em>, <em class="sig-param"><span class="n">axisSpec</span></em>, <em class="sig-param"><span class="n">tickSpecs</span></em>, <em class="sig-param"><span class="n">textSpecs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.drawPicture" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.generateDrawSpecs">
+<code class="sig-name descname">generateDrawSpecs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.generateDrawSpecs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls tickValues() and tickStrings() to determine where and how ticks should
+be drawn, then generates from this a set of drawing commands to be
+interpreted by drawPicture().</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.getAzimuthalLines">
+<code class="sig-name descname">getAzimuthalLines</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">rng</span></em>, <em class="sig-param"><span class="n">ang</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.getAzimuthalLines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Way too over-the-top rendering of lines to make them start and end at the bounds
+of the view rect
+:param rng:
+:param ang:
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.mouseClickEvent">
+<code class="sig-name descname">mouseClickEvent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.mouseClickEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.mouseDragEvent">
+<code class="sig-name descname">mouseDragEvent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">event</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.mouseDragEvent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.paint">
+<code class="sig-name descname">paint</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">QPainter</span></em>, <em class="sig-param"><span class="n">QStyleOptionGraphicsItem</span></em>, <em class="sig-param"><span class="n">widget</span><span class="p">:</span> <span class="n">QWidget</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.paint" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.tickSpacing">
+<code class="sig-name descname">tickSpacing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">minVal</span></em>, <em class="sig-param"><span class="n">maxVal</span></em>, <em class="sig-param"><span class="n">size</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.tickSpacing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return values describing the desired spacing and offset of ticks.</p>
+<p>This method is called whenever the axis needs to be redrawn and is a
+good method to override in subclasses that require control over tick locations.</p>
+<p>The return value must be a list of tuples, one for each set of ticks:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+    <span class="p">(</span><span class="n">major</span> <span class="n">tick</span> <span class="n">spacing</span><span class="p">,</span> <span class="n">offset</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">minor</span> <span class="n">tick</span> <span class="n">spacing</span><span class="p">,</span> <span class="n">offset</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">sub</span><span class="o">-</span><span class="n">minor</span> <span class="n">tick</span> <span class="n">spacing</span><span class="p">,</span> <span class="n">offset</span><span class="p">),</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.tickValues">
+<code class="sig-name descname">tickValues</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">minVal</span></em>, <em class="sig-param"><span class="n">maxVal</span></em>, <em class="sig-param"><span class="n">size</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_ipg.items.PolarAxisItem.PolarAxis.tickValues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the values and spacing of ticks to draw:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+    <span class="p">(</span><span class="n">spacing</span><span class="p">,</span> <span class="p">[</span><span class="n">major</span> <span class="n">ticks</span><span class="p">]),</span>
+    <span class="p">(</span><span class="n">spacing</span><span class="p">,</span> <span class="p">[</span><span class="n">minor</span> <span class="n">ticks</span><span class="p">]),</span>
+    <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>By default, this method calls tickSpacing to determine the correct tick locations.
+This is a good method to override in subclasses.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-Stele.analysis.analysis_ipg.items">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-Stele.analysis.analysis_ipg.items" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 

@@ -64,12 +64,12 @@
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">Stele.analysis.analysis_hsg package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#stele-analysis-analysis-hsg-collection-functions-module">Stele.analysis.analysis_hsg.collection_functions module</a></li>
-<li><a class="reference internal" href="#stele-analysis-analysis-hsg-complete-functions-module">Stele.analysis.analysis_hsg.complete_functions module</a></li>
+<li><a class="reference internal" href="#module-Stele.analysis.analysis_hsg.collection_functions">Stele.analysis.analysis_hsg.collection_functions module</a></li>
+<li><a class="reference internal" href="#module-Stele.analysis.analysis_hsg.complete_functions">Stele.analysis.analysis_hsg.complete_functions module</a></li>
 <li><a class="reference internal" href="#stele-analysis-analysis-hsg-fitting-functions-module">Stele.analysis.analysis_hsg.fitting_functions module</a></li>
-<li><a class="reference internal" href="#stele-analysis-analysis-hsg-helper-functions-module">Stele.analysis.analysis_hsg.helper_functions module</a></li>
-<li><a class="reference internal" href="#stele-analysis-analysis-hsg-smoothing-functions-module">Stele.analysis.analysis_hsg.smoothing_functions module</a></li>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li><a class="reference internal" href="#module-Stele.analysis.analysis_hsg.helper_functions">Stele.analysis.analysis_hsg.helper_functions module</a></li>
+<li><a class="reference internal" href="#module-Stele.analysis.analysis_hsg.smoothing_functions">Stele.analysis.analysis_hsg.smoothing_functions module</a></li>
+<li><a class="reference internal" href="#module-Stele.analysis.analysis_hsg">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -117,23 +117,539 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="stele-analysis-analysis-hsg-collection-functions-module">
-<h2>Stele.analysis.analysis_hsg.collection_functions module<a class="headerlink" href="#stele-analysis-analysis-hsg-collection-functions-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-Stele.analysis.analysis_hsg.collection_functions">
+<span id="stele-analysis-analysis-hsg-collection-functions-module"></span><h2>Stele.analysis.analysis_hsg.collection_functions module<a class="headerlink" href="#module-Stele.analysis.analysis_hsg.collection_functions" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.collection_functions.hsg_combine_qwp_sweep">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.collection_functions.</code><code class="sig-name descname">hsg_combine_qwp_sweep</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">loadNorm</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">save</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">skipOdds</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.collection_functions.hsg_combine_qwp_sweep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process polarimetry data into a matrix of sb strength, QWP angle, sb #.</p>
+<p>Given a path to data taken from rotating the QWP (doing polarimetry),
+process the data (fit peaks), and parse it into a matrix of sb strength vs
+QWP angle vs sb number.</p>
+<p>By default, saves the file into “Processed QWP Dependence”</p>
+<p>Return should be passed directly into fitting</p>
+<blockquote>
+<div><blockquote>
+<div><dl class="option-list">
+<dt><kbd><span class="option">-1</span></kbd></dt>
+<dd><div class="line-block">
+<div class="line">SB1    |  SB1 |    SB2    |  SB2 | … | … | SBn | SBn |</div>
 </div>
-<div class="section" id="stele-analysis-analysis-hsg-complete-functions-module">
-<h2>Stele.analysis.analysis_hsg.complete_functions module<a class="headerlink" href="#stele-analysis-analysis-hsg-complete-functions-module" title="Permalink to this headline">¶</a></h2>
+</dd>
+</dl>
+</div></blockquote>
+<p>angle1 | SB Strength <a href="#id2"><span class="problematic" id="id3">|SB err|SB Strength|SB Err|</span></a>
+angle2 |     …     |   .  |</p>
+<blockquote>
+<div><p>.</p>
+</div></blockquote>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> – Path to load</p></li>
+<li><p><strong>loadNorm</strong> – if true, load the normalized data</p></li>
+<li><p><strong>save</strong> – Save the processed file or not</p></li>
+<li><p><strong>verbose</strong> – </p></li>
+<li><p><strong>skipOdds</strong> – Passed on to save sweep; determine whether or not to save
+odd orders. Generally, odds are artifacts and I don’t want
+them messing up the data, so default to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.collection_functions.hsg_combine_spectra">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.collection_functions.</code><code class="sig-name descname">hsg_combine_spectra</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spectra_list</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.collection_functions.hsg_combine_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Smooshes an HSG spectrum together using stitch_hsg_dicts.</p>
+<p>This function is all about smooshing different parts of the same hsg
+spectrum together.  It takes a list of HighSidebandCCD spectra and turns
+the zeroth spec_step into a FullHighSideband object.  It then uses the
+function stitch_hsg_dicts over and over again for the smooshing.</p>
+<p>Input:
+spectra_list = list of HighSidebandCCD objects that have sideband spectra</p>
+<blockquote>
+<div><p>larger than the spectrometer can see.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>good_list = A list of FullHighSideband objects that have been combined as</dt><dd><p>much as can be.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>spectra_list</strong> (<em>List of HighSidebandCCD objects</em>) – randomly-ordered list of HSG spectra, some of which
+can be stitched together</p>
+</dd>
+</dl>
+<p>kwargs gets passed onto add_item
+:return: fully combined list of full hsg spectra.  No PMT business yet.
+:rtype: list of FullHighSideband</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.collection_functions.hsg_combine_spectra_arb_param">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.collection_functions.</code><code class="sig-name descname">hsg_combine_spectra_arb_param</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spectra_list</span></em>, <em class="sig-param"><span class="n">param_name</span><span class="o">=</span><span class="default_value">'series'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.collection_functions.hsg_combine_spectra_arb_param" title="Permalink to this definition">¶</a></dt>
+<dd><p>Smooshes like combine_spectra, but allows you to pick what is the “same”.</p>
+<p>This function is all about smooshing different parts of the same hsg
+spectrum together.  It takes a list of HighSidebandCCD spectra and turns
+the zeroth spec_step into a FullHighSideband object.  It then uses the
+function stitch_hsg_dicts over and over again for the smooshing.</p>
+<p>This is different than hsg_combine_spectra in that you pass which criteria
+distinguishes the files to be the “same”. Since it can be any arbitrary
+value, things won’t be exactly the same (field strength will never be
+identical between images). It will start with the first (lowest) spec step,
+then compare the number of images in the next step. Whichever has</p>
+<p>Input:
+spectra_list = list of HighSidebandCCD objects that have sideband spectra</p>
+<blockquote>
+<div><p>larger than the spectrometer can see.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>good_list = A list of FullHighSideband objects that have been combined as</dt><dd><p>much as can be.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>spectra_list</strong> (<em>list of HighSidebandCCD</em>) – randomly-ordered list of HSG spectra, some of which
+can be stitched together</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>fully combined list of full hsg spectra.  No PMT business yet.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of FullHighSideband</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.collection_functions.makeCurve">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.collection_functions.</code><code class="sig-name descname">makeCurve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eta</span></em>, <em class="sig-param"><span class="n">isVertical</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.collection_functions.makeCurve" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>eta</strong> – QWP retardance at the wavelength</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.collection_functions.pmt_sorter">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.collection_functions.</code><code class="sig-name descname">pmt_sorter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">folder_path</span></em>, <em class="sig-param"><span class="n">plot_individual</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.collection_functions.pmt_sorter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn a folder of PMT files into a list of HighSidebandPMT objects.</p>
+<p>This function will be fed a folder with a bunch of PMT data files in it.
+The folder should contain a bunch of spectra with at least one sideband in
+them, each differing by the series entry in the parameters dictionary.</p>
+<p>This function will return a list of HighSidebandPMT objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder_path</strong> (<em>str</em>) – Path to a folder containing a bunch of PMT data, can be
+part of a parameter sweep</p></li>
+<li><p><strong>plot_individual</strong> – Whether to plot each sideband itself</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of all the possible hsg pmt spectra, organized by series
+tag</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of HighSidebandPMT</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.collection_functions.proc_n_fit_qwp_data">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.collection_functions.</code><code class="sig-name descname">proc_n_fit_qwp_data</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">laserParams={}</em>, <em class="sig-param">wantedSBs=None</em>, <em class="sig-param">vertAnaDir=True</em>, <em class="sig-param">plot=False</em>, <em class="sig-param">save=False</em>, <em class="sig-param">plotRaw=&lt;function &lt;lambda&gt;&gt;</em>, <em class="sig-param">series=''</em>, <em class="sig-param">eta=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.collection_functions.proc_n_fit_qwp_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit a set of sideband data vs QWP angle to get the stoke’s parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – data in the form of the return of hsg_combine_qwp_sweep</p></li>
+<li><p><strong>laserParams</strong> – dictionary of the parameters of the laser, the angles
+and frequencies. See function for expected keys. I don’t think the
+errors are used (except for plotting?), or the wavelengths (but left in
+for potential future use (wavelength dependent stuff?))</p></li>
+<li><p><strong>wantedSBs</strong> – List of the wanted sidebands to fit out.</p></li>
+<li><p><strong>vertAnaDir</strong> – direction of the analzyer. True if vertical, false if
+horizontal.</p></li>
+<li><p><strong>plot</strong> – True/False to plot alpha/gamma/dop. Alternatively, a list of
+“a”, “g”, “d” to only plot selected ones</p></li>
+<li><p><strong>save</strong> – filename to save the files. Accepts BytesIO</p></li>
+<li><p><strong>plotRaw</strong> – callable that takes an index of the sb and sb number,
+returns true to plot the raw curve</p></li>
+<li><p><strong>series</strong> – a string to be put in the header for the origin files</p></li>
+<li><p><strong>eta</strong> – a function to call to calculate the desired retardance. Input
+will be the SB order.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>if saveStokes is in kwargs and False, it will not save the stokes</dt><dd><p>parameters, since I rarely actually use them.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.collection_functions.stitch_abs_results">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.collection_functions.</code><code class="sig-name descname">stitch_abs_results</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">main</span></em>, <em class="sig-param"><span class="n">new</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.collection_functions.stitch_abs_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-Stele.analysis.analysis_hsg.complete_functions">
+<span id="stele-analysis-analysis-hsg-complete-functions-module"></span><h2>Stele.analysis.analysis_hsg.complete_functions module<a class="headerlink" href="#module-Stele.analysis.analysis_hsg.complete_functions" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.complete_functions.create_full_spectra">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.complete_functions.</code><code class="sig-name descname">create_full_spectra</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">folder_path</span></em>, <em class="sig-param"><span class="n">skipLaser</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.complete_functions.create_full_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Given the folder path of raw data (where the PMT data is held in the</dt><dd><p>subfolder “PMT”), scale all the data to create a raw comb spectra.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>folder_path</strong> – </p></li>
+<li><p><strong>args</strong> – </p></li>
+<li><p><strong>kwargs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.complete_functions.proc_n_plotCCD">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.complete_functions.</code><code class="sig-name descname">proc_n_plotCCD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">folder_path</span></em>, <em class="sig-param"><span class="n">offset</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">plot</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">confirm_fits</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">keep_empties</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.complete_functions.proc_n_plotCCD" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will take a list of ccd files and process it completely.
+save_name is a tuple (file_base, folder_path)</p>
+<dl class="simple">
+<dt>keep_empties: If True, keep the HighSidebandCCD object in the list if no</dt><dd><p>sidebands are found. Else, cut it off.</p>
+</dd>
+</dl>
+<p>The cutoff of 8 is too high, but I don’t know what to change it to
+:rtype: list of HighSidebandCCD</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.complete_functions.proc_n_plotPMT">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.complete_functions.</code><code class="sig-name descname">proc_n_plotPMT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">folder_path</span></em>, <em class="sig-param"><span class="n">plot</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">confirm_fits</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">save</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.complete_functions.proc_n_plotPMT" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will take a pmt object, process it completely.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of HighSidebandPMT</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="stele-analysis-analysis-hsg-fitting-functions-module">
 <h2>Stele.analysis.analysis_hsg.fitting_functions module<a class="headerlink" href="#stele-analysis-analysis-hsg-fitting-functions-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="stele-analysis-analysis-hsg-helper-functions-module">
-<h2>Stele.analysis.analysis_hsg.helper_functions module<a class="headerlink" href="#stele-analysis-analysis-hsg-helper-functions-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-Stele.analysis.analysis_hsg.helper_functions">
+<span id="stele-analysis-analysis-hsg-helper-functions-module"></span><h2>Stele.analysis.analysis_hsg.helper_functions module<a class="headerlink" href="#module-Stele.analysis.analysis_hsg.helper_functions" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.helper_functions.convertTime">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.helper_functions.</code><code class="sig-name descname">convertTime</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timeStr</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.helper_functions.convertTime" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>The data file headers have the timestamp of data collection. Sometimes you</dt><dd><p>want to convert that to numbers for data’s sake, but I constantly
+forget the functions to convert it from the time-stamp string.
+So here you go.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>timeStr</strong> – the time as a string from the data file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>int of the time since the epoch</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.helper_functions.fvb_crr">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.helper_functions.</code><code class="sig-name descname">fvb_crr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">raw_array</span></em>, <em class="sig-param"><span class="n">offset</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">medianRatio</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">noiseCoeff</span><span class="o">=</span><span class="default_value">5</span></em>, <em class="sig-param"><span class="n">debugging</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.helper_functions.fvb_crr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove cosmic rays from a sequency of identical exposures
+:param raw_array: The array to be cleaned. Successive spectra should</p>
+<blockquote>
+<div><p>be the columns (i.e. 1600 x n) of the raw_array</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>offset</strong> – baseline to add to raw_array.
+Not used, but here if it’s needed in the future</p></li>
+<li><p><strong>medianRatio</strong> – Multiplier to the median when deciding a cutoff</p></li>
+<li><p><strong>noiseCoeff</strong> – Multiplier to the noise on the median
+May need changing for noisy data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.helper_functions.get_data_and_header">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.helper_functions.</code><code class="sig-name descname">get_data_and_header</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fname</span></em>, <em class="sig-param"><span class="n">returnOrigin</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.helper_functions.get_data_and_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a file to a raw data file, returns the data
+and the json decoded header.</p>
+<p>Can choose to return the origin header as well
+:param fname: Filename to open
+:return: data, header (dict)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.helper_functions.integrateData">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.helper_functions.</code><code class="sig-name descname">integrateData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">t1</span></em>, <em class="sig-param"><span class="n">t2</span></em>, <em class="sig-param"><span class="n">ave</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.helper_functions.integrateData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integrate a discrete data set for a
+given time period. Sums the data between
+the given bounds and divides by dt. Optional
+argument to divide by T = t2-t1 for calculating
+averages.</p>
+<p>data = 2D array. data[:,0] = t, data[:,1] = y
+t1 = start of integration
+t2 = end of integration</p>
+<p>if data is a NxM, with M&gt;=3, it will take the
+third column to be the errors of the points,
+and return the error as the quadrature sum</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.helper_functions.natural_glob">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.helper_functions.</code><code class="sig-name descname">natural_glob</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.helper_functions.natural_glob" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.helper_functions.save_parameter_sweep">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.helper_functions.</code><code class="sig-name descname">save_parameter_sweep</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spectrum_list</span></em>, <em class="sig-param"><span class="n">file_name</span></em>, <em class="sig-param"><span class="n">folder_str</span></em>, <em class="sig-param"><span class="n">param_name</span></em>, <em class="sig-param"><span class="n">unit</span></em>, <em class="sig-param"><span class="n">wanted_indices</span><span class="o">=</span><span class="default_value">[1, 3, 4]</span></em>, <em class="sig-param"><span class="n">skip_empties</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">header_dict</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">only_even</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.helper_functions.save_parameter_sweep" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will take a fully processed list of spectrum objects and
+slice Spectrum.sb_fits appropriately to get an output like:</p>
+<p>“Parameter”<a href="#id4"><span class="problematic" id="id5">|SB1 freq|err|SB1 amp|error|SB1 linewidth|error|SB2...|SBn...|</span></a>
+param1     |   .    |
+param2     |   .    |</p>
+<blockquote>
+<div><p>.</p>
+</div></blockquote>
+<p>Currently I’m thinking fuck the offset y0
+After constructing this large matrix, it will save it somewhere.</p>
+<p>Thus function has been update to pass a list of indices to slice for the
+return values</p>
+<dl class="simple">
+<dt>skip_empties: If False, will add a row of zeroes for the parameter even if</dt><dd><p>no sidebands are found. If True, will not add a line for that parameter</p>
+</dd>
+</dl>
+<p>only_even: don’t include odd orders in the saved sweep</p>
+<dl class="simple">
+<dt>[sb number, Freq (eV), Freq error (eV), Gauss area (arb.), Area error,</dt><dd><p>Gauss linewidth (eV), Linewidth error (eV)]</p>
+</dd>
+<dt>[    0    ,      1   ,        2,      ,        3         ,      4    ,</dt><dd><p>5           ,        6            ]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.helper_functions.save_parameter_sweep_no_sb">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.helper_functions.</code><code class="sig-name descname">save_parameter_sweep_no_sb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spectrum_list</span></em>, <em class="sig-param"><span class="n">file_name</span></em>, <em class="sig-param"><span class="n">folder_str</span></em>, <em class="sig-param"><span class="n">param_name</span></em>, <em class="sig-param"><span class="n">unit</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.helper_functions.save_parameter_sweep_no_sb" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function will take a fully processed list of spectrum objects and
+slice Spectrum.sb_fits appropriately to get an output like:</p>
+<p>“Parameter”<a href="#id6"><span class="problematic" id="id7">|SB1 freq|err|SB1 amp|error|SB1 linewidth|error|SB2...|SBn...|</span></a>
+param1     |   .    |
+param2     |   .    |</p>
+<blockquote>
+<div><p>.</p>
+</div></blockquote>
+<p>Currently I’m thinking fuck the offset y0
+After constructing this large matrix, it will save it somewhere.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.helper_functions.save_parameter_sweep_vs_sideband">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.helper_functions.</code><code class="sig-name descname">save_parameter_sweep_vs_sideband</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">spectrum_list</span></em>, <em class="sig-param"><span class="n">file_name</span></em>, <em class="sig-param"><span class="n">folder_str</span></em>, <em class="sig-param"><span class="n">param_name</span></em>, <em class="sig-param"><span class="n">unit</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">wanted_indices</span><span class="o">=</span><span class="default_value">[1, 3, 4]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.helper_functions.save_parameter_sweep_vs_sideband" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Similar to save_parameter_sweep, but the data[:,0] column is sideband</dt><dd><p>number instead of series, and each set of columns correspond to a
+series step. Pretty much compiles all of the fit parameters from the
+files that are already saved and puts it into</p>
+</dd>
+</dl>
+<p>one file to keep from polluting the Origin folder
+:param spectrum_list:
+:param file_name:
+:param folder_str:
+:param param_name:
+:param unit:
+:param verbose:</p>
+<p>sb number is automatically prepended, so do not include in slicing list</p>
+<dl class="simple">
+<dt>[sb number, Freq (eV), Freq error (eV), Gauss area (arb.), Area error,</dt><dd><p>Gauss linewidth (eV), Linewidth error (eV)]</p>
+</dd>
+<dt>[    0    ,      1   ,        2,      ,        3         ,      4    ,</dt><dd><p>5           ,        6            ]</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.helper_functions.stitchData">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.helper_functions.</code><code class="sig-name descname">stitchData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataList</span></em>, <em class="sig-param"><span class="n">plot</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.helper_functions.stitchData" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Attempt to stitch together absorbance data. Will translate the second data</dt><dd><p>set to minimize leastsq between the two data sets.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataList</strong> – Iterable of the data sets to be fit. Currently
+it only takes the first two elements of the list, but should be
+fairly straightforward to recursivly handle a list&gt;2. Shifts the
+second data set to overlap the first elements of dataList can be
+either np.arrays or Absorbance class, where it will take the
+proc_data itself.</p></li>
+<li><p><strong>plot</strong> – bool whether or not you want the fit iterations to be plotted
+(for debugging)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a, a (2,) np.array of the shift</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
-<div class="section" id="stele-analysis-analysis-hsg-smoothing-functions-module">
-<h2>Stele.analysis.analysis_hsg.smoothing_functions module<a class="headerlink" href="#stele-analysis-analysis-hsg-smoothing-functions-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-Stele.analysis.analysis_hsg.smoothing_functions">
+<span id="stele-analysis-analysis-hsg-smoothing-functions-module"></span><h2>Stele.analysis.analysis_hsg.smoothing_functions module<a class="headerlink" href="#module-Stele.analysis.analysis_hsg.smoothing_functions" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.smoothing_functions.band_pass_filter">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.smoothing_functions.</code><code class="sig-name descname">band_pass_filter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x_vals</span></em>, <em class="sig-param"><span class="n">y_vals</span></em>, <em class="sig-param"><span class="n">cutoff</span></em>, <em class="sig-param"><span class="n">inspectPlots</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.smoothing_functions.band_pass_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replicate origin directy
+<a class="reference external" href="http://www.originlab.com/doc/Origin-Help/Smooth-Algorithm">http://www.originlab.com/doc/Origin-Help/Smooth-Algorithm</a>
+“rotate” the data set so it ends at 0,
+enforcing a periodicity in the data. Otherwise
+oscillatory artifacts result at the ends</p>
+<p>This uses a 50th order Butterworth filter.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.smoothing_functions.fft_filter">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.smoothing_functions.</code><code class="sig-name descname">fft_filter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">cutoffFrequency</span><span class="o">=</span><span class="default_value">1520</span></em>, <em class="sig-param"><span class="n">inspectPlots</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">tryFitting</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">freqSigma</span><span class="o">=</span><span class="default_value">50</span></em>, <em class="sig-param"><span class="n">ftol</span><span class="o">=</span><span class="default_value">0.0001</span></em>, <em class="sig-param"><span class="n">isInteractive</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.smoothing_functions.fft_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs an FFT, then fits a peak in frequency around the
+input with the input width.
+If only data is given, it will cut off all frequencies above the</p>
+<blockquote>
+<div><p>default value.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>inspectPlots = True will plot the FFT and the filtering at each step,</dt><dd><p>as well as the results</p>
+</dd>
+<dt>tryFitting = True will try to fit the peak in frequency space centered</dt><dd><p>at the cutoffFrequency</p>
+</dd>
+<dt>and with a width of freqSigma, using the background function above. Will</dt><dd><p>replace the peak with the background function.
+Feature not very well tested.</p>
+</dd>
+<dt>isInteractive: Will pop up interactive windows to move the cutoff frequency</dt><dd><p>and view the FFT in real time. Requires pyqtgraph and PyQt4 installed
+(pyqt4 is standard with anaconda/winpython, but pyqtgraph is not)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.smoothing_functions.high_pass_filter">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.smoothing_functions.</code><code class="sig-name descname">high_pass_filter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x_vals</span></em>, <em class="sig-param"><span class="n">y_vals</span></em>, <em class="sig-param"><span class="n">cutoff</span></em>, <em class="sig-param"><span class="n">inspectPlots</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.smoothing_functions.high_pass_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replicate origin directy
+<a class="reference external" href="http://www.originlab.com/doc/Origin-Help/Smooth-Algorithm">http://www.originlab.com/doc/Origin-Help/Smooth-Algorithm</a>
+“rotate” the data set so it ends at 0,
+enforcing a periodicity in the data. Otherwise
+oscillatory artifacts result at the ends</p>
+<p>This uses a 50th order Butterworth filter.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Stele.analysis.analysis_hsg.smoothing_functions.savitzky_golay">
+<code class="sig-prename descclassname">Stele.analysis.analysis_hsg.smoothing_functions.</code><code class="sig-name descname">savitzky_golay</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">window_size</span></em>, <em class="sig-param"><span class="n">order</span></em>, <em class="sig-param"><span class="n">deriv</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">rate</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#Stele.analysis.analysis_hsg.smoothing_functions.savitzky_golay" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Smooth (and optionally differentiate) data with a</dt><dd><p>Savitzky-Golay filter.</p>
+</dd>
+</dl>
+<p>The Savitzky-Golay filter removes high frequency noise from data.
+It has the advantage of preserving the original shape and
+features of the signal better than other types of filtering
+approaches, such as moving averages techniques.
+Parameters
+———-
+y : array_like, shape (N,)</p>
+<blockquote>
+<div><p>the values of the time history of the signal.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>window_size<span class="classifier">int</span></dt><dd><p>the length of the window. Must be an odd integer number.</p>
+</dd>
+<dt>order<span class="classifier">int</span></dt><dd><p>the order of the polynomial used in the filtering.
+Must be less then <cite>window_size</cite> - 1.</p>
+</dd>
+<dt>deriv: int</dt><dd><p>the order of the derivative to compute
+(default = 0 means only smoothing)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>ys<span class="classifier">ndarray, shape (N)</span></dt><dd><p>the smoothed signal (or it’s n-th derivative).</p>
+</dd>
+</dl>
+<p>The Savitzky-Golay is a type of low-pass filter, particularly
+suited for smoothing noisy data. The main idea behind this
+approach is to make for each point a least-square fit with a
+polynomial of high order over a odd-sized window centered at
+the point.
+Examples
+——–
+t = np.linspace(-4, 4, 500)
+y = np.exp( -t**2 ) + np.random.normal(0, 0.05, t.shape)
+ysg = savitzky_golay(y, window_size=31, order=4)
+import matplotlib.pyplot as plt
+plt.plot(t, y, label=’Noisy signal’)
+plt.plot(t, np.exp(-t**2), ‘k’, lw=1.5, label=’Original signal’)
+plt.plot(t, ysg, ‘r’, label=’Filtered signal’)
+plt.legend()
+plt.show()
+References
+———-
+.. [1] A. Savitzky, M. J. E. Golay, Smoothing and Differentiation of</p>
+<blockquote>
+<div><p>Data by Simplified Least Squares Procedures. Analytical
+Chemistry, 1964, 36 (8), pp 1627-1639.</p>
+</div></blockquote>
+<dl class="footnote brackets">
+<dt class="label" id="id1"><span class="brackets">2</span></dt>
+<dd><p>Numerical Recipes 3rd Edition: The Art of Scientific Computing
+W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
+Cambridge University Press ISBN-13: 9780521880688</p>
+</dd>
+</dl>
+<p>source:
+<a class="reference external" href="http://scipy.github.io/old-wiki/pages/Cookbook/SavitzkyGolay">http://scipy.github.io/old-wiki/pages/Cookbook/SavitzkyGolay</a></p>
+</dd></dl>
+
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-Stele.analysis.analysis_hsg">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-Stele.analysis.analysis_hsg" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
