@@ -1,7 +1,7 @@
 import json
 import numpy as np
 import os
-from .CCD_collection import helperFunctions
+from . import helper_functions
 
 np.set_printoptions(linewidth=500)
 
@@ -115,5 +115,5 @@ class CCD(object):
 
         # Convert from nm to eV
         # self.ccd_data[:, 0] = 1239.84 / self.ccd_data[:, 0]
-        self.ccd_data[:, 0] = helperFunctions.photon_converter["nm"]["eV"](
+        self.ccd_data[:, 0] = helper_functions.photon_converter["nm"]["eV"](
             self.ccd_data[:, 0])
