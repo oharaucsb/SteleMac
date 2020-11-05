@@ -2,7 +2,7 @@ import os
 import glob
 import numpy as np
 import matplotlib.pyplot as plt
-import analysis_hsg.helper_functions as help
+import Stele.analysis.analysis_hsg.helper_functions as help
 
 np.set_printoptions(linewidth=500)
 
