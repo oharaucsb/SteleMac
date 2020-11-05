@@ -1,5 +1,5 @@
 import numpy as np
-import CCD_collection.HighSidebandCCD as HSCCD
+import ccd_collection.high_sideband_ccd as HSCCD
 
 np.set_printoptions(linewidth=500)
 

@@ -3,6 +3,8 @@ import glob
 import numpy as np
 import matplotlib.pyplot as plt
 import Stele.analysis.analysis_hsg.helper_functions as help
+import Stele.processing.processing_hsg.ccd_collection.high_sideband_ccd as \
+    hsccd
 
 np.set_printoptions(linewidth=500)
 
@@ -79,7 +81,7 @@ def proc_n_plotCCD(
         file_list = help.natural_glob(folder_path, '*seq_spectrum.txt')
     raw_list = []
     for fname in file_list:
-        raw_list.append(HighSidebandCCD(fname, spectrometer_offset=offset))
+        raw_list.append(hsccd.HighSidebandCCD(fname, spectrometer_offset=offset))
 
     index = 0
     for spectrum in raw_list:
@@ -162,7 +164,7 @@ def create_full_spectra(
     pmt = proc_n_plotPMT(os.path.join(folder_path, "PMT"))
 
     ccd_file_list = glob.glob(os.path.join(folder_path, '*seq_spectrum.txt'))
-    ccd_list = [HighSidebandCCD(fname) for fname in ccd_file_list]
+    ccd_list = [hsccd.HighSidebandCCD(fname) for fname in ccd_file_list]
 
     for pmtsb in sorted(pmt[0].sb_dict.keys()):
         if skipLaser and pmtsb == 0:
