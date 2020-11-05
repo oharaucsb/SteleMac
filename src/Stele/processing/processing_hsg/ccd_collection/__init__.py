@@ -13,7 +13,7 @@ likely needs to be broken down into 2, more likely 3-4 files.
 
 rewrite code to style
 """
-
+from . import ccd
 # from .Absorbance import *
 # from .CCD import *
 # from .HighSidebandCCD import *

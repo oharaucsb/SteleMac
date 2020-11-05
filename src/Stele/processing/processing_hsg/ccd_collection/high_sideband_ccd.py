@@ -5,7 +5,7 @@ import json
 import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
-from ccd import CCD
+from .ccd import CCD
 from processing.processing_hsg.helper_functions import gauss
 from ccd_collection.helper_functions import calc_laser_frequencies
 
