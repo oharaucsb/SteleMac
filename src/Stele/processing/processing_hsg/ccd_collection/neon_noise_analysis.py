@@ -1,12 +1,12 @@
 import os
 import errno
 import numpy as np
-from .CCD_collection import CCD
+from .ccd import CCD
 
 np.set_printoptions(linewidth=500)
 
 
-class NeonNoiseAnalysis(CCD.CCD):
+class NeonNoiseAnalysis(CCD):
     """
     This class is used to make handling neon calibration lines easier.
         It's not great.

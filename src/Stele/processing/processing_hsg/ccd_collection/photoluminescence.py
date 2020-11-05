@@ -1,8 +1,8 @@
 import numpy as np
-from .CCD_collection import CCD
+from .ccd import CCD
 
 
-class Photoluminescence(CCD.CCD):
+class Photoluminescence(CCD):
     def __init__(self, fname):
         """
         This object handles PL-type data. The only distinction from the parent
