@@ -1,6 +1,9 @@
 import numpy as np
-import hsganalysis.newhsganalysis as hsg
-import hsganalysis.QWPProcessing as qwp
+# import hsganalysis.newhsganalysis as hsg
+# import hsganalysis.QWPProcessing as qwp
+import Stele.processing.processing_qwp as qwp
+import Stele.analysis.analysis_hsg.helper_functions as hsg_help
+import Stele.analysis.analysis_hsg.collection_functions as hsg_collect
 from PyQt5 import QtWidgets
 
 """
@@ -12,7 +15,7 @@ how all of the data processing works.
 
 
 # Make a list of all the folders for this fan diagram
-datasets = hsg.natural_glob(r"FanData", "*")
+datasets = hsg_help.natural_glob(r"FanData", "*")
 # Which sidebands did you see? Data gets cropped so everything has these
 #   sidebands inclduded
 observedSidebands = np.arange(10, 32, 2)
@@ -25,13 +28,13 @@ saveFileName = "820nm_c123"
 
 # FanCompiler is a class which adds together the different \alpha and \gamma of
 # for different \alpha_NIR, and then turns it into a
-fanData = qwp.expFanCompiler.FanCompiler(observedSidebands)
+fanData = qwp.fan_compiler.FanCompiler(observedSidebands)
 
 for data in datasets:
     # Do the standard data processing
     # You should know from previous experiments how to call these functions
-    laserParams, rawData = hsg.hsg_combine_qwp_sweep(data)
-    _, fitDict = hsg.proc_n_fit_qwp_data(
+    laserParams, rawData = hsg_collect.hsg_combine_qwp_sweep(data)
+    _, fitDict = hsg_collect.proc_n_fit_qwp_data(
         rawData, vertAnaDir=False, laserParams=laserParams,
         wantedSbs=observedSidebands
         )
@@ -58,31 +61,31 @@ gammaData = np.genfromtxt(
 
 # Now we need to calculate the Jones matrices.
 # This is a
-J = qwp.extractMatrices.findJ(alphaData, gammaData)
+J = qwp.extract_matrices.findJ(alphaData, gammaData)
 
 # A lot of stuff can be done with this Jones matrix now....
 
 # Get the T matrix:
-T = qwp.extractMatrices.makeT(J, crystalAngle)
+T = qwp.extract_matrices.makeT(J, crystalAngle)
 
 # Either file can be saved:
 # (It's called saveT, but it works for any complex 2x2 matrix, including J).
-qwp.extractMatrices.saveT(
+qwp.extract_matrices.saveT(
     J, observedSidebands, "{}_JMatrix.txt".format(saveFileName)
     )
-qwp.extractMatrices.saveT(
+qwp.extract_matrices.saveT(
     T, observedSidebands, "{}_TMatrix.txt".format(saveFileName)
     )
 
 app = QtWidgets.QApplication([])
 
 # Interpolate all alpha and gamma from J
-resampledAlpha, resampledGamma = qwp.expFanCompiler.jonesToFans(
+resampledAlpha, resampledGamma = qwp.jones_to_fans.jonesToFans(
     observedSidebands, J
     )
 
 # Make Fan diagram
-f = qwp.fanDiagram.FanDiagram(resampledAlpha, resampledGamma)
+f = qwp.fan_diagram.FanDiagram(resampledAlpha, resampledGamma)
 f.setTitle(title=saveFileName, adjustBounds=False)
 f.show()
 app.exec_()
