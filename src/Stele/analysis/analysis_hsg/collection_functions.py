@@ -8,6 +8,7 @@ from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 import itertools as itt
 import analysis_hsg.complete_functions as hsg_complete
+import analysis_hsg.helper_functions as hsg_help
 
 np.set_printoptions(linewidth=500)
 
@@ -401,7 +402,7 @@ def hsg_combine_qwp_sweep(
                 # from back before I changed the name
                 keyName = "detectorHWP"
 
-            save_parameter_sweep(
+            hsg_help.save_parameter_sweep(
                 specs, [full, snip, norm], None, keyName, "deg",
                 wanted_indices=[3, 4],
                 header_dict={
@@ -418,7 +419,7 @@ def hsg_combine_qwp_sweep(
             else:
                 sbData, lAlpha, lGamma, nir, thz = getData(snip)
         else:
-            save_parameter_sweep(
+            hsg_help.save_parameter_sweep(
                 specs, os.path.basename(path), "Processed QWP Dependence",
                 "rotatorAngle", "deg", wanted_indices=[3, 4],
                 header_dict={
