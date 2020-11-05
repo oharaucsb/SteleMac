@@ -7,6 +7,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 import itertools as itt
+import analysis_hsg.complete_functions as hsg_complete
 
 np.set_printoptions(linewidth=500)
 
@@ -374,7 +375,8 @@ def hsg_combine_qwp_sweep(
         # TODO: correct control structure to not be reliant on Exception
     except Exception:
         # Do the processing on all the files
-        specs = proc_n_plotCCD(path, keep_empties=True, verbose=verbose)
+        specs = hsg_complete.proc_n_plotCCD(
+            path, keep_empties=True, verbose=verbose)
 
         for sp in specs:
             try:
