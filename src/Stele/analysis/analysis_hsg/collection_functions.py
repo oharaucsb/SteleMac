@@ -7,8 +7,8 @@ import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 import itertools as itt
-import analysis_hsg.complete_functions as hsg_complete
-import analysis_hsg.helper_functions as hsg_help
+import Stele.analysis.analysis_hsg.complete_functions as hsg_complete
+import Stele.analysis.analysis_hsg.helper_functions as hsg_help
 
 np.set_printoptions(linewidth=500)
 
