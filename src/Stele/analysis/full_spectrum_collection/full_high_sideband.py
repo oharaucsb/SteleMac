@@ -2,8 +2,8 @@ import os
 import errno
 import json
 import numpy as np
-from .full_spectrum_collection.full_spectrum import FullSpectrum
-from .full_spectrum_collection import helper_functions as helpers
+from .full_spectrum import FullSpectrum
+import helper_functions as helpers
 
 np.set_printoptions(linewidth=500)
 

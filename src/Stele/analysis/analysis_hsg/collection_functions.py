@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import itertools as itt
 import Stele.analysis.analysis_hsg.complete_functions as hsg_complete
 import Stele.analysis.analysis_hsg.helper_functions as hsg_help
+import Stele.analysis.full_spectrum_collection.full_high_sideband as fhs
 
 np.set_printoptions(linewidth=500)
 
@@ -79,7 +80,7 @@ def hsg_combine_spectra(spectra_list, verbose=False, **kwargs):
         except Exception:
             break
 
-        good_list.append(FullHighSideband(temp))
+        good_list.append(fhs.FullHighSideband(temp))
 
         counter = 1
         temp_list = list(spectra_list)
@@ -186,7 +187,7 @@ def hsg_combine_spectra_arb_param(
         if elem in already_added:
             continue
         already_added.add(elem)
-        good_list.append(FullHighSideband(elem))
+        good_list.append(fhs.FullHighSideband(elem))
 
         other_spec_steps = [v for k, v in list(spec_steps.items()) if
                             k != good_list[-1].parameters["spec_step"]]
