@@ -2,8 +2,8 @@ import os
 import errno
 import json
 import numpy as np
-from .ccd_collection.ccd import CCD
-from .ccd_collection.helper_functions import low_pass_filter
+from .ccd import CCD
+from .helper_functions import low_pass_filter
 
 np.set_printoptions(linewidth=500)
 
