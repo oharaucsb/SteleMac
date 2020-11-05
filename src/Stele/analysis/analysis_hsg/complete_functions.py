@@ -2,6 +2,7 @@ import os
 import glob
 import numpy as np
 import matplotlib.pyplot as plt
+import analysis_hsg.helper_functions as help
 
 np.set_printoptions(linewidth=500)
 
@@ -75,7 +76,7 @@ def proc_n_plotCCD(
     if isinstance(folder_path, list):
         file_list = folder_path
     else:
-        file_list = natural_glob(folder_path, '*seq_spectrum.txt')
+        file_list = help.natural_glob(folder_path, '*seq_spectrum.txt')
     raw_list = []
     for fname in file_list:
         raw_list.append(HighSidebandCCD(fname, spectrometer_offset=offset))
