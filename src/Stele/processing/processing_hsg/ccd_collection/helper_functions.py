@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.fftpack as fft
 import matplotlib.pyplot as plt
-from .processing_HSG import helperFunctions
+from Stele.processing.processing_hsg import helper_functions
 
 
 def calc_laser_frequencies(spec, nir_units="eV", thz_units="eV",
@@ -70,7 +70,7 @@ def low_pass_filter(x_vals, y_vals, cutoff, inspectPlots=True):
 
     This uses a 50th order Butterworth filter.
     """
-    x_vals, y_vals = helperFunctions.fourier_prep(x_vals, y_vals)
+    x_vals, y_vals = helper_functions.fourier_prep(x_vals, y_vals)
     if inspectPlots:
         plt.figure("Real Space")
         plt.plot(x_vals, y_vals, label="Non-nan Data")
