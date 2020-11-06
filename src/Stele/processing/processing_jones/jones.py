@@ -1,7 +1,7 @@
 from __future__ import division
 import numpy as np
-import numpy.exp as exp
-import numpy.pi as pi
+from numpy import exp
+from numpy import pi
 
 
 p0 = [0.5, 2, 90., 0.5]
