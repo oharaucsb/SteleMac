@@ -4,7 +4,7 @@ import json
 import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
-from Stele.processing.processing_HSG import helper_functions as procHSGHelp
+from Stele.processing.processing_hsg import helper_functions as procHSGHelp
 from .pmt import PMT
 from .high_sideband_pmt import HighSidebandPMT
 
