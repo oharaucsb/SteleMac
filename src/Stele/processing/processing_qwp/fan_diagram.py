@@ -1,11 +1,11 @@
 import numpy as np
 from PyQt5 import QtGui, QtCore, QtWidgets
-from Stele.ipg import PolarImageItem, PolarAxis
+from Stele.analysis.analysis_ipg import PolarImageItem, PolarAxis
 from pyqtgraph import GraphicsView, HistogramLUTWidget, \
     ViewBox, mkColor, TextItem, Point
-from .processing_QWP.fan_compiler import FanCompiler
-from .processing_QWP.extract_matrices import makeJfromT, loadT
-from .processing_QWP.jones_to_fans import jonesToFans
+from .fan_compiler import FanCompiler
+from .extract_matrices import makeJfromT, loadT
+from .jones_to_fans import jonesToFans
 
 
 class FanDiagram(QtGui.QWidget):

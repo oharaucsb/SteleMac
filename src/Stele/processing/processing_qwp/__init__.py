@@ -10,9 +10,11 @@ expFanCompiler broken into fanCompiler, fanCompilerWOStokes, jonesToFans,
 from . import create_fan_diagram
 from . import extract_matrices
 from . import fan_compiler_wo_stokes
-from . import fan_compiler
+# TODO: Correct fan_compiler imports in order to utilize
+# from . import fan_compiler
 from . import fan_diagram
-from . import interactive_j_matrix_extraction
+# TODO: fix interactive_j_matrix_extraction imports in order to use
+# from . import interactive_j_matrix_extraction
 from . import jones_to_fans
 from . import monte_carlo_t_matrices
 from . import polar_plot

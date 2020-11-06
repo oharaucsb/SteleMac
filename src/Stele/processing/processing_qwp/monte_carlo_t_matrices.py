@@ -1,6 +1,6 @@
 import numpy as np
 from joblib import Parallel, delayed, cpu_count
-from .expFanCompiler import FanCompiler
+from .fan_compiler import FanCompiler
 
 
 # TODO: unify this code into a single object

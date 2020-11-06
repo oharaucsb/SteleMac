@@ -1,6 +1,6 @@
 from __future__ import division
 import numpy as np
-import Stele.ipg as pg
+import Stele.analysis.analysis_ipg as pg
 
 
 def makePolarPlot():

@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import Stele as hsg
-from .processing_QWP.fan_compiler import FanCompiler
+from .fan_compiler import FanCompiler
 
 
 class FanCompilerWithoutStokes(object):

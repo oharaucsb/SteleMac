@@ -1,5 +1,5 @@
 import numpy as np
-from Stele.jones import JonesVector as JV
+from Stele.processing.processsing_jones.jones_vector import JonesVector as JV
 
 
 def jonesToFans(sbs, J, wantNIR=np.arange(-90, 90, 5)):

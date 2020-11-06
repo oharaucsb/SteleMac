@@ -1,5 +1,5 @@
 import numpy as np
-import Stele.ipg as pg
+import Stele.analysis.analysis_ipg as pg
 from scipy.optimize import minimize
 from PyQt5 import QtCore, QtWidgets
 from Stele import newhsganalysis
