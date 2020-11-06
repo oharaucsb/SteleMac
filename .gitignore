@@ -1,2 +1,3 @@
 # Built Documentation Files
 docs/build
+!**/__pycache__/
