@@ -1,4 +1,4 @@
 # Built Documentation Files
 docs/build
-# ALL nested Pychache
-!**/__pycache__/
+# ALL instances of __pychache__
+__pycache__/
