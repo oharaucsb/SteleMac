@@ -1,4 +1,4 @@
-from .fullSpectrum_collection.full_spectrum import FullSpectrum
+from .full_spectrum import FullSpectrum
 
 
 class FullAbsorbance(FullSpectrum):

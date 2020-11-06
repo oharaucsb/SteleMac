@@ -1,7 +1,7 @@
 import copy
 import numpy as np
-from .full_spectrum_collection.full_high_sideband import parse_sb_array
-from .processing.processing_hsg.pmt_collection.high_sideband_pmt \
+from .full_high_sideband import parse_sb_array
+from Stele.processing.processing_hsg.pmt_collection.high_sideband_pmt \
     import HighSidebandPMT
 
 

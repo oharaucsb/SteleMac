@@ -3,7 +3,7 @@ import errno
 import json
 import numpy as np
 from .full_spectrum import FullSpectrum
-import helper_functions as helpers
+from . import helper_functions as helpers
 
 np.set_printoptions(linewidth=500)
 
