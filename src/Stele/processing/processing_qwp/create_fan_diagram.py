@@ -1,6 +1,6 @@
 import numpy as np
 from PyQt5 import QtCore, QtGui, QtWidgets
-from Stele.ipg import PolarImagePlot
+from Stele.analysis.analysis_ipg import PolarImagePlot
 import Stele.analysis.analysis_ipg as pg
 
 

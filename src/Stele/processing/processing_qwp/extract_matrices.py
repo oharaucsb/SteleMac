@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.optimize import minimize
 
-from Stele.processing.processsing_jones.jones_vector import JonesVector as JV
+from Stele.processing.processing_jones.jones_vector import JonesVector as JV
 from .sb_state_getter import SbStateGetter
 from .fan_compiler import FanCompiler
 
