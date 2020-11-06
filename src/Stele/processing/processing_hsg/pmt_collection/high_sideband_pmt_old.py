@@ -4,9 +4,9 @@ import json
 import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
-from .processing.processing_HSG import helperFunctions as procHSGHelp
-from .PMT_collection.pmt import PMT
-from .PMT_collection.HighSidebandPMT import HighSidebandPMT
+from Stele.processing.processing_HSG import helper_functions as procHSGHelp
+from .pmt import PMT
+from .high_sideband_pmt import HighSidebandPMT
 
 np.set_printoptions(linewidth=500)
 

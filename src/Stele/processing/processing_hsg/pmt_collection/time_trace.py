@@ -1,5 +1,5 @@
-from .PMT_collection.pmt import PMT
-from .PMT_collection.HighSidebandPMT import HighSidebandPMT
+from .pmt import PMT
+from .high_sideband_pmt import HighSidebandPMT
 
 
 class TimeTrace(PMT):
