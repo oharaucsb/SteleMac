@@ -81,6 +81,10 @@ class JonesVector(object):
         self.vec = np.array([Ex, Ey])
 
     def __repr__(self):
+        """
+        This returns a string that is a vector representation of the Jones
+        Vector in the form r exp(it)
+        """
         st = '['
         if self.vec.ndim == 1:
             st += "\t" + ', '.join(["{:.3f} exp({:.3f}i)".format(
@@ -95,14 +99,23 @@ class JonesVector(object):
 
     @property
     def x(self):
+        """
+        Returns the component of the Jones vector along the x direction
+        """
         return self.horizontal_projection()[0]
 
     @property
     def y(self):
+        """
+        Returns the component of the Jones vector along the y direction
+        """
         return self.vertical_projection()[1]
 
     @property
     def delta(self):
+        """
+        Returns delta, the phase between Ey and Ex
+        """
         # v = self.vec[:,None,None]
         v = self.vec
         ang = np.angle(v, deg=True)
@@ -111,6 +124,9 @@ class JonesVector(object):
     # TODO: determine what pideg and degpi are meant to be and assign them
     @property
     def phi(self):
+        """
+        The angle of the Jones vector in the xy plane, ignoring any phases
+        """
         # v = self.vec[:,None,None]
         v = self.vec
         mag = np.abs(v)
@@ -118,6 +134,9 @@ class JonesVector(object):
 
     @property
     def alpha(self):
+        """
+        Returns alpha, the orientation angle, calculated from phi and delta.
+        """
         phi = self.phi * degpi
         delta = self.delta * degpi
 
@@ -133,6 +152,9 @@ class JonesVector(object):
 
     @property
     def gamma(self):
+        """
+        Returns gamma, the ellipticity angle, calculated from phi and delta.
+        """
         phi = self.phi * degpi
         delta = self.delta * degpi
 
@@ -141,6 +163,9 @@ class JonesVector(object):
 
     @property
     def oldalpha(self):
+        """
+        Deprecated method of calculating alpha, the orientation angle.
+        """
         # v = self.vec[:,None,None]
         v = self.vec
         ang = np.angle(v)
@@ -151,6 +176,9 @@ class JonesVector(object):
 
     @property
     def oldgamma(self):
+        """
+        Deprecated method of calculating gamma, the ellipticity angle.
+        """
         # v = self.vec[:,None,None]
         v = self.vec
         mag = np.abs(v)
@@ -204,10 +232,16 @@ class JonesVector(object):
         ret = self.apply_transformation(transform)
 
     def vertical_projection(self):
+        """
+        Projects the vector along the y axis
+        """
         m = [[0, 0], [0, 1]]
         return self.apply_transformation(m, update_state=False)
 
     def horizontal_projection(self):
+        """
+        Projects the vector along the x axis
+        """
         m = [[1, 0], [0, 0]]
         return self.apply_transformation(m, update_state=False)
 
@@ -297,6 +331,11 @@ class JonesVector(object):
         pass
 
     def to_Stokes(self):
+        """
+        I think this is supposed to give the stokes parameters from the x and
+        y components, but I don't recognize the equations used here. Especially
+        weird is the S0 component. 
+        """
         x = np.abs(self.x)**2 - np.abs(self.y)**2
         y = 2 * np.real(self.x*np.conj(self.y))
         z = 2 * np.imag(self.x*np.conj(self.y))
@@ -309,3 +348,4 @@ if __name__ == '__main__':
     a.to_Stokes()
     a = JonesVector(phi=np.arange(0, 90, 5), delta=np.ones(90/5))
     a.gamma
+    #What is this doing? Especially the a.gamma line

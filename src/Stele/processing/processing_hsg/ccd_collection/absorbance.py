@@ -126,7 +126,7 @@ class Absorbance(CCD):
         """
         This bad boy saves the absorption spectrum that has been manipulated.
 
-        Saves 100 lines of comments.
+        Saves 100 lines of comments to meet the Origin theme.
 
         :param file_name: The base name of the file to be saved
         :type file_name: str

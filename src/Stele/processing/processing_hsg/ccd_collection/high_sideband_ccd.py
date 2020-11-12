@@ -201,6 +201,10 @@ class HighSidebandCCD(CCD):
         return ret
 
     def __repr__(self):
+        """
+        This returns a string of filename, series, spectrometer step,
+        and the wavelengths of FEL and NIR lasers.
+        """
         base = """
             fname: {},
             Series: {series},

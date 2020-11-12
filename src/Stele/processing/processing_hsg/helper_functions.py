@@ -4,6 +4,9 @@ import scipy.interpolate as spi
 
 # Returns the indices where Trues reside
 def my_lambda(x):
+    """
+    Returns the indices where Trues reside
+    """
     return x.nonzero()[0]
 
 

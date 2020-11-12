@@ -232,6 +232,17 @@ def stitchData(dataList, plot=False):
         first, second = second, first
 
     def fitter(p, shiftable, immutable):
+        """
+        Defines the function used in spo.leastsq to stitch data
+
+        Input:
+        p = Tuple of the the shifts for x and y
+        shiftable = Data set that is being shifted
+        immutable = Data set that is not being shifted
+
+        Returns:
+        Array to be minimized by spo.leastsq
+        """
         # designed to over
 
         # Get the shifts

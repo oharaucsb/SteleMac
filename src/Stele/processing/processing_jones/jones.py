@@ -12,13 +12,23 @@ class AngleWrapper(object):
     Class which will force angles to be within the specified bounds
     """
     def __init__(self, mn, mx):
+        """
+        Sets the min and max angle which the class will force angles to be
+        within
+        """
         self._min = mn
         self._max = mx
 
     def __contains__(self, item):
+        """
+        Returns Boolean if item is within the bounds set in __init__
+        """
         return self._min < item < self._max
 
     def wrap(self, datum):
+        """
+        Wraps the datam to be within the bounds set by __init__
+        """
         bnd = (self._max - self._min)
         datum = np.array(datum)
         datum[datum > self._max] = abs(datum[datum > self._max]) - bnd
@@ -27,14 +37,24 @@ class AngleWrapper(object):
 
 
 def cos(x):
+    """
+    Performs cos(x) in degrees
+    """
     return np.cos(x * np.pi/180.)
 
 
 def sin(x):
+    """
+    Performs sin(x) in degrees
+    """
     return np.sin(x * np.pi/180.)
 
 
 def printMat(m):
+    """
+    This returns a string that is a vector representation of the Jones
+    matrix in the form r exp(it)
+    """
     print('[')
     if m.ndim == 1:
         print(
