@@ -1,0 +1,45 @@
+A useful set of guidelines to help keep the code nice, clear, and extendable
+These are in no particular order.
+
+- Use a linter with the requisite styles, currently Pep8, mccabe, pyflakes
+
+- This is the site for the Pep8 standard, it was made by people much smarter
+    than I in the ways of python and explains much of the reasoning for it.
+    https://www.python.org/dev/peps/pep-0008/
+
+- No seriously, read the Pep8 documentation. It was in part the basis for the
+    refactoring. If my code looks like I know python, it is because I just
+    followed what they did. The style will try to help you, but knowing why
+    to do these things, not just what to do, is invaluable.
+
+- PEP 290 is also incredibly helpful for modernization of code, though less so
+    with deprecation of python 2.X
+
+- Any included C like code should comply to PEP 7. None is currently present,
+    but it is useful in case this changes in the future.
+
+- Look through the PEP index when implementing something new to see if there
+    are helpful guidelines. While not forced, they tend to be filled with a
+    great deal of wisdom from professional python developers.
+
+- One object, one file. Keep objects in their own files with clear filenames
+
+- One file, one commit. Stage your changes so each commit clearly reflects the
+    changes made to the specific files it appears next to. This is incredibly
+    helpful for anyone trying to understand changes made to the code by reading
+    commits
+
+    Special note should be taken for moving a function or object from one file
+    to another, then it is appropriate to commit both files at once.
+
+    Similarly, if one action has been performed across multiple files, such as
+    updating a dependency being moved, that could appropriately be one commit.
+
+    Use your best judgment.
+
+- Have clear and informative commit messages.
+
+- If something seems unclear, read the documentation, if there is no
+    documentation, then firstly I am sorry, and secondly, please add some once
+    you feel you significantly understand the matter. Alternatively, if daring,
+    correct and update the code such that verbosity is no longer needed.

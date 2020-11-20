@@ -1,0 +1,4 @@
+# Built Documentation Files
+docs/build
+# ALL instances of __pychache__
+__pycache__/

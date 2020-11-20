@@ -62,7 +62,13 @@ Altogether, refactoring can follow a staged plan as follows
 |--Rewrite code once fitted to architecture with priorities roughly as follow
 |   |--break large objects such as hsg into smaller more manageable ones
 |   |--fit code to style, at minimum whitespace styling, noting other issues
+|   |  |--implement pep257 docstrings
+|   |  |--ensure consistent usage of spaces instead of tabs
+|   |  |--correct naming conventions to match PEP8 recommendations
+|   |  |  |-- ex package names from mixed_Case to lower_case
 |   |--update documentation to feature autodoc support, add new documentation
+|   |--rewrite redundant lines and egregiously complex objects
+|   |--perform basic testing to ensure import functionality
 |--Write tests for newly refactored code
 |   |--key hsg and QWP functions aiming for 100% unit testing
 |   |--general hsg and QWP functions aiming for 100% integration testing
