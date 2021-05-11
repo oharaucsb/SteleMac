@@ -16,12 +16,12 @@ setup(
     # ***package setup***
 
     # package name
-    name='Stele',
+    name='Stele-Sherwin_Group',
     # what version, pre release codes are 'anything' < 'final'
     # equivelat post finals, c = pre = preview = rc
     # post release codes are 'anything' > 'final'
     # thus 1.0 < 1.1a < 1.1pre < 1.1 < 1.1finally < 1.1g
-    version='0.1a2',
+    version='0.1b1',
     # what and where are the packages, conforms to src/ layout
     # calls setuptools member to automate this, allows setup.py auto update
     packages=find_namespace_packages(where='src'),
