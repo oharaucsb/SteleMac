@@ -1,0 +1,11 @@
+Metadata-Version: 2.1
+Name: Stele-Sherwin-Group
+Version: 0.1b1
+Summary: Monolithic python distribution to house ITST's HSG code.
+Home-page: https://github.com/C-S-Cannon/Stele
+Author: Cameron Cannon
+Author-email: c_cannon@ucsb.edu
+License: MIT
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3.5
