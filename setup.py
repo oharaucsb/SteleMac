@@ -51,7 +51,7 @@ setup(
         'jsonschema>=2.6.0',
         'matplotlib>=2.2.2',
         'numpy>=1.14.3',
-        'PyQt5==5.14.0',
+        'PyQt5>=5.14.0',
         'pyqtgraph==0.10.0',
         'scipy>=1.1.0'
         ],
