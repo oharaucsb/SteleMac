@@ -1,3 +1,4 @@
+LICENSE
 README.md
 setup.py
 src/Stele/__init__.py
@@ -8,6 +9,7 @@ src/Stele.egg-info/not-zip-safe
 src/Stele.egg-info/requires.txt
 src/Stele.egg-info/top_level.txt
 src/Stele/UI/__init__.py
+src/Stele/UI/_ui.py
 src/Stele/UI/draggablePlotWidget.py
 src/Stele/UI/mainWin_ui.py
 src/Stele/UI/qwpCompWin_ui.py
@@ -49,6 +51,8 @@ src/Stele/analysis/analysis_ipg/widgets/DelayEditor.py
 src/Stele/analysis/analysis_ipg/widgets/LabviewSlider.py
 src/Stele/analysis/analysis_ipg/widgets/doubleYPlot.py
 src/Stele/analysis/analysis_ipg/widgets/numberEdits.py
+src/Stele/analysis/analysis_tm/__init__.py
+src/Stele/analysis/analysis_tm/berry.py
 src/Stele/analysis/analysis_tm/theory_matrix.py
 src/Stele/analysis/full_spectrum_collection/__init__.py
 src/Stele/analysis/full_spectrum_collection/full_absorbance.py
