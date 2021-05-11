@@ -1,10 +1,9 @@
 from setuptools import find_namespace_packages, setup
-import sys
-sys.path.append("/Users/marketing/Documents/GitHub/Stele")
+
 # to understand how setuptools and many following commands work, see
 # https://setuptools.readthedocs.io/en/latest/setuptools.html
 
-setup.py(
+setup(
     # ***distribution metadata***
 
     url='https://github.com/C-S-Cannon/Stele',
