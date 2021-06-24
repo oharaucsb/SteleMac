@@ -489,7 +489,7 @@ def makeCurve(eta, isVertical):
 def proc_n_fit_qwp_data(
         data, laserParams=dict(), wantedSBs=None, vertAnaDir=True, plot=False,
         save=False, plotRaw=lambda sbidx, sbnum: False, series='', eta=None,
-        **kwargs
+        fourier=True, **kwargs
         ):
     """
     Fit a set of sideband data vs QWP angle to get the stoke's parameters.
@@ -587,83 +587,156 @@ def proc_n_fit_qwp_data(
             continue
         sbData = allSbData[1:, sbIdx]
         sbDataErr = allSbData[1:, sbIdx + 1]
-        p0 = [1, 1, 0, 0]
+        if fourier:
+            '''
+            We want to do Fourier Analysis
+            I've hard coded the maximum expected variance from QWP retardance
+            to be 5 degrees (converted to radians bc of small angle approx).
+            Not sure how to deal with the fact that this method leaves no
+            variance for the S3 paramter.
+            '''
+            f0 = 0
+            f2 = 0
+            f4 = 0
+            df0 = 0
+            df2 = 0
+            df4 = 0
+            for k in range(0, 16, 1):
+                f0 = f0 + allSbData[k+1, sbIdx]
+                f2 = f2 + allSbData[k+1, sbIdx]*np.exp(-1j*4*np.pi*k/16)
+                f4 = f4 + allSbData[k+1, sbIdx]*np.exp(-1j*8*np.pi*k/16)
+                df0 = df0 + allSbData[k+1, sbIdx+1]
+                df2 = df2 + allSbData[k+1, sbIdx+1]*np.exp(-1j*4*np.pi*k/16)
+                df4 = df4 + allSbData[k+1, sbIdx+1]*np.exp(-1j*8*np.pi*k/16)
 
-        etan = eta(sbNum)
-        try:
-            p, pcov = curve_fit(
-                makeCurve(etan, vertAnaDir), angles, sbData, p0=p0
+            phi = 5*2*np.pi/180
+            # Generate the Stokes parameters from the Fourier Components
+            S0 = (f0 - 2*f4.real)/(2*np.pi)
+            S1 = 2*f4.real/(np.pi)
+            S2 = -2*f4.imag/(np.pi)
+            S3 = f2.imag/(np.pi)
+            # For the Error Propagation, I say phi = 0 and dPhi = 2*phi
+            # (value set above)
+            d0 = np.sqrt(
+                    ((-2*f4.real)/(np.pi)*2*phi)**2 + (df0/(2*np.pi))**2 +
+                    (-df4.imag/np.pi)**2)
+            d1 = np.absolute(S1)*np.sqrt(
+                            (df4.real/f4.real)**2 + (2*phi/np.pi)**2)
+            d2 = np.absolute(S2)*np.sqrt(
+                            (df4.imag/f4.imag)**2 + (2*phi/np.pi)**2)
+            d3 = df2.imag/np.pi
+
+            # Calculate the alpha, gamma, DOP and errors from Stokes parameters
+            thisAlpha = np.arctan2(S2, S1)/2*180./np.pi
+            thisAlphaError = (np.sqrt(
+                              d2**2*S1**2+d1**2*S2**2) /
+                              (S1**2+S2**2)*180./np.pi)
+            thisGamma = np.arctan2(
+                            S3, np.sqrt(S1**2+S2**2))/2*180./np.pi
+            thisGammaError = np.sqrt(
+                                    (d3**2*(S1**2+S2**2)**2 +
+                                     (d1**2*S1**2+d2**2*S2**2)*S3**2) /
+                                     ((S1**2+S2**2)*(S1**2+S2**2+S3**2)**2)
+                                     )*180./np.pi
+            thisDOP = np.sqrt(S1**2 + S2 ** 2 + S3 ** 2) / S0
+            thisDOPerror = np.sqrt(
+                            ((d1**2*S0**2*S1**2+d0**2*(S1**2+S2**2+S3**2)**2 +
+                             S0**2*(d2**2*S2**2+d3**2*S3**2)) /
+                             (S0**4*(S1**2+S2**2+S3**2))))
+
+            # Append The stokes parameters and errors to the dictionary output.
+            sbFitsDict["S0"].append([sbNum, S0, d0])
+            sbFitsDict["S1"].append([sbNum, S1, d1])
+            sbFitsDict["S2"].append([sbNum, S2, d2])
+            sbFitsDict["S3"].append([sbNum, S3, d3])
+            sbFitsDict["alpha"].append([sbNum, thisAlpha, thisAlphaError])
+            sbFitsDict["gamma"].append([sbNum, thisGamma, thisGammaError])
+            sbFitsDict["DOP"].append([sbNum, thisDOP, thisDOPerror])
+            toAppend = [sbNum, S0, d0, S1, d1, S2, d2, S3, d3,
+                        thisAlpha, thisAlphaError, thisGamma, thisGammaError,
+                        thisDOP, thisDOPerror]
+            sbFits.append(toAppend)
+
+        # Otherwise we will do the normal fit
+        else:
+            p0 = [1, 1, 0, 0]
+
+            etan = eta(sbNum)
+            try:
+                p, pcov = curve_fit(
+                    makeCurve(etan, vertAnaDir), angles, sbData, p0=p0
+                    )
+            except ValueError:
+                # This is getting tossed around, especially when looking at
+                # noisy data, especially with the laser line, and it's fitting
+                # erroneous values.
+                # Ideally, I should be cutting this out and not even returning
+                # them, but that's immedaitely causing
+                p = np.nan*np.array(p0)
+                pcov = np.eye(len(p))
+
+            if plot and plotRaw(sbIdx, sbNum):
+                plt.figure("All Curves")
+                plt.errorbar(
+                    angles, sbData, sbDataErr, 'o-', name=f"{series}, {sbNum}")
+                fineAngles = np.linspace(angles.min(), angles.max(), 300)
+                plt.plot(fineAngles,
+                         makeCurve(etan, vertAnaDir)(fineAngles, *p))
+                plt.ylim(0, 1)
+                plt.xlim(0, 360)
+                plt.ylabel("Normalized Intensity")
+                plt.xlabel("QWP Angle (&theta;)")
+                print(f"\t{series} {sbNum}, p={p}")
+
+            # get the errors
+            d = np.sqrt(np.diag(pcov))
+            thisData = [sbNum] + list(p) + list(d)
+            d0, d1, d2, d3 = d
+            S0, S1, S2, S3 = p
+            # reorder so errors are after values
+            thisData = [thisData[i] for i in [0, 1, 5, 2, 6, 3, 7, 4, 8]]
+
+            sbFitsDict["S0"].append([sbNum, S0, d0])
+            sbFitsDict["S1"].append([sbNum, S1, d1])
+            sbFitsDict["S2"].append([sbNum, S2, d2])
+            sbFitsDict["S3"].append([sbNum, S3, d3])
+
+            # append alpha value
+            thisData.append(np.arctan2(S2, S1) / 2 * 180. / np.pi)
+            # append alpha error
+            variance = \
+                (d2 ** 2 * S1 ** 2 + d1 ** 2 * S2 ** 2) \
+                / (S1 ** 2 + S2 ** 2) ** 2
+            thisData.append(np.sqrt(variance) * 180. / np.pi)
+
+            sbFitsDict["alpha"].append([sbNum, thisData[-2], thisData[-1]])
+
+            # append gamma value
+            thisData.append(
+                np.arctan2(S3, np.sqrt(S1 ** 2 + S2 ** 2)) / 2 * 180. / np.pi)
+            # append gamma error
+            variance = (
+                d3 ** 2 * (S1 ** 2 + S2 ** 2) ** 2
+                + (d1 ** 2 * S1 ** 2 + d2 ** 2 * S2 ** 2) * S3 ** 2
+                ) \
+                / ((S1 ** 2 + S2 ** 2) * (S1 ** 2 + S2 ** 2 + S3 ** 2) ** 2)
+            thisData.append(np.sqrt(variance) * 180. / np.pi)
+            sbFitsDict["gamma"].append([sbNum, thisData[-2], thisData[-1]])
+
+            # append degree of polarization
+            thisData.append(np.sqrt(S1 ** 2 + S2 ** 2 + S3 ** 2) / S0)
+            variance = (
+                (
+                    d1 ** 2 * S0 ** 2 * S1 ** 2
+                    + d0 ** 2 * (S1 ** 2 + S2 ** 2 + S3 ** 2) ** 2
+                    + S0 ** 2 * (d2 ** 2 * S2 ** 2 + d3 ** 2 * S3 ** 2)
                 )
-        except ValueError:
-            # This is getting tossed around, especially when looking at noisy
-            # data, especially with the laser line, and it's fitting erroneous
-            # values.
-            # Ideally, I should be cutting this out and not even returning
-            # them, but that's immedaitely causing
-            p = np.nan*np.array(p0)
-            pcov = np.eye(len(p))
-
-        if plot and plotRaw(sbIdx, sbNum):
-            plt.figure("All Curves")
-            plt.errorbar(
-                angles, sbData, sbDataErr, 'o-', name=f"{series}, {sbNum}")
-            fineAngles = np.linspace(angles.min(), angles.max(), 300)
-            plt.plot(fineAngles, makeCurve(etan, vertAnaDir)(fineAngles, *p))
-            plt.ylim(0, 1)
-            plt.xlim(0, 360)
-            plt.ylabel("Normalized Intensity")
-            plt.xlabel("QWP Angle (&theta;)")
-            print(f"\t{series} {sbNum}, p={p}")
-
-        # get the errors
-        d = np.sqrt(np.diag(pcov))
-        thisData = [sbNum] + list(p) + list(d)
-        d0, d1, d2, d3 = d
-        S0, S1, S2, S3 = p
-        # reorder so errors are after values
-        thisData = [thisData[i] for i in [0, 1, 5, 2, 6, 3, 7, 4, 8]]
-
-        sbFitsDict["S0"].append([sbNum, S0, d0])
-        sbFitsDict["S1"].append([sbNum, S1, d1])
-        sbFitsDict["S2"].append([sbNum, S2, d2])
-        sbFitsDict["S3"].append([sbNum, S3, d3])
-
-        # append alpha value
-        thisData.append(np.arctan2(S2, S1) / 2 * 180. / np.pi)
-        # append alpha error
-        variance = \
-            (d2 ** 2 * S1 ** 2 + d1 ** 2 * S2 ** 2) \
-            / (S1 ** 2 + S2 ** 2) ** 2
-        thisData.append(np.sqrt(variance) * 180. / np.pi)
-
-        sbFitsDict["alpha"].append([sbNum, thisData[-2], thisData[-1]])
-
-        # append gamma value
-        thisData.append(
-            np.arctan2(S3, np.sqrt(S1 ** 2 + S2 ** 2)) / 2 * 180. / np.pi)
-        # append gamma error
-        variance = (
-            d3 ** 2 * (S1 ** 2 + S2 ** 2) ** 2
-            + (d1 ** 2 * S1 ** 2 + d2 ** 2 * S2 ** 2) * S3 ** 2
-            ) \
-            / ((S1 ** 2 + S2 ** 2) * (S1 ** 2 + S2 ** 2 + S3 ** 2) ** 2)
-        thisData.append(np.sqrt(variance) * 180. / np.pi)
-        sbFitsDict["gamma"].append([sbNum, thisData[-2], thisData[-1]])
-
-        # append degree of polarization
-        thisData.append(np.sqrt(S1 ** 2 + S2 ** 2 + S3 ** 2) / S0)
-        variance = (
-            (
-                d1 ** 2 * S0 ** 2 * S1 ** 2
-                + d0 ** 2 * (S1 ** 2 + S2 ** 2 + S3 ** 2) ** 2
-                + S0 ** 2 * (d2 ** 2 * S2 ** 2 + d3 ** 2 * S3 ** 2)
+                / (S0 ** 4 * (S1 ** 2 + S2 ** 2 + S3 ** 2))
             )
-            / (S0 ** 4 * (S1 ** 2 + S2 ** 2 + S3 ** 2))
-        )
-        thisData.append(np.sqrt(variance))
-        sbFitsDict["DOP"].append([sbNum, thisData[-2], thisData[-1]])
+            thisData.append(np.sqrt(variance))
+            sbFitsDict["DOP"].append([sbNum, thisData[-2], thisData[-1]])
 
-        sbFits.append(thisData)
+            sbFits.append(thisData)
 
     sbFits = np.array(sbFits)
     sbFitsDict = {k: np.array(v) for k, v in sbFitsDict.items()}
@@ -674,7 +747,9 @@ def proc_n_fit_qwp_data(
         + 'alpha,alpha err,gamma,gamma err,DOP,DOP err\n'
     origin_header += 'Order,arb.u,arb.u,arb.u,arb.u,arb.u,arb.u,arb.u,' \
         + 'arb.u,deg,deg,deg,deg,arb.u.,arb.u.\n'
-    origin_header += 'Sideband,{},{},{},{},{},{},{},{},{},{},{},{},{},{}'.format(*["{}".format(series)] * 14)
+    sbform = 'Sideband,{},{},{},{},{},{},{},{},{},{},{},{},{},{}'.format(
+                *["{}".format(series)] * 14)
+    origin_header += sbform
     sbFits = sbFits[sbFits[:, 0].argsort()]
 
     if isinstance(save, str):
