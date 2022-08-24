@@ -359,7 +359,7 @@ class HighSidebandCCD(CCD):
         # one's noisy or something, so we keep looking after skipping one
         consecutive_null_sb = 0
         consecutive_null_odd = 0
-        no_more_odds = False
+        no_more_odds = True
         break_condition = False
         for order in range(order_init - 1, min_sb - 1, -1):
             # Check to make sure we're not looking at an odd when
@@ -475,7 +475,7 @@ class HighSidebandCCD(CCD):
         index_guess = global_max
         consecutive_null_sb = 0
         consecutive_null_odd = 0
-        no_more_odds = False
+        no_more_odds = True
         break_condition = False
         for order in range(order_init + 1, max_sb + 1):
             if no_more_odds is True and order % 2 == 1:

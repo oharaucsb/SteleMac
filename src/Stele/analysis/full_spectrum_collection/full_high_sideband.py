@@ -81,7 +81,43 @@ class FullHighSideband(FullSpectrum):
         if (arr[0, sbarr.SBNUM] > 0 and arr[1, sbarr.SBNUM] > 0 and
             # and the fact the area is less
                 arr[0, sbarr.AREA] < arr[1, sbarr.AREA]):
+            # print('BEFORE')
+            # print(arr)
             arr = arr[1:]
+            # print('AFTER')
+            # print(arr)
+
+        full_dict = {}
+        for sb in arr:
+            full_dict[sb[0]] = np.asarray(sb[1:])
+        return full_dict, arr
+
+    def remove_sp_sb(arr, spn):
+        """
+        When you know that a given sb order is caught in the short pass filter
+        use this to remove it. Right now only works with one sideband order in
+        the shortpass, but could be generalized to more later simply by using a
+        for loop. But I'm not doing that now because I honestly don't think we
+        will be taking spectra with two sb's in the shortpass anytime soon.
+
+        We cut it out to prevent it from itnerfering with calculating overlaps
+        :param arr:
+        :param spn: order of sideband caught in short pass.
+        :return:
+        """
+        arr = np.array(arr)
+
+        # make sure they're both pos
+        if spn in arr[:, sbarr.SBNUM]:
+            # print('BEFORE')
+            # print(arr)
+            spidx = np.where(arr[:, sbarr.SBNUM] == spn)[0]
+            # takes index where spn
+            arrlen = len(arr)
+            arridx = np.delete(np.arange(arrlen), spidx)
+            arr = arr[arridx]
+            # print('AFTER')
+            # print(arr)
 
         full_dict = {}
         for sb in arr:
@@ -125,13 +161,15 @@ class FullHighSideband(FullSpectrum):
                     ccd_object.parameters["series"],
                     ccd_object.parameters["spec_step"]))
 
-    def add_PMT(self, pmt_object, verbose=False):
+    def add_PMT(self, pmt_object, verbose=False, spn=None):
         """
         This method will be called by the stitch_hsg_results function to add
         the PMT data to the spectrum.
+
+        spn is the order of a CCD sideband caught in the short pass filter
         """
         self.full_dict = helpers.stitch_hsg_dicts(
-            pmt_object, self, need_ratio=True, verbose=verbose)
+            pmt_object, self, need_ratio=True, verbose=verbose, spn=spn)
         self.parameters['files_here'].append(
             pmt_object.parameters['files included'])
         self.make_results_array()

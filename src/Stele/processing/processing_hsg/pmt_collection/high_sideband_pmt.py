@@ -1,11 +1,12 @@
 import os
 import errno
 import json
+import glob
 import numpy as np
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
 from Stele.processing.processing_hsg import helper_functions as procHSGHelp
-from .pmt import PMT
+from Stele.processing.processing_hsg.pmt_collection.pmt import PMT
 
 np.set_printoptions(linewidth=500)
 
@@ -465,3 +466,63 @@ class HighSidebandPMT(PMT):
         if verbose:
             print("Saved PMT spectrum.\nDirectory: {}".format(
                 os.path.join(folder_str, spectra_fname)))
+
+
+def pmt_sorter(folder_path, plot_individual=True):
+    """
+    Turn a folder of PMT files into a list of HighSidebandPMT objects.
+
+    This function will be fed a folder with a bunch of PMT data files in it.
+    The folder should contain a bunch of spectra with at least one sideband in
+    them, each differing by the series entry in the parameters dictionary.
+
+    This function will return a list of HighSidebandPMT objects.
+
+    :param folder_path: Path to a folder containing a bunch of PMT data, can be
+                        part of a parameter sweep
+    :type folder_path: str
+    :param plot_individual: Whether to plot each sideband itself
+    :return: A list of all the possible hsg pmt spectra, organized by series
+        tag
+    :rtype: list of HighSidebandPMT
+
+    """
+    file_list = glob.glob(os.path.join(folder_path, '*[0-9].txt'))
+
+    pmt_list = []
+
+    plot_sb = lambda x: None
+
+    if plot_individual:
+        plt.figure("PMT data")
+
+        def plot_sb(spec):
+            spec = copy.deepcopy(spec)
+            spec.process_sidebands()
+            elem = spec.sb_dict[spec.initial_sb]
+            plt.errorbar(
+                elem[:, 0], elem[:, 1], elem[:, 2],
+                marker='o',
+                label="{} {}, {}.{} ".format(
+                    spec.parameters["series"], spec.initial_sb,
+                    spec.parameters["pm_hv"],
+                    't' if spec.parameters.get(
+                        "photon counted", False) else 'f')
+                )
+
+    for sb_file in file_list:
+        temp = HighSidebandPMT(sb_file)
+        plot_sb(temp)
+        try:
+            for pmt_spectrum in pmt_list:  # pmt_spectrum is a pmt object
+                if temp.parameters['series'] \
+                        == pmt_spectrum.parameters['series']:
+                    pmt_spectrum.add_sideband(temp)
+                    break
+            else:  # this will execute IF the break was NOT called
+                pmt_list.append(temp)
+        except Exception:
+            pmt_list.append(temp)
+    for pmt_spectrum in pmt_list:
+        pmt_spectrum.process_sidebands()
+    return pmt_list

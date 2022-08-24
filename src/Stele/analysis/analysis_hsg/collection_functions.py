@@ -476,7 +476,7 @@ def makeCurve(eta, isVertical):
                 + S1/2*(np.cos(eta)-1)*cosd(4*x) \
                 + S2/2*(np.cos(eta)-1)*sind(4*x)
     else:
-        # vertical polarizer
+        # horizontal polarizer
         def analyzerCurve(x, *S):
             S0, S1, S2, S3 = S
             return S0+S1/2*(1+np.cos(eta)) \

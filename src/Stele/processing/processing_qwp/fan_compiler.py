@@ -64,7 +64,7 @@ class FanCompiler(object):
         # different reference frames
         self._n = 1
         if negateNIR:
-            print("WARNING: NEGATING NIR ALPHA")
+            print("WARNING: NEGATING NIR ALPHA AND GAMMA")
             self._n = -1
 
     @staticmethod
@@ -115,7 +115,7 @@ class FanCompiler(object):
         if self._e:
             # keep track of the errors in everything
             nirAlpha = [self._n*dataSet["alpha"][0][1], dataSet["alpha"][0][2]]
-            nirGamma = [dataSet["gamma"][0][1], dataSet["gamma"][0][2]]
+            nirGamma = [self._n*dataSet["gamma"][0][1], dataSet["gamma"][0][2]]
             for sb in self.want:
                 # the list(*[]) bullshit is to make sure a list gets appended,
                 # not a numpy array. Further complicated because if the list
@@ -135,7 +135,7 @@ class FanCompiler(object):
             # Even though it's a single number each, put them in lists so they
             # can be list.extended() and consistent with the error usage above
             nirAlpha = [self._n*dataSet["alpha"][0][1]]
-            nirGamma = [dataSet["gamma"][0][1]]
+            nirGamma = [self._n*dataSet["gamma"][0][1]]
             for sb in self.want:
                 # Even though only one element is being kept (i.e. data without
                 # error), it's still being placed inside a list to be

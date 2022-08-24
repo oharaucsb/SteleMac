@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import Stele.analysis.analysis_hsg.helper_functions as help
 import Stele.processing.processing_hsg.ccd_collection.high_sideband_ccd as \
     hsccd
+# from Stele.analysis.analysis_hsg.collection_functions import pmt_sorter
+from Stele.processing.processing_hsg.pmt_collection.high_sideband_pmt import (
+    pmt_sorter)
 
 np.set_printoptions(linewidth=500)
 

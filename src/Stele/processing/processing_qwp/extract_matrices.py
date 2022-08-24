@@ -139,7 +139,7 @@ def findJ(alphas, gammas=None, **kwargs):
     nirGammas = gammas[0, 1:]
     # This SbStateGetter makes it more convenient to get the alpha and gamma
     # angles for a specific sideband and NIR alpha
-    sbGetter = SbStateGetter(alphas[1:, 1:], gammas[1:, 1:], sbs, nirAlphas)
+    # sbGetter = SbStateGetter(alphas[1:, 1:], gammas[1:, 1:], sbs, nirAlphas)
 
     # Initialize the matrices
     outputFlatJMatrix = np.empty((len(sbs), 9))
@@ -149,7 +149,12 @@ def findJ(alphas, gammas=None, **kwargs):
     # iterate over each sideband
     for idx, sb in enumerate(sbs):
         # Get a list of alpha and gamma angles for each of the NIR Alphas used
-        als, gms = zip(*[sbGetter(sb, ii) for ii in nirAlphas])
+        # als, gms = zip(*[sbGetter(sb, ii) for ii in nirAlphas])
+        als = alphas[idx+1, 1:]
+        gms = gammas[idx+1, 1:]
+        # print('Sideband: ', sb)
+        # print('Extraction Alphas: ', als)
+        # print('Extraction Gammas: ', gms)
         # Check to make sure all of the data is reasonable (not nan, meaning
         # the sideband wasn't observed for all NIRalpha, or infinite when the
         # fits fucked up)
@@ -219,9 +224,12 @@ def saveT(T, sbs, out):
     header = "SB,ReT++,ReT+-,ReT-+,ReT--,Im++,Im+-,Im-+,Im--"
 
     header = "SB,ReT--,ImT--,ReT+-,ImT+-,ReT-+,ImT-+,ReT++,ImT++"
+    # np.savetxt(out,
+    #            flatT, header=header, comments='', delimiter=',',
+    #            fmt="%.6f")
     np.savetxt(out,
                flatT, header=header, comments='', delimiter=',',
-               fmt="%.6f")
+               )  # Doing this to make scaling work better
     print("saved {}\n".format(out))
 
 

@@ -10,9 +10,8 @@ def J_T_proc(file, observedSidebands, crystalAngle, saveFileName,
              save_results=False, Plot=False, keepErrors=False):
     """
     This function will take a folder of polarimetry scans and produce
-    DOP, alpha/gamma, J and T matrices, and Matrix Relations This is the same
-    as fan_n_Tmat but doesn't create the fan itself. Otherwise creates pretty
-    much everything one would need.
+    DOP, alpha/gamma, J and T matrices, and Matrix Relations.
+    Otherwise creates pretty much everything one would need.
 
     :param file: String of folder name containing 4 polarimetry scans
     :param observedSidebands: np array of observed sidebands. Data will be
@@ -120,7 +119,7 @@ def J_T_proc(file, observedSidebands, crystalAngle, saveFileName,
         MatalphaData = alphaData
         MatgammaData = gammaData
 
-    J = extmat.findJ(MatalphaData, MatgammaData)
+    J = extmat.findJ(MatalphaData, gammas=MatgammaData)
 
     # Get the T matrix:
     T = extmat.makeT(J, crystalAngle)

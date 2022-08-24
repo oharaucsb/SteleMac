@@ -177,7 +177,7 @@ def stitch_hsg_dicts_old(full, new_dict, need_ratio=False, verbose=False):
 
 def stitch_hsg_dicts(
  full_obj, new_obj, need_ratio=False, verbose=False, ratios=[1, 1],
- override_ratio=False, ignore_weaker_lowers=True):
+ override_ratio=False, ignore_weaker_lowers=True, spn=None):
     """
     This helper function takes a FullHighSideband and a sideband object, either
     CCD or PMT and smushes the new sb_results into the full_dict.
@@ -231,6 +231,8 @@ def stitch_hsg_dicts(
     ignore_weaker_lowers: Sometimes, a SB is in the short pass filter so a
         lower order is weaker than the next highest. If True, causes script to
         ignore all sidebands which are weaker and lower order.
+    spn: One integer that identifies a sideband caught in the short pass filter
+    of the CCD.
 
     Returns:
     full = extended version of the input full.  Overlapping sidebands are
@@ -252,15 +254,20 @@ def stitch_hsg_dicts(
     # where it's possible that the sidebands might not be monotonic
     # (from noise?)
     if ignore_weaker_lowers:
-        full_obj.full_dict, full_obj.sb_results = (
-            fhs.parse_sb_array(full_obj.sb_results))
+        # full_obj.full_dict, full_obj.sb_results = (
+        #     fhs.FullHighSideband.parse_sb_array(full_obj.sb_results))
+        # new_obj.new_dict, new_obj.sb_results = (
+        #     fhs.FullHighSideband.parse_sb_array(new_obj.sb_results))
         new_obj.new_dict, new_obj.sb_results = (
-            fhs.parse_sb_array(new_obj.sb_results))
+            fhs.FullHighSideband.remove_sp_sb(new_obj.sb_results, spn))
+
 
     # was messing around with references and causing updates to arrays when
     # it shouldn't be
     full = copy.deepcopy(full_obj.full_dict)
-    new_dict = copy.deepcopy(new_obj.full_dict)
+    new_dict = copy.deepcopy(new_obj.new_dict)
+    # Ok not really sure why new_obj has 2 dictionaries, but this should make
+    #   it so that the proper sidebands are actually cut.
 
     # Force a rescaling if you've passed a specified parameter
     # if isinstance(override_ratio, float):

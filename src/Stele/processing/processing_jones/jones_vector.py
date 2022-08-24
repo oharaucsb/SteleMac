@@ -334,7 +334,7 @@ class JonesVector(object):
         """
         I think this is supposed to give the stokes parameters from the x and
         y components, but I don't recognize the equations used here. Especially
-        weird is the S0 component. 
+        weird is the S0 component.
         """
         x = np.abs(self.x)**2 - np.abs(self.y)**2
         y = 2 * np.real(self.x*np.conj(self.y))
@@ -348,4 +348,4 @@ if __name__ == '__main__':
     a.to_Stokes()
     a = JonesVector(phi=np.arange(0, 90, 5), delta=np.ones(90/5))
     a.gamma
-    #What is this doing? Especially the a.gamma line
+    # What is this doing? Especially the a.gamma line
