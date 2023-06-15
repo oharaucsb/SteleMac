@@ -159,47 +159,6 @@ def stitchData(dataList, plot=False):
             fairly straightforward to recursivly handle a list>2. Shifts the
             second data set to overlap the first elements of dataList can be
             either np.arrays or Absorbance class, where it will take the
-            proc_data itself
-    :param plot: bool whether or not you want the fit iterations to be plotted
-            (for debugging)
-    :return: a, a (2,) np.array of the shift
-    """
-
-    # Data coercsion, make sure we know what we're working wtih
-    first = dataList[0]
-    if isinstance(first, Absorbance):
-        first = first.proc_data
-        second = dataList[1]
-    if isinstance(second, Absorbance):
-        second = second.proc_data
-    if plot:
-        # Keep a reference to whatever plot is open at call-time
-        # Useful if the calling script has plots before and after, as
-        # omitting this will cause future plots to be added to figures here
-        firstFig = plt.gcf()
-        plt.figure("Stitcher")
-        # Plot the raw input data
-        plt.plot(*first.T)
-        plt.plot(*second.T)
-
-    # Algorithm is set up such that the "second" data set spans the
-    # higher domain than first. Need to enforce this, and remember it
-    # so the correct shift is applied
-    flipped = False
-    if max(first[:, 0]) > max(second[:, 0]):
-        flipped = True
-        first, second = second, first
-
-
-def stitchData(dataList, plot=False):
-    """
-    Attempt to stitch together absorbance data. Will translate the second data
-        set to minimize leastsq between the two data sets.
-    :param dataList: Iterable of the data sets to be fit. Currently
-            it only takes the first two elements of the list, but should be
-            fairly straightforward to recursivly handle a list>2. Shifts the
-            second data set to overlap the first elements of dataList can be
-            either np.arrays or Absorbance class, where it will take the
             proc_data itself.
     :param plot: bool whether or not you want the fit iterations to be plotted
             (for debugging)
