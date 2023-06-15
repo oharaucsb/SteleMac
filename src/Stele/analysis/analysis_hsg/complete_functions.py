@@ -8,6 +8,8 @@ import Stele.processing.processing_hsg.ccd_collection.high_sideband_ccd as \
 # from Stele.analysis.analysis_hsg.collection_functions import pmt_sorter
 from Stele.processing.processing_hsg.pmt_collection.high_sideband_pmt import (
     pmt_sorter)
+from Stele.analysis.full_spectrum_collection.helper_functions import (
+    stitch_hsg_dicts)
 
 np.set_printoptions(linewidth=500)
 
